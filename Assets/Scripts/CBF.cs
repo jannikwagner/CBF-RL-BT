@@ -4,9 +4,9 @@ using UnityEngine;
 
 public interface CBF<T, U>
 {
-    float evaluate(T x);
-    U gradient(T x);
-    bool isSafe(T x)
+    public float evaluate(T x);
+    public U gradient(T x);
+    public bool isSafe(T x)
     {
         return evaluate(x) >= 0;
     }

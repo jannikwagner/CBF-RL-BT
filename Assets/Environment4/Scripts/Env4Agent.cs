@@ -19,6 +19,7 @@ public class Env4Agent : Agent
     public float batteryConsumption = 1f;
     private float battery = 1f;
     public float fieldWidth = 10f;
+    public CBF3D cbf;
 
     public override void OnEpisodeBegin()
     {
@@ -30,6 +31,8 @@ public class Env4Agent : Agent
         batteryTransform.gameObject.SetActive(true);
 
         battery = Random.Range(0.5f, 1f);
+
+        cbf = new CBF3D(2f, enemyTransform.localPosition);
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -46,18 +49,42 @@ public class Env4Agent : Agent
         sensor.AddObservation(battery);
     }
 
+    public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
+    {
+        var allMasked = true;
+        for (int i = 0; i < 9; i++)
+        {
+            var actions = new ActionBuffers(new float[] { }, new int[] { i });
+            var movement = dynamics(actions);
+            var position = transform.localPosition + movement * Time.deltaTime;
+            // var mask = cbf.evaluate(position) < 0;
+            var mask = Vector3.Dot(movement, cbf.gradient(position)) < 0;
+            if (mask)
+            {
+                actionMask.SetActionEnabled(0, i, false);
+            }
+            else
+            {
+                actionMask.SetActionEnabled(0, i, true);
+                allMasked = false;
+            }
+        }
+        if (allMasked)
+        {
+            Debug.Log("All actions masked!");
+            for (int i = 0; i < 9; i++)
+            {
+                actionMask.SetActionEnabled(0, i, true);
+            }
+        }
+    }
+
     public override void OnActionReceived(ActionBuffers actions)
     {
-        var discreteActions = actions.DiscreteActions;
-        var moveXAction = discreteActions[0];
-        var moveZAction = discreteActions[1];
-        float moveX = moveXAction - 1;
-        float moveZ = moveZAction - 1;
-
-        var movement = new Vector3(moveX, 0f, moveZ);
+        Vector3 movement = dynamics(actions);
 
         // Apply the movement
-        transform.localPosition += movement * speed * Time.deltaTime;
+        transform.localPosition += movement * Time.deltaTime;
 
         AddReward(-0.5f / MaxStep);
         battery -= batteryConsumption * movement.magnitude / MaxStep;
@@ -70,16 +97,34 @@ public class Env4Agent : Agent
         }
     }
 
+    private Vector3 dynamics(ActionBuffers actions)
+    {
+        var discreteActions = actions.DiscreteActions;
+        var action = discreteActions[0];
+
+        var i = action % 3;
+        var j = action / 3;
+        var movement = new Vector3(i - 1, 0f, j - 1) * speed;
+        return movement;
+
+        // var moveXAction = discreteActions[0];
+        // var moveZAction = discreteActions[1];
+
+        // float moveX = moveXAction - 1;
+        // float moveZ = moveZAction - 1;
+
+        // var movement = new Vector3(moveX, 0f, moveZ) * speed;
+        // return movement;
+    }
+
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discreateActionsOut = actionsOut.DiscreteActions;
 
-        // var distance = targetTransform.localPosition - transform.localPosition;
-        // continuousActionsOut[0] = Mathf.Clamp(distance.x, -1f, 1f);
-        // continuousActionsOut[1] = Mathf.Clamp(distance.z, -1f, 1f);
-
-        discreateActionsOut[0] = (int)Input.GetAxisRaw("Horizontal") + 1;
-        discreateActionsOut[1] = (int)Input.GetAxisRaw("Vertical") + 1;
+        var i = (int)Input.GetAxisRaw("Horizontal") + 1;
+        var j = (int)Input.GetAxisRaw("Vertical") + 1;
+        discreateActionsOut[0] = i + 3 * j;
+        Debug.Log(discreateActionsOut[0]);
     }
 
     private void OnTriggerEnter(Collider other)
