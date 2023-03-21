@@ -1,45 +1,48 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface CBF<T, U>
+public interface ICBF<T>
 {
     public float evaluate(T x);
-    public U gradient(T x);
+    public T gradient(T x);
     public bool isSafe(T x)
     {
         return evaluate(x) >= 0;
     }
 }
 
-public class CBF2D : CBF<Vector2, Vector2>
+public class MovingBallCBF3D : ICBF<Tuple<Vector3, Vector3>>
 {
     public float radius;
-    public Vector2 center;
 
-    public CBF2D(float radius, Vector2 center)
+    public MovingBallCBF3D(float radius)
     {
         this.radius = radius;
-        this.center = center;
     }
 
-    public float evaluate(Vector2 x)
+    public float evaluate(Tuple<Vector3, Vector3> x)
     {
-        return (x - center).magnitude - radius;
+        var center = x.Item1;
+        var position = x.Item2;
+        return (position - center).magnitude - radius;
     }
 
-    public Vector2 gradient(Vector2 x)
+    public Tuple<Vector3, Vector3> gradient(Tuple<Vector3, Vector3> x)
     {
-        return (x - center).normalized;
+        var center = x.Item1;
+        var position = x.Item2;
+        return new Tuple<Vector3, Vector3>((position - center).normalized, (center - position).normalized);
     }
 }
 
-public class CBF3D : CBF<Vector3, Vector3>
+public class StaticBallCBF3D : ICBF<Vector3>
 {
     public float radius;
     public Vector3 center;
 
-    public CBF3D(float radius, Vector3 center)
+    public StaticBallCBF3D(float radius, Vector3 center)
     {
         this.radius = radius;
         this.center = center;
@@ -53,5 +56,27 @@ public class CBF3D : CBF<Vector3, Vector3>
     public Vector3 gradient(Vector3 x)
     {
         return (x - center).normalized;
+    }
+}
+
+public class WallCBF3D : ICBF<Vector3>
+{
+    public Vector3 normal;
+    public Vector3 point;
+
+    public WallCBF3D(Vector3 normal, Vector3 point)
+    {
+        this.normal = normal;
+        this.point = point;
+    }
+
+    public float evaluate(Vector3 x)
+    {
+        return Vector3.Dot(x - point, normal);
+    }
+
+    public Vector3 gradient(Vector3 x)
+    {
+        return normal;
     }
 }

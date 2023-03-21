@@ -16,10 +16,10 @@ public class Env4Agent : Agent
     [SerializeField] private Material loseMaterial;
     [SerializeField] private MeshRenderer floorMeshRenderer;
 
-    public float batteryConsumption = 1f;
+    public float batteryConsumption = 0.00f;
     private float battery = 1f;
     public float fieldWidth = 10f;
-    public CBF3D cbf;
+    public StaticBallCBF3D cbf;
 
     public override void OnEpisodeBegin()
     {
@@ -32,7 +32,7 @@ public class Env4Agent : Agent
 
         battery = Random.Range(0.5f, 1f);
 
-        cbf = new CBF3D(2f, enemyTransform.localPosition);
+        cbf = new StaticBallCBF3D(1f, enemyTransform.localPosition);
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -52,13 +52,16 @@ public class Env4Agent : Agent
     public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
     {
         var allMasked = true;
+        var currentPosition = transform.localPosition;
+        var currentEnemyPosition = enemyTransform.localPosition;
+        var x = new System.Tuple<Vector3, Vector3>(currentEnemyPosition, currentPosition);
         for (int i = 0; i < 9; i++)
         {
             var actions = new ActionBuffers(new float[] { }, new int[] { i });
             var movement = dynamics(actions);
-            var position = transform.localPosition + movement * Time.deltaTime;
+            var nextPosition = transform.localPosition + movement * Time.deltaTime;
             // var mask = cbf.evaluate(position) < 0;
-            var mask = Vector3.Dot(movement, cbf.gradient(position)) < 0;
+            var mask = Vector3.Dot(movement, cbf.gradient(x)) < -cbf.evaluate(x);
             if (mask)
             {
                 actionMask.SetActionEnabled(0, i, false);
@@ -87,7 +90,7 @@ public class Env4Agent : Agent
         transform.localPosition += movement * Time.deltaTime;
 
         AddReward(-0.5f / MaxStep);
-        battery -= batteryConsumption * movement.magnitude / MaxStep;
+        // battery -= batteryConsumption * movement.magnitude / MaxStep;
         if (battery <= 0)
         {
             AddReward(-1f);
