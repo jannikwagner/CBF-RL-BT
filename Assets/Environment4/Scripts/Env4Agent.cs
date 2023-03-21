@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
@@ -22,6 +20,10 @@ public class Env4Agent : Agent, IStateController
     public EnemyBehavior4 enemy;
     private CBFApplicator enemyCbfApplicator;
     private CBFApplicator wall1CBFApplicator;
+    private CBFApplicator wall2CBFApplicator;
+    private CBFApplicator wall3CBFApplicator;
+    private CBFApplicator wall4CBFApplicator;
+    private CBFApplicator[] cBFApplicators;
 
 
     public override void OnEpisodeBegin()
@@ -37,6 +39,10 @@ public class Env4Agent : Agent, IStateController
 
         enemyCbfApplicator = new CBFApplicator(new MovingBallCBF3D(1f), new CombinedState(this, enemy));
         wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(9f, 0f, 0f), new Vector3(1f, 0f, 0f)), this);
+        wall2CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(-9f, 0f, 0f), new Vector3(-1f, 0f, 0f)), this);
+        wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, 9f), new Vector3(0f, 0f, 1f)), this);
+        wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -9f), new Vector3(0f, 0f, -1f)), this);
+        cBFApplicators = new CBFApplicator[] { enemyCbfApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator };
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -55,28 +61,30 @@ public class Env4Agent : Agent, IStateController
 
     public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
     {
-        var allMasked = true;
-        for (int i = 0; i < 9; i++)
+        var numActions = 9;
+        bool[] actionMasked = new bool[numActions];
+        foreach (var cbfApplicator in cBFApplicators)
         {
-            var actions = new ActionBuffers(new float[] { }, new int[] { i });
-            var okay = enemyCbfApplicator.actionOkayDiscrete(actions);
-            if (!okay)
+            bool[] actionMaskedNew = new bool[numActions];
+            var allMasked = true;
+            for (int i = 0; i < numActions; i++)
             {
-                actionMask.SetActionEnabled(0, i, false);
+                var actions = new ActionBuffers(new float[] { }, new int[] { i });
+                var okay = cbfApplicator.actionOkayContinuous(actions);
+                bool mask = !okay || actionMasked[i];
+                actionMaskedNew[i] = mask;
+                allMasked = allMasked && mask;
             }
-            else
+            if (allMasked)
             {
-                actionMask.SetActionEnabled(0, i, true);
-                allMasked = false;
+                Debug.Log("All actions masked!");
+                break;
             }
+            actionMasked = actionMaskedNew;
         }
-        if (allMasked)
+        for (int i = 0; i < numActions; i++)
         {
-            Debug.Log("All actions masked!");
-            for (int i = 0; i < 9; i++)
-            {
-                actionMask.SetActionEnabled(0, i, true);
-            }
+            actionMask.SetActionEnabled(0, i, !actionMasked[i]);
         }
     }
 
