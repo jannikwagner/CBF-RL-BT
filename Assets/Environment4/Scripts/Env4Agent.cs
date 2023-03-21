@@ -5,7 +5,7 @@ using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 
-public class Env4Agent : Agent
+public class Env4Agent : Agent, IStateController
 {
     public float speed = 1f;
 
@@ -19,7 +19,10 @@ public class Env4Agent : Agent
     public float batteryConsumption = 0.00f;
     private float battery = 1f;
     public float fieldWidth = 10f;
-    public StaticBallCBF3D cbf;
+    public EnemyBehavior4 enemy;
+    private CBFApplicator enemyCbfApplicator;
+    private CBFApplicator wall1CBFApplicator;
+
 
     public override void OnEpisodeBegin()
     {
@@ -32,7 +35,8 @@ public class Env4Agent : Agent
 
         battery = Random.Range(0.5f, 1f);
 
-        cbf = new StaticBallCBF3D(1f, enemyTransform.localPosition);
+        enemyCbfApplicator = new CBFApplicator(new MovingBallCBF3D(1f), new CombinedState(this, enemy));
+        wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(9f, 0f, 0f), new Vector3(1f, 0f, 0f)), this);
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -52,17 +56,11 @@ public class Env4Agent : Agent
     public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
     {
         var allMasked = true;
-        var currentPosition = transform.localPosition;
-        var currentEnemyPosition = enemyTransform.localPosition;
-        var x = new System.Tuple<Vector3, Vector3>(currentEnemyPosition, currentPosition);
         for (int i = 0; i < 9; i++)
         {
             var actions = new ActionBuffers(new float[] { }, new int[] { i });
-            var movement = dynamics(actions);
-            var nextPosition = transform.localPosition + movement * Time.deltaTime;
-            // var mask = cbf.evaluate(position) < 0;
-            var mask = Vector3.Dot(movement, cbf.gradient(x)) < -cbf.evaluate(x);
-            if (mask)
+            var okay = enemyCbfApplicator.actionOkayDiscrete(actions);
+            if (!okay)
             {
                 actionMask.SetActionEnabled(0, i, false);
             }
@@ -84,7 +82,7 @@ public class Env4Agent : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        Vector3 movement = dynamics(actions);
+        Vector3 movement = _controlledDynamics(actions);
 
         // Apply the movement
         transform.localPosition += movement * Time.deltaTime;
@@ -100,7 +98,7 @@ public class Env4Agent : Agent
         }
     }
 
-    private Vector3 dynamics(ActionBuffers actions)
+    private Vector3 _controlledDynamics(ActionBuffers actions)
     {
         var discreteActions = actions.DiscreteActions;
         var action = discreteActions[0];
@@ -162,5 +160,15 @@ public class Env4Agent : Agent
             // batteryTransform.gameObject.SetActive(false);
             Debug.Log("Battery collected!");
         }
+    }
+
+    public float[] currentState()
+    {
+        return Utility.vec3ToArr(transform.localPosition);
+    }
+
+    public float[] ControlledDynamics(ActionBuffers action)
+    {
+        return Utility.vec3ToArr(_controlledDynamics(action));
     }
 }

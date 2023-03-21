@@ -3,17 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ICBF<T>
+public interface ICBF
 {
-    public float evaluate(T x);
-    public T gradient(T x);
-    public bool isSafe(T x)
-    {
-        return evaluate(x) >= 0;
-    }
+    public float evaluate(float[] x);
+    public float[] gradient(float[] x);
 }
 
-public class MovingBallCBF3D : ICBF<Tuple<Vector3, Vector3>>
+public class MovingBallCBF3D : ICBF
 {
     public float radius;
 
@@ -22,22 +18,23 @@ public class MovingBallCBF3D : ICBF<Tuple<Vector3, Vector3>>
         this.radius = radius;
     }
 
-    public float evaluate(Tuple<Vector3, Vector3> x)
+    public float evaluate(float[] x)
     {
-        var center = x.Item1;
-        var position = x.Item2;
+        var position = new Vector3(x[0], x[1], x[2]);
+        var center = new Vector3(x[3], x[4], x[5]);
         return (position - center).magnitude - radius;
     }
 
-    public Tuple<Vector3, Vector3> gradient(Tuple<Vector3, Vector3> x)
+    public float[] gradient(float[] x)
     {
-        var center = x.Item1;
-        var position = x.Item2;
-        return new Tuple<Vector3, Vector3>((position - center).normalized, (center - position).normalized);
+        var position = new Vector3(x[0], x[1], x[2]);
+        var center = new Vector3(x[3], x[4], x[5]);
+        var diff = (position - center).normalized;
+        return new float[] { diff.x, diff.y, diff.z, -diff.x, -diff.y, -diff.z };
     }
 }
 
-public class StaticBallCBF3D : ICBF<Vector3>
+public class StaticBallCBF3D : ICBF
 {
     public float radius;
     public Vector3 center;
@@ -48,18 +45,18 @@ public class StaticBallCBF3D : ICBF<Vector3>
         this.center = center;
     }
 
-    public float evaluate(Vector3 x)
+    public float evaluate(float[] x)
     {
-        return (x - center).magnitude - radius;
+        return (Utility.ArrToVec3(x) - center).magnitude - radius;
     }
 
-    public Vector3 gradient(Vector3 x)
+    public float[] gradient(float[] x)
     {
-        return (x - center).normalized;
+        return Utility.vec3ToArr((Utility.ArrToVec3(x) - center).normalized);
     }
 }
 
-public class WallCBF3D : ICBF<Vector3>
+public class WallCBF3D : ICBF
 {
     public Vector3 normal;
     public Vector3 point;
@@ -70,13 +67,13 @@ public class WallCBF3D : ICBF<Vector3>
         this.point = point;
     }
 
-    public float evaluate(Vector3 x)
+    public float evaluate(float[] x)
     {
-        return Vector3.Dot(x - point, normal);
+        return Vector3.Dot(Utility.ArrToVec3(x) - point, normal);
     }
 
-    public Vector3 gradient(Vector3 x)
+    public float[] gradient(float[] x)
     {
-        return normal;
+        return Utility.vec3ToArr(normal);
     }
 }
