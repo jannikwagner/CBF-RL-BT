@@ -903,7 +903,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: b4359e4a483844de49a751e664a36743, type: 3}
   m_InferenceDevice: 3
   m_BehaviorType: 0
   m_BehaviorName: Env4Behavior
@@ -964,7 +964,8 @@ MonoBehaviour:
   winMaterial: {fileID: 2100000, guid: f8bcb4a997f5a41898330fd0d658c14a, type: 2}
   loseMaterial: {fileID: 2100000, guid: 8c5d461f909334b6b86bb75303b96a24, type: 2}
   floorMeshRenderer: {fileID: 8737789753715737142}
-  batteryConsumption: 1
+  batteryConsumption: 0.01
+  battery: 1
   fieldWidth: 9
   enemy: {fileID: 611626697394130468}
 --- !u!1 &8737789753715737128

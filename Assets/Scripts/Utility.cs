@@ -60,7 +60,7 @@ public class Utility
         return result;
     }
 
-    internal static float[] Mult(float[] floats, float factor)
+    public static float[] Mult(float[] floats, float factor)
     {
         var result = new float[floats.Length];
         for (int i = 0; i < floats.Length; i++)
@@ -69,4 +69,15 @@ public class Utility
         }
         return result;
     }
+
+    public static String arrToStr(float[] arr)
+    {
+        var str = "";
+        foreach (var element in arr)
+        {
+            str += element + ", ";
+        }
+        return str;
+    }
+
 }

@@ -15,11 +15,13 @@ public class CBFApplicator
 {
     public ICBF cbf;
     public IControlledDynamics controlledState;
+    public bool debug;
 
-    public CBFApplicator(ICBF cbf, IControlledDynamics controlledState)
+    public CBFApplicator(ICBF cbf, IControlledDynamics controlledState, bool debug = false)
     {
         this.cbf = cbf;
         this.controlledState = controlledState;
+        this.debug = debug;
     }
 
     public bool isSafe()
@@ -44,11 +46,15 @@ public class CBFApplicator
 
     public bool actionOkayContinuous(ActionBuffers action, float steps = 1f)
     {
+        var x = controlledState.currentState();
+        var gradient = cbf.gradient(x);
         var dynamics = controlledState.ControlledDynamics(action);
-        // Debug.Log("dynamics: " + Utility.ArrToVec3(dynamics));
-        float left = Utility.Dot(dynamics, cbf.gradient(controlledState.currentState())) * Time.deltaTime * steps;
-        float right = -cbf.evaluate(controlledState.currentState());
-        // Debug.Log("left: " + left + ", right: " + right);
+        if (debug) Debug.Log("dynamics: " + Utility.arrToStr(dynamics));
+        if (debug) Debug.Log("gradient: " + Utility.arrToStr(gradient));
+        if (debug) Debug.Log("State: " + Utility.arrToStr(x));
+        float left = Utility.Dot(dynamics, gradient) * Time.deltaTime * steps;
+        float right = -cbf.evaluate(x);
+        if (debug) Debug.Log("left: " + left + ", right: " + right);
         return left >= right;
     }
 

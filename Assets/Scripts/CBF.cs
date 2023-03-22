@@ -78,3 +78,32 @@ public class WallCBF3D : ICBF
         return Utility.vec3ToArr(normal);
     }
 }
+
+public class StaticBatteryMarginCBF : ICBF
+{
+    public float margin;
+    public Vector3 center;
+    public float batteryConsumption;
+
+    public StaticBatteryMarginCBF(Vector3 center, float margin, float batteryConsumption)
+    {
+        this.center = center;
+        this.margin = margin;
+        this.batteryConsumption = batteryConsumption;
+    }
+
+    public float evaluate(float[] x)
+    {
+        var position = new Vector3(x[0], x[1], x[2]);
+        var battery = x[3];
+        return battery - ((position - center).magnitude - margin) * batteryConsumption;
+    }
+
+    public float[] gradient(float[] x)
+    {
+        var position = new Vector3(x[0], x[1], x[2]);
+        var battery = x[3];
+        var diff = (position - center).normalized;
+        return new float[] { diff.x, diff.y, diff.z, 1f };
+    }
+}

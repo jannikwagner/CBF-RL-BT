@@ -15,7 +15,7 @@ public class Env4Agent : Agent
     [SerializeField] private MeshRenderer floorMeshRenderer;
 
     public float batteryConsumption = 0.00f;
-    private float battery = 1f;
+    public float battery = 1f;
     public float fieldWidth = 9f;
     public EnemyBehavior4 enemy;
     private CBFApplicator enemyCBFApplicator;
@@ -24,6 +24,7 @@ public class Env4Agent : Agent
     private CBFApplicator wall2CBFApplicator;
     private CBFApplicator wall3CBFApplicator;
     private CBFApplicator wall4CBFApplicator;
+    private CBFApplicator batteryCBFApplicator;
     private CBFApplicator[] cbfApplicators;
     private DecisionRequester decisionRequester;
 
@@ -47,7 +48,9 @@ public class Env4Agent : Agent
         wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), movementDynamics);
         wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), movementDynamics);
         enemyCBFApplicatorWide = new CBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy));
-        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, enemyCBFApplicatorWide };
+        batteryCBFApplicator = new CBFApplicator(new StaticBatteryMarginCBF(batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics, true);
+        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, batteryCBFApplicator, enemyCBFApplicatorWide };
+        // cbfApplicators = new CBFApplicator[] { };
         decisionRequester = GetComponent<DecisionRequester>();
     }
 
@@ -119,7 +122,7 @@ public class Env4Agent : Agent
 
     private float getBatteryChange(Vector3 movement)
     {
-        return batteryConsumption * movement.magnitude / MaxStep * 5;
+        return batteryConsumption * movement.magnitude;
     }
 
     private Vector3 getMovement(ActionBuffers actions)
@@ -149,7 +152,7 @@ public class Env4Agent : Agent
         var i = (int)Input.GetAxisRaw("Horizontal") + 1;
         var j = (int)Input.GetAxisRaw("Vertical") + 1;
         discreateActionsOut[0] = i + 3 * j;
-        Debug.Log(discreateActionsOut[0]);
+        // Debug.Log(discreateActionsOut[0]);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -157,7 +160,6 @@ public class Env4Agent : Agent
         if (other.gameObject.CompareTag("Target"))
         {
             AddReward(1.0f);
-            Debug.Log("Target reached!");
             Debug.Log("Reward: " + GetCumulativeReward() + " | Battery: " + battery + " | Target reached!");
             floorMeshRenderer.material = winMaterial;
             EndEpisode();
