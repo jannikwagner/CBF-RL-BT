@@ -58,17 +58,18 @@ public class StaticBallCBF3D : ICBF
 
 public class WallCBF3D : ICBF
 {
-    public Vector3 normal;
     public Vector3 point;
+    public Vector3 normal;
 
-    public WallCBF3D(Vector3 normal, Vector3 point)
+    public WallCBF3D(Vector3 point, Vector3 normal)
     {
-        this.normal = normal;
         this.point = point;
+        this.normal = normal;
     }
 
     public float evaluate(float[] x)
     {
+        // Debug.Log("x: " + Utility.ArrToVec3(x) + ", point: " + point.ToString() + ", normal: " + normal.ToString());
         return Vector3.Dot(Utility.ArrToVec3(x) - point, normal);
     }
 

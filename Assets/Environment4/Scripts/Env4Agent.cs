@@ -16,14 +16,15 @@ public class Env4Agent : Agent, IStateController
 
     public float batteryConsumption = 0.00f;
     private float battery = 1f;
-    public float fieldWidth = 10f;
+    public float fieldWidth = 9f;
     public EnemyBehavior4 enemy;
-    private CBFApplicator enemyCbfApplicator;
+    private CBFApplicator enemyCBFApplicator;
     private CBFApplicator wall1CBFApplicator;
     private CBFApplicator wall2CBFApplicator;
     private CBFApplicator wall3CBFApplicator;
     private CBFApplicator wall4CBFApplicator;
-    private CBFApplicator[] cBFApplicators;
+    private CBFApplicator[] cbfApplicators;
+    private DecisionRequester decisionRequester;
 
 
     public override void OnEpisodeBegin()
@@ -37,12 +38,13 @@ public class Env4Agent : Agent, IStateController
 
         battery = Random.Range(0.5f, 1f);
 
-        enemyCbfApplicator = new CBFApplicator(new MovingBallCBF3D(1f), new CombinedState(this, enemy));
-        wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(9f, 0f, 0f), new Vector3(1f, 0f, 0f)), this);
-        wall2CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(-9f, 0f, 0f), new Vector3(-1f, 0f, 0f)), this);
-        wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, 9f), new Vector3(0f, 0f, 1f)), this);
-        wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -9f), new Vector3(0f, 0f, -1f)), this);
-        cBFApplicators = new CBFApplicator[] { enemyCbfApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator };
+        enemyCBFApplicator = new CBFApplicator(new MovingBallCBF3D(1.5f), new CombinedState(this, enemy));
+        wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f)), this);
+        wall2CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(-fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f)), this);
+        wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), this);
+        wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), this);
+        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator };
+        decisionRequester = GetComponent<DecisionRequester>();
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -63,21 +65,24 @@ public class Env4Agent : Agent, IStateController
     {
         var numActions = 9;
         bool[] actionMasked = new bool[numActions];
-        foreach (var cbfApplicator in cBFApplicators)
+        foreach (var cbfApplicator in cbfApplicators)
         {
+            // Debug.Log("CBF: " + cbfApplicator.cbf);
+            // Debug.Log(cbfApplicator.evluate());
             bool[] actionMaskedNew = new bool[numActions];
             var allMasked = true;
             for (int i = 0; i < numActions; i++)
             {
+                // Debug.Log("Action: " + i);
                 var actions = new ActionBuffers(new float[] { }, new int[] { i });
-                var okay = cbfApplicator.actionOkayContinuous(actions);
+                var okay = cbfApplicator.actionOkayContinuous(actions, decisionRequester.DecisionPeriod);
                 bool mask = !okay || actionMasked[i];
                 actionMaskedNew[i] = mask;
                 allMasked = allMasked && mask;
             }
             if (allMasked)
             {
-                Debug.Log("All actions masked!");
+                Debug.Log("All actions masked! CBF: " + cbfApplicator.cbf);
                 break;
             }
             actionMasked = actionMaskedNew;
@@ -86,6 +91,8 @@ public class Env4Agent : Agent, IStateController
         {
             actionMask.SetActionEnabled(0, i, !actionMasked[i]);
         }
+        // Debug.Log("Local position: " + transform.localPosition);
+        // Debug.Log("State: " + Utility.ArrToVec3(this.currentState()));
     }
 
     public override void OnActionReceived(ActionBuffers actions)

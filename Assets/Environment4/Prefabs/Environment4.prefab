@@ -244,7 +244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a91b5e5d6cfc4efd9a5c981e983cb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0
+  speed: 1
   playerTransform: {fileID: 8737789753651330960}
 --- !u!1 &8737789751903642483
 GameObject:
@@ -965,7 +965,7 @@ MonoBehaviour:
   loseMaterial: {fileID: 2100000, guid: 8c5d461f909334b6b86bb75303b96a24, type: 2}
   floorMeshRenderer: {fileID: 8737789753715737142}
   batteryConsumption: 1
-  fieldWidth: 10
+  fieldWidth: 9
   enemy: {fileID: 611626697394130468}
 --- !u!1 &8737789753715737128
 GameObject:
