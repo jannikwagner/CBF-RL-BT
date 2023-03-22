@@ -14,9 +14,9 @@ using Unity.MLAgents.Actuators;
 public class CBFApplicator
 {
     public ICBF cbf;
-    public IStateController controlledState;
+    public IControlledDynamics controlledState;
 
-    public CBFApplicator(ICBF cbf, IStateController controlledState)
+    public CBFApplicator(ICBF cbf, IControlledDynamics controlledState)
     {
         this.cbf = cbf;
         this.controlledState = controlledState;

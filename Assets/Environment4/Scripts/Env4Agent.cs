@@ -3,7 +3,7 @@ using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 
-public class Env4Agent : Agent, IStateController
+public class Env4Agent : Agent
 {
     public float speed = 1f;
 
@@ -19,6 +19,7 @@ public class Env4Agent : Agent, IStateController
     public float fieldWidth = 9f;
     public EnemyBehavior4 enemy;
     private CBFApplicator enemyCBFApplicator;
+    private CBFApplicator enemyCBFApplicatorWide;
     private CBFApplicator wall1CBFApplicator;
     private CBFApplicator wall2CBFApplicator;
     private CBFApplicator wall3CBFApplicator;
@@ -38,12 +39,15 @@ public class Env4Agent : Agent, IStateController
 
         battery = Random.Range(0.5f, 1f);
 
-        enemyCBFApplicator = new CBFApplicator(new MovingBallCBF3D(1.5f), new CombinedState(this, enemy));
-        wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f)), this);
-        wall2CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(-fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f)), this);
-        wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), this);
-        wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), this);
-        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator };
+        var movementDynamics = new MovementDynamics(this);
+        var batteryDynamics = new BatteryDynamics(this);
+        enemyCBFApplicator = new CBFApplicator(new MovingBallCBF3D(1.5f), new CombinedDynamics(movementDynamics, enemy));
+        wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f)), movementDynamics);
+        wall2CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(-fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f)), movementDynamics);
+        wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), movementDynamics);
+        wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), movementDynamics);
+        enemyCBFApplicatorWide = new CBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy));
+        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, enemyCBFApplicatorWide };
         decisionRequester = GetComponent<DecisionRequester>();
     }
 
@@ -97,13 +101,13 @@ public class Env4Agent : Agent, IStateController
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        Vector3 movement = _controlledDynamics(actions);
+        Vector3 movement = getMovement(actions);
 
         // Apply the movement
         transform.localPosition += movement * Time.deltaTime;
 
         AddReward(-0.5f / MaxStep);
-        // battery -= batteryConsumption * movement.magnitude / MaxStep;
+        battery -= getBatteryChange(movement) * Time.deltaTime;
         if (battery <= 0)
         {
             AddReward(-1f);
@@ -113,7 +117,12 @@ public class Env4Agent : Agent, IStateController
         }
     }
 
-    private Vector3 _controlledDynamics(ActionBuffers actions)
+    private float getBatteryChange(Vector3 movement)
+    {
+        return batteryConsumption * movement.magnitude / MaxStep * 5;
+    }
+
+    private Vector3 getMovement(ActionBuffers actions)
     {
         var discreteActions = actions.DiscreteActions;
         var action = discreteActions[0];
@@ -177,13 +186,43 @@ public class Env4Agent : Agent, IStateController
         }
     }
 
-    public float[] currentState()
+    public class MovementDynamics : IControlledDynamics
     {
-        return Utility.vec3ToArr(transform.localPosition);
+        private Env4Agent agent;
+        public MovementDynamics(Env4Agent agent)
+        {
+            this.agent = agent;
+        }
+
+        public float[] ControlledDynamics(ActionBuffers action)
+        {
+            return Utility.vec3ToArr(agent.getMovement(action));
+        }
+
+        public float[] currentState()
+        {
+            return Utility.vec3ToArr(agent.transform.localPosition);
+        }
     }
 
-    public float[] ControlledDynamics(ActionBuffers action)
+    public class BatteryDynamics : IControlledDynamics
     {
-        return Utility.vec3ToArr(_controlledDynamics(action));
+        private Env4Agent agent;
+        public BatteryDynamics(Env4Agent agent)
+        {
+            this.agent = agent;
+        }
+
+        public float[] ControlledDynamics(ActionBuffers action)
+        {
+            var movement = agent.getMovement(action);
+            var batteryChange = agent.getBatteryChange(movement);
+            return Utility.combineArrs(Utility.vec3ToArr(movement), new float[] { batteryChange });
+        }
+
+        public float[] currentState()
+        {
+            return Utility.combineArrs(Utility.vec3ToArr(agent.transform.localPosition), new float[] { agent.battery });
+        }
     }
 }

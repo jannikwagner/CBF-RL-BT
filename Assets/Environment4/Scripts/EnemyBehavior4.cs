@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-public class EnemyBehavior4 : MonoBehaviour, IStateProvider
+public class EnemyBehavior4 : MonoBehaviour, IDynamics
 {
     public float speed = 1f;
 

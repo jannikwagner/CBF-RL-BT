@@ -5,24 +5,24 @@ using UnityEngine;
 using Unity.MLAgents.Actuators;
 
 
-public interface IStateProvider
+public interface IDynamics
 {
     public float[] currentState();
     public float[] Dynamics();
 }
 
-public interface IStateController
+public interface IControlledDynamics
 {
     public float[] currentState();
     public float[] ControlledDynamics(ActionBuffers action);
 }
 
-public class CombinedState : IStateController
+public class CombinedDynamics : IControlledDynamics
 {
-    public IStateController controlledState;
-    public IStateProvider state;
+    public IControlledDynamics controlledState;
+    public IDynamics state;
 
-    public CombinedState(IStateController controlledState, IStateProvider state)
+    public CombinedDynamics(IControlledDynamics controlledState, IDynamics state)
     {
         this.controlledState = controlledState;
         this.state = state;
