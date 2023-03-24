@@ -244,7 +244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a91b5e5d6cfc4efd9a5c981e983cb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
+  speed: 0
   playerTransform: {fileID: 8737789753651330960}
 --- !u!1 &8737789751903642483
 GameObject:
@@ -898,12 +898,12 @@ MonoBehaviour:
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
-      BranchSizes: 09000000
-    VectorActionSize: 09000000
+      BranchSizes: 19000000
+    VectorActionSize: 19000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: b4359e4a483844de49a751e664a36743, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: abb938202e98840ce9fc891ca72c3256, type: 3}
   m_InferenceDevice: 3
   m_BehaviorType: 0
   m_BehaviorName: Env4Behavior
@@ -968,6 +968,8 @@ MonoBehaviour:
   battery: 1
   fieldWidth: 9
   enemy: {fileID: 611626697394130468}
+  useCBF: 1
+  numActions: 25
 --- !u!1 &8737789753715737128
 GameObject:
   m_ObjectHideFlags: 0

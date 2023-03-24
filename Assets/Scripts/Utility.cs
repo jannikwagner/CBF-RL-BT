@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Utility
 {
@@ -72,12 +73,44 @@ public class Utility
 
     public static String arrToStr(float[] arr)
     {
-        var str = "";
+        var str = "[";
         foreach (var element in arr)
         {
             str += element + ", ";
         }
+        str += "]";
         return str;
+    }
+
+    public static Vector3 SamplePosition(float xMin,
+                                  float xMax,
+                                  float zMin,
+                                  float zMax,
+                                  float yMin,
+                                  float yMax,
+                                  float minDistance,
+                                  Vector3[] positionsToAvoid)
+    {
+        Vector3 samplePosition;
+        while (true)
+        {
+            samplePosition = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), Random.Range(zMin, zMax));
+
+            var anyTooClose = false;
+            foreach (var positionToAvoid in positionsToAvoid)
+            {
+                if ((samplePosition - positionToAvoid).magnitude < minDistance)
+                {
+                    anyTooClose = true;
+                    break;
+                }
+            }
+            if (!anyTooClose)
+            {
+                break;
+            }
+        }
+        return samplePosition;
     }
 
 }

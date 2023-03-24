@@ -103,7 +103,7 @@ public class StaticBatteryMarginCBF : ICBF
     {
         var position = new Vector3(x[0], x[1], x[2]);
         var battery = x[3];
-        var diff = (position - center).normalized;
+        var diff = -(position - center).normalized * batteryConsumption;
         return new float[] { diff.x, diff.y, diff.z, 1f };
     }
 }

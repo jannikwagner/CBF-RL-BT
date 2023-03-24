@@ -27,18 +27,27 @@ public class Env4Agent : Agent
     private CBFApplicator batteryCBFApplicator;
     private CBFApplicator[] cbfApplicators;
     private DecisionRequester decisionRequester;
+    public bool useCBF = true;
+    public int numActions = 25;
 
 
     public override void OnEpisodeBegin()
     {
         // Reset the positions
-        transform.localPosition = new Vector3(Random.Range(-5f, 5f), 0f, Random.Range(-5f, 5f));
-        targetTransform.localPosition = new Vector3(Random.Range(-5f, 5f), 0f, Random.Range(-5f, 5f));
-        enemyTransform.localPosition = new Vector3(Random.Range(-5f, 5f), 0f, Random.Range(-5f, 5f));
-        batteryTransform.localPosition = new Vector3(Random.Range(-5f, 5f), 0f, Random.Range(-5f, 5f));
+        var xMin = -fieldWidth + 1f;
+        var xMax = fieldWidth - 1f;
+        var zMin = -fieldWidth + 1f;
+        var zMax = fieldWidth - 1f;
+        var yMin = 0f;
+        var yMax = 0f;
+        var minDistance = 1.1f;
+        transform.localPosition = Utility.SamplePosition(xMin, xMax, zMin, zMax, yMin, yMax, minDistance, new Vector3[] { });
+        targetTransform.localPosition = Utility.SamplePosition(xMin, xMax, zMin, zMax, yMin, yMax, minDistance, new Vector3[] { transform.localPosition });
+        enemyTransform.localPosition = Utility.SamplePosition(xMin, xMax, zMin, zMax, yMin, yMax, minDistance, new Vector3[] { transform.localPosition, targetTransform.localPosition });
+        batteryTransform.localPosition = Utility.SamplePosition(xMin, xMax, zMin, zMax, yMin, yMax, minDistance, new Vector3[] { transform.localPosition, targetTransform.localPosition, enemyTransform.localPosition });
         batteryTransform.gameObject.SetActive(true);
 
-        battery = Random.Range(0.5f, 1f);
+        battery = Random.Range(0.1f, 1f);
 
         var movementDynamics = new MovementDynamics(this);
         var batteryDynamics = new BatteryDynamics(this);
@@ -48,8 +57,8 @@ public class Env4Agent : Agent
         wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), movementDynamics);
         wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), movementDynamics);
         enemyCBFApplicatorWide = new CBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy));
-        batteryCBFApplicator = new CBFApplicator(new StaticBatteryMarginCBF(batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics, true);
-        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, batteryCBFApplicator, enemyCBFApplicatorWide };
+        batteryCBFApplicator = new CBFApplicator(new StaticBatteryMarginCBF(batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics);
+        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, batteryCBFApplicator, };
         // cbfApplicators = new CBFApplicator[] { };
         decisionRequester = GetComponent<DecisionRequester>();
     }
@@ -57,20 +66,25 @@ public class Env4Agent : Agent
     public override void CollectObservations(VectorSensor sensor)
     {
         var factor = 1f;
-        sensor.AddObservation(transform.localPosition.x / factor);
-        sensor.AddObservation(transform.localPosition.z / factor);
-        sensor.AddObservation(targetTransform.localPosition.x / factor);
-        sensor.AddObservation(targetTransform.localPosition.z / factor);
-        sensor.AddObservation(enemyTransform.localPosition.x / factor);
-        sensor.AddObservation(enemyTransform.localPosition.z / factor);
-        sensor.AddObservation(batteryTransform.localPosition.x / factor);
-        sensor.AddObservation(batteryTransform.localPosition.z / factor);
+        Vector3 localPosition = transform.localPosition;
+        Vector3 targetPos = targetTransform.localPosition - localPosition;
+        Vector3 enemyPos = enemyTransform.localPosition - localPosition;
+        Vector3 batteryPos = batteryTransform.localPosition - localPosition;
+        sensor.AddObservation(localPosition.x);
+        sensor.AddObservation(localPosition.z);
+        sensor.AddObservation(targetPos.x);
+        sensor.AddObservation(targetPos.z);
+        sensor.AddObservation(enemyPos.x);
+        sensor.AddObservation(enemyPos.z);
+        sensor.AddObservation(batteryPos.x);
+        sensor.AddObservation(batteryPos.z);
         sensor.AddObservation(battery);
     }
 
     public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
     {
-        var numActions = 9;
+        if (!useCBF) return;
+
         bool[] actionMasked = new bool[numActions];
         foreach (var cbfApplicator in cbfApplicators)
         {
@@ -80,7 +94,7 @@ public class Env4Agent : Agent
             var allMasked = true;
             for (int i = 0; i < numActions; i++)
             {
-                // Debug.Log("Action: " + i);
+                if (cbfApplicator.debug) Debug.Log("Action: " + i);
                 var actions = new ActionBuffers(new float[] { }, new int[] { i });
                 var okay = cbfApplicator.actionOkayContinuous(actions, decisionRequester.DecisionPeriod);
                 bool mask = !okay || actionMasked[i];
@@ -89,7 +103,7 @@ public class Env4Agent : Agent
             }
             if (allMasked)
             {
-                Debug.Log("All actions masked! CBF: " + cbfApplicator.cbf);
+                if (cbfApplicator.debug) Debug.Log("All actions masked! CBF: " + cbfApplicator.cbf);
                 break;
             }
             actionMasked = actionMaskedNew;
@@ -109,12 +123,19 @@ public class Env4Agent : Agent
         // Apply the movement
         transform.localPosition += movement * Time.deltaTime;
 
-        AddReward(-0.5f / MaxStep);
+        // AddReward(-0.5f / MaxStep);
         battery -= getBatteryChange(movement) * Time.deltaTime;
         if (battery <= 0)
         {
             AddReward(-1f);
             Debug.Log("Reward: " + GetCumulativeReward() + " | Battery empty!");
+            floorMeshRenderer.material = loseMaterial;
+            EndEpisode();
+        }
+        if (StepCount >= MaxStep - 1)
+        {
+            AddReward(-1f);
+            Debug.Log("Reward: " + GetCumulativeReward() + " | Max steps reached!");
             floorMeshRenderer.material = loseMaterial;
             EndEpisode();
         }
@@ -130,9 +151,9 @@ public class Env4Agent : Agent
         var discreteActions = actions.DiscreteActions;
         var action = discreteActions[0];
 
-        var i = action % 3;
-        var j = action / 3;
-        var movement = new Vector3(i - 1, 0f, j - 1) * speed;
+        var i = action % 5;
+        var j = action / 5;
+        var movement = new Vector3(i - 2, 0f, j - 2) * speed / 2.0f;
         return movement;
 
         // var moveXAction = discreteActions[0];
@@ -149,9 +170,9 @@ public class Env4Agent : Agent
     {
         var discreateActionsOut = actionsOut.DiscreteActions;
 
-        var i = (int)Input.GetAxisRaw("Horizontal") + 1;
-        var j = (int)Input.GetAxisRaw("Vertical") + 1;
-        discreateActionsOut[0] = i + 3 * j;
+        var i = 2 * (int)Input.GetAxisRaw("Horizontal") + 2;
+        var j = 2 * (int)Input.GetAxisRaw("Vertical") + 2;
+        discreateActionsOut[0] = i + 5 * j;
         // Debug.Log(discreateActionsOut[0]);
     }
 
