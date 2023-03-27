@@ -48,6 +48,7 @@ public class Env4Agent : Agent
         batteryTransform.gameObject.SetActive(true);
 
         battery = Random.Range(0.1f, 1f);
+        enemy.speed = Random.Range(0f, 2f);
 
         var movementDynamics = new MovementDynamics(this);
         var batteryDynamics = new BatteryDynamics(this);
@@ -65,11 +66,11 @@ public class Env4Agent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        var factor = 1f;
-        Vector3 localPosition = transform.localPosition;
-        Vector3 targetPos = targetTransform.localPosition - localPosition;
-        Vector3 enemyPos = enemyTransform.localPosition - localPosition;
-        Vector3 batteryPos = batteryTransform.localPosition - localPosition;
+        var factor = 2f / fieldWidth;
+        Vector3 localPosition = transform.localPosition * 2 * factor;
+        Vector3 targetPos = (targetTransform.localPosition - localPosition) * factor;
+        Vector3 enemyPos = (enemyTransform.localPosition - localPosition) * factor;
+        Vector3 batteryPos = (batteryTransform.localPosition - localPosition) * factor;
         sensor.AddObservation(localPosition.x);
         sensor.AddObservation(localPosition.z);
         sensor.AddObservation(targetPos.x);
@@ -201,11 +202,11 @@ public class Env4Agent : Agent
         }
         else if (other.gameObject.CompareTag("Battery"))
         {
-            battery = 1f;
             AddReward(0.1f);
+            Debug.Log("Battery collected with Battery: " + battery);
+            battery = 1f;
             batteryTransform.localPosition = new Vector3(Random.Range(-5f, 5f), 0f, Random.Range(-5f, 5f));
             // batteryTransform.gameObject.SetActive(false);
-            Debug.Log("Battery collected!");
         }
     }
 

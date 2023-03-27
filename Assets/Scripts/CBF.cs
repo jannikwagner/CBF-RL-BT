@@ -96,7 +96,7 @@ public class StaticBatteryMarginCBF : ICBF
     {
         var position = new Vector3(x[0], x[1], x[2]);
         var battery = x[3];
-        return battery - ((position - center).magnitude - margin) * batteryConsumption;
+        return battery - ((position - center).magnitude + margin) * batteryConsumption;
     }
 
     public float[] gradient(float[] x)
