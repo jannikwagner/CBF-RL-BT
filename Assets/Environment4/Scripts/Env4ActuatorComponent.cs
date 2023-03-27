@@ -22,10 +22,11 @@ public class Env4Actuator : IActuator
 
     public void Heuristic(in ActionBuffers actionsOut)
     {
+        int factor = Input.GetKey(KeyCode.Space) ? 2 : 1;
         var discreateActionsOut = actionsOut.DiscreteActions;
 
-        var i = 2 * (int)Input.GetAxisRaw("Horizontal") + 2;
-        var j = 2 * (int)Input.GetAxisRaw("Vertical") + 2;
+        var i = factor * (int)Input.GetAxisRaw("Horizontal") + 2;
+        var j = factor * (int)Input.GetAxisRaw("Vertical") + 2;
         discreateActionsOut[0] = i + 5 * j;
         // Debug.Log(discreateActionsOut[0]);
     }
@@ -43,7 +44,7 @@ public class Env4Actuator : IActuator
 
     public void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
     {
-        var numActions = ActionSpec.NumDiscreteActions;
+        var numActions = ActionSpec.BranchSizes[0];
         if (!agent.useCBF) return;
 
         bool[] actionMasked = new bool[numActions];

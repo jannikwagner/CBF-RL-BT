@@ -899,14 +899,14 @@ MonoBehaviour:
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
-      BranchSizes: 19000000
-    VectorActionSize: 19000000
+      BranchSizes: 
+    VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: ccab90c171817472dbf039170635ee65, type: 3}
   m_InferenceDevice: 3
-  m_BehaviorType: 2
+  m_BehaviorType: 0
   m_BehaviorName: Env4Behavior
   TeamId: 0
   m_UseChildSensors: 1
@@ -971,8 +971,6 @@ MonoBehaviour:
   enemy: {fileID: 611626697394130468}
   decisionRequester: {fileID: 8737789753651330975}
   useCBF: 1
-  numActions: 25
-  actuatorComponent: {fileID: 0}
 --- !u!114 &1519101609706873163
 MonoBehaviour:
   m_ObjectHideFlags: 0
