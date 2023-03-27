@@ -796,6 +796,7 @@ GameObject:
   - component: {fileID: 8737789753651330975}
   - component: {fileID: 8737789753651330974}
   - component: {fileID: 8747426257990194615}
+  - component: {fileID: 1519101609706873163}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -968,8 +969,23 @@ MonoBehaviour:
   battery: 1
   fieldWidth: 9
   enemy: {fileID: 611626697394130468}
+  decisionRequester: {fileID: 8737789753651330975}
   useCBF: 1
   numActions: 25
+  actuatorComponent: {fileID: 0}
+--- !u!114 &1519101609706873163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8737789753651330966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a6356296614641f1899176ca87209cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 8747426257990194615}
 --- !u!1 &8737789753715737128
 GameObject:
   m_ObjectHideFlags: 0

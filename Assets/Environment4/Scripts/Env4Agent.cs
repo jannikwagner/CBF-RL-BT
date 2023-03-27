@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
+using System.Collections.Generic;
 
 public class Env4Agent : Agent
 {
@@ -25,10 +26,25 @@ public class Env4Agent : Agent
     private CBFApplicator wall3CBFApplicator;
     private CBFApplicator wall4CBFApplicator;
     private CBFApplicator batteryCBFApplicator;
-    private CBFApplicator[] cbfApplicators;
-    private DecisionRequester decisionRequester;
+    public CBFApplicator[] cbfApplicators;
+    public DecisionRequester decisionRequester;
     public bool useCBF = true;
-    public int numActions = 25;
+
+    public void Start()
+    {
+        var movementDynamics = new MovementDynamics(this);
+        var batteryDynamics = new BatteryDynamics(this);
+        enemyCBFApplicator = new CBFApplicator(new MovingBallCBF3D(1.5f), new CombinedDynamics(movementDynamics, enemy));
+        wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f)), movementDynamics);
+        wall2CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(-fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f)), movementDynamics);
+        wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), movementDynamics);
+        wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), movementDynamics);
+        enemyCBFApplicatorWide = new CBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy));
+        batteryCBFApplicator = new CBFApplicator(new StaticBatteryMarginCBF(batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics);
+        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, batteryCBFApplicator, };
+        // cbfApplicators = new CBFApplicator[] { };
+        decisionRequester = GetComponent<DecisionRequester>();
+    }
 
 
     public override void OnEpisodeBegin()
@@ -50,18 +66,7 @@ public class Env4Agent : Agent
         battery = Random.Range(0.1f, 1f);
         enemy.speed = Random.Range(0f, 2f);
 
-        var movementDynamics = new MovementDynamics(this);
-        var batteryDynamics = new BatteryDynamics(this);
-        enemyCBFApplicator = new CBFApplicator(new MovingBallCBF3D(1.5f), new CombinedDynamics(movementDynamics, enemy));
-        wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f)), movementDynamics);
-        wall2CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(-fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f)), movementDynamics);
-        wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), movementDynamics);
-        wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), movementDynamics);
-        enemyCBFApplicatorWide = new CBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy));
-        batteryCBFApplicator = new CBFApplicator(new StaticBatteryMarginCBF(batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics);
-        cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, batteryCBFApplicator, };
-        // cbfApplicators = new CBFApplicator[] { };
-        decisionRequester = GetComponent<DecisionRequester>();
+
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -82,46 +87,8 @@ public class Env4Agent : Agent
         sensor.AddObservation(battery);
     }
 
-    public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
+    public void Move(Vector3 movement)
     {
-        if (!useCBF) return;
-
-        bool[] actionMasked = new bool[numActions];
-        foreach (var cbfApplicator in cbfApplicators)
-        {
-            // Debug.Log("CBF: " + cbfApplicator.cbf);
-            // Debug.Log(cbfApplicator.evluate());
-            bool[] actionMaskedNew = new bool[numActions];
-            var allMasked = true;
-            for (int i = 0; i < numActions; i++)
-            {
-                if (cbfApplicator.debug) Debug.Log("Action: " + i);
-                var actions = new ActionBuffers(new float[] { }, new int[] { i });
-                var okay = cbfApplicator.actionOkayContinuous(actions, decisionRequester.DecisionPeriod);
-                bool mask = !okay || actionMasked[i];
-                actionMaskedNew[i] = mask;
-                allMasked = allMasked && mask;
-            }
-            if (allMasked)
-            {
-                if (cbfApplicator.debug) Debug.Log("All actions masked! CBF: " + cbfApplicator.cbf);
-                break;
-            }
-            actionMasked = actionMaskedNew;
-        }
-        for (int i = 0; i < numActions; i++)
-        {
-            actionMask.SetActionEnabled(0, i, !actionMasked[i]);
-        }
-        // Debug.Log("Local position: " + transform.localPosition);
-        // Debug.Log("State: " + Utility.ArrToVec3(this.currentState()));
-    }
-
-    public override void OnActionReceived(ActionBuffers actions)
-    {
-        Vector3 movement = getMovement(actions);
-
-        // Apply the movement
         transform.localPosition += movement * Time.deltaTime;
 
         // AddReward(-0.5f / MaxStep);
@@ -141,13 +108,12 @@ public class Env4Agent : Agent
             EndEpisode();
         }
     }
-
     private float getBatteryChange(Vector3 movement)
     {
         return batteryConsumption * movement.magnitude;
     }
 
-    private Vector3 getMovement(ActionBuffers actions)
+    public Vector3 getMovement(ActionBuffers actions)
     {
         var discreteActions = actions.DiscreteActions;
         var action = discreteActions[0];
@@ -165,16 +131,6 @@ public class Env4Agent : Agent
 
         // var movement = new Vector3(moveX, 0f, moveZ) * speed;
         // return movement;
-    }
-
-    public override void Heuristic(in ActionBuffers actionsOut)
-    {
-        var discreateActionsOut = actionsOut.DiscreteActions;
-
-        var i = 2 * (int)Input.GetAxisRaw("Horizontal") + 2;
-        var j = 2 * (int)Input.GetAxisRaw("Vertical") + 2;
-        discreateActionsOut[0] = i + 5 * j;
-        // Debug.Log(discreateActionsOut[0]);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -249,4 +205,5 @@ public class Env4Agent : Agent
             return Utility.combineArrs(Utility.vec3ToArr(agent.transform.localPosition), new float[] { agent.battery });
         }
     }
+
 }
