@@ -58,7 +58,7 @@ public class Env4Actuator : IActuator
             {
                 if (cbfApplicator.debug) Debug.Log("Action: " + i);
                 var actions = new ActionBuffers(new float[] { }, new int[] { i });
-                var okay = cbfApplicator.actionOkayContinuous(actions, agent.decisionRequester.DecisionPeriod);
+                var okay = cbfApplicator.isActionValid(actions);
                 bool mask = !okay || actionMasked[i];
                 actionMaskedNew[i] = mask;
                 allMasked = allMasked && mask;

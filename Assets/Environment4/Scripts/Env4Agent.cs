@@ -3,6 +3,8 @@ using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 using System.Collections.Generic;
+using System;
+using Random = UnityEngine.Random;
 
 public class Env4Agent : Agent
 {
@@ -32,18 +34,23 @@ public class Env4Agent : Agent
 
     public void Start()
     {
+        decisionRequester = GetComponent<DecisionRequester>();
+        int steps = decisionRequester.DecisionPeriod;
+        float deltaTime = Time.fixedDeltaTime * steps;
+        float eta = 0.5f;
+        Func<float, float> alpha = ((float x) => x / deltaTime);
+
         var movementDynamics = new MovementDynamics(this);
         var batteryDynamics = new BatteryDynamics(this);
-        enemyCBFApplicator = new CBFApplicator(new MovingBallCBF3D(1.5f), new CombinedDynamics(movementDynamics, enemy));
-        wall1CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f)), movementDynamics);
-        wall2CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(-fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f)), movementDynamics);
-        wall3CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), movementDynamics);
-        wall4CBFApplicator = new CBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), movementDynamics);
-        enemyCBFApplicatorWide = new CBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy));
-        batteryCBFApplicator = new CBFApplicator(new StaticBatteryMarginCBF(batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics);
+        enemyCBFApplicator = new DiscreteCBFApplicator(new MovingBallCBF3D(1.5f), new CombinedDynamics(movementDynamics, enemy), eta, deltaTime);
+        wall1CBFApplicator = new DiscreteCBFApplicator(new WallCBF3D(new Vector3(fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f)), movementDynamics, eta, deltaTime);
+        wall2CBFApplicator = new DiscreteCBFApplicator(new WallCBF3D(new Vector3(-fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f)), movementDynamics, eta, deltaTime);
+        wall3CBFApplicator = new DiscreteCBFApplicator(new WallCBF3D(new Vector3(0f, 0f, fieldWidth), new Vector3(0f, 0f, -1f)), movementDynamics, eta, deltaTime);
+        wall4CBFApplicator = new DiscreteCBFApplicator(new WallCBF3D(new Vector3(0f, 0f, -fieldWidth), new Vector3(0f, 0f, 1f)), movementDynamics, eta, deltaTime);
+        enemyCBFApplicatorWide = new DiscreteCBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy), eta, deltaTime);
+        batteryCBFApplicator = new DiscreteCBFApplicator(new StaticBatteryMarginCBF(batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics, eta, deltaTime);
         cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, batteryCBFApplicator, };
         // cbfApplicators = new CBFApplicator[] { };
-        decisionRequester = GetComponent<DecisionRequester>();
     }
 
 
@@ -65,8 +72,6 @@ public class Env4Agent : Agent
 
         battery = Random.Range(0.1f, 1f);
         enemy.speed = Random.Range(0f, 2f);
-
-
     }
 
     public override void CollectObservations(VectorSensor sensor)

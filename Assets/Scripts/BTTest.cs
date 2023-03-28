@@ -125,6 +125,9 @@ namespace BTTest
     public class LearningCompositeNode : CompositeNode
     {
         // TODO
+        private BehaviorParameters behaviorParameters;
+        private IActuator actuator;
+        private ISensor sensor;
         public LearningCompositeNode(String name, Node[] children, Node parent = null) : base(name, children, parent)
         {
         }
