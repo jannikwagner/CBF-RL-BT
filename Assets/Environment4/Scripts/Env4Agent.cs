@@ -37,7 +37,7 @@ public class Env4Agent : Agent
         decisionRequester = GetComponent<DecisionRequester>();
         int steps = decisionRequester.DecisionPeriod;
         float deltaTime = Time.fixedDeltaTime * steps;
-        float eta = 0.5f;
+        float eta = 1f;
         Func<float, float> alpha = ((float x) => x / deltaTime);
 
         var movementDynamics = new MovementDynamics(this);
@@ -50,7 +50,7 @@ public class Env4Agent : Agent
         enemyCBFApplicatorWide = new DiscreteCBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy), eta, deltaTime);
         batteryCBFApplicator = new DiscreteCBFApplicator(new StaticBatteryMarginCBF(batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics, eta, deltaTime);
         cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, batteryCBFApplicator, };
-        // cbfApplicators = new CBFApplicator[] { };
+        if (!useCBF) cbfApplicators = new CBFApplicator[] { };
     }
 
 

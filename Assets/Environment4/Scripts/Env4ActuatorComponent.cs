@@ -10,15 +10,17 @@ public class Env4Actuator : IActuator
 {
     ActionSpec m_ActionSpec;
     private Env4Agent agent;
+    private CBFDiscreteInvalidActionMasker masker;
     public Env4Actuator(Env4Agent agent)
     {
         this.agent = agent;
         m_ActionSpec = ActionSpec.MakeDiscrete(25);
+        this.masker = new CBFDiscreteInvalidActionMasker(this.ActionSpec);
     }
 
     public ActionSpec ActionSpec => m_ActionSpec;
 
-    public string Name => "Ev4AgentActuator";
+    public string Name => "Env4AgentActuator";
 
     public void Heuristic(in ActionBuffers actionsOut)
     {
@@ -37,45 +39,11 @@ public class Env4Actuator : IActuator
         agent.Move(movement);
     }
 
-
-    public void ResetData()
-    {
-    }
+    public void ResetData() { }
 
     public void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
     {
-        var numActions = ActionSpec.BranchSizes[0];
-        if (!agent.useCBF) return;
-
-        bool[] actionMasked = new bool[numActions];
-        foreach (var cbfApplicator in agent.cbfApplicators)
-        {
-            // Debug.Log("CBF: " + cbfApplicator.cbf);
-            // Debug.Log(cbfApplicator.evluate());
-            bool[] actionMaskedNew = new bool[numActions];
-            var allMasked = true;
-            for (int i = 0; i < numActions; i++)
-            {
-                if (cbfApplicator.debug) Debug.Log("Action: " + i);
-                var actions = new ActionBuffers(new float[] { }, new int[] { i });
-                var okay = cbfApplicator.isActionValid(actions);
-                bool mask = !okay || actionMasked[i];
-                actionMaskedNew[i] = mask;
-                allMasked = allMasked && mask;
-            }
-            if (allMasked)
-            {
-                if (cbfApplicator.debug) Debug.Log("All actions masked! CBF: " + cbfApplicator.cbf);
-                break;
-            }
-            actionMasked = actionMaskedNew;
-        }
-        for (int i = 0; i < numActions; i++)
-        {
-            actionMask.SetActionEnabled(0, i, !actionMasked[i]);
-        }
-        // Debug.Log("Local position: " + transform.localPosition);
-        // Debug.Log("State: " + Utility.ArrToVec3(this.currentState()));
+        masker.WriteDiscreteActionMask(actionMask, agent.cbfApplicators);
     }
 }
 
@@ -84,17 +52,10 @@ public class Env4ActuatorComponent : ActuatorComponent
     public Env4Agent controller;
     ActionSpec m_ActionSpec = ActionSpec.MakeDiscrete(25);
 
-    /// <summary>
-    /// Creates a BasicActuator.
-    /// </summary>
-    /// <returns></returns>
     public override IActuator[] CreateActuators()
     {
         return new IActuator[] { new Env4Actuator(controller) };
     }
 
-    public override ActionSpec ActionSpec
-    {
-        get { return m_ActionSpec; }
-    }
+    public override ActionSpec ActionSpec => m_ActionSpec;
 }
