@@ -107,3 +107,68 @@ public class StaticBatteryMarginCBF : ICBF
         return new float[] { diff.x, diff.y, diff.z, 1f };
     }
 }
+
+public class FuncWithDerivative
+{
+    public Func<float, float> f;
+    public Func<float, float> df;
+
+    public FuncWithDerivative(Func<float, float> f, Func<float, float> df)
+    {
+        this.f = f;
+        this.df = df;
+    }
+}
+
+public class ModulatedCBF : ICBF
+{
+    public ICBF cbf;
+    public FuncWithDerivative alpha;
+
+    public ModulatedCBF(ICBF cbf, FuncWithDerivative alpha)
+    {
+        this.cbf = cbf;
+        this.alpha = alpha;
+    }
+
+    public float evaluate(float[] x)
+    {
+        return alpha.f(cbf.evaluate(x));
+    }
+
+    public float[] gradient(float[] x)
+    {
+        var cbfValue = cbf.evaluate(x);
+        var cbfGradient = cbf.gradient(x);
+        var alphaDerivative = alpha.df(cbfValue);
+
+        return Utility.Mult(cbfGradient, alphaDerivative);
+    }
+}
+
+public class SQRTCBF : ModulatedCBF
+{
+    public SQRTCBF(ICBF cbf) : base(cbf, new FuncWithDerivative(
+        (x) => Mathf.Sqrt(x),
+        (x) => 0.5f / Mathf.Sqrt(x)
+    ))
+    { }
+}
+
+public class SigmoidCBF : ModulatedCBF
+{
+    public SigmoidCBF(ICBF cbf) : base(cbf, new FuncWithDerivative(
+        (x) => 1f / (1f + Mathf.Exp(-x)),
+        (x) => Mathf.Exp(-x) / Mathf.Pow(1f + Mathf.Exp(-x), 2)
+    ))
+    { }
+}
+
+public class SignedSquareCBF : ModulatedCBF
+{
+    public SignedSquareCBF(ICBF cbf) : base(cbf, new FuncWithDerivative(
+        (x) => Mathf.Sign(x) * x * x,
+        (x) => 2f * Mathf.Sign(x) * x
+    ))
+    { }
+}

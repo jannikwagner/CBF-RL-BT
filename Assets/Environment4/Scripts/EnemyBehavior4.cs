@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class EnemyBehavior4 : MonoBehaviour, IDynamics
 {
+    public float maxSpeed = 1f;
+    public float minSpeed = 1f;
+    [HideInInspector]
     public float speed = 1f;
 
     [SerializeField] private Transform playerTransform;

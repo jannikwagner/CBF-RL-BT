@@ -85,7 +85,7 @@ public class DiscreteCBFApplicator : CBFApplicator
         var nextState = Utility.Add(currentState, Utility.Mult(dynamics, deltaTime));
         var nextValue = cbf.evaluate(nextState);
         var currentValue = cbf.evaluate(currentState);
-        var criterion = nextValue - (1 - eta) * currentValue;
+        var criterion = nextValue + (eta - 1) * currentValue;
         return criterion >= 0;
     }
 }
