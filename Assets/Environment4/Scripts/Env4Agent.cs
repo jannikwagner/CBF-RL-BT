@@ -9,6 +9,7 @@ using Random = UnityEngine.Random;
 public class Env4Agent : Agent
 {
     public Env4Controller controller;
+    public Env4ActuatorComponent actuatorComponent;
 
     public DecisionRequester decisionRequester;
     public bool useCBF = true;
@@ -31,8 +32,8 @@ public class Env4Agent : Agent
         float eta = 1f;
         Func<float, float> alpha = ((float x) => x / deltaTime);
 
-        var movementDynamics = new MovementDynamics(this.controller);
-        var batteryDynamics = new BatteryDynamics(this.controller);
+        var movementDynamics = new MovementDynamics(this);
+        var batteryDynamics = new BatteryDynamics(this);
         enemyCBFApplicator = new DiscreteCBFApplicator((new MovingBallCBF3D(1.5f)), new CombinedDynamics(movementDynamics, controller.enemy), 0.9f, deltaTime);
         wall1CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(controller.fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f))), movementDynamics, eta, deltaTime);
         wall2CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(-controller.fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f))), movementDynamics, eta, deltaTime);
@@ -44,7 +45,6 @@ public class Env4Agent : Agent
         if (!useCBF) cbfApplicators = new CBFApplicator[] { };
     }
 
-
     public override void OnEpisodeBegin()
     {
         controller.Initialize();
@@ -53,12 +53,14 @@ public class Env4Agent : Agent
     public override void CollectObservations(VectorSensor sensor)
     {
         var factor = 2f / controller.fieldWidth;
-        Vector3 localPosition = 2 * factor * transform.localPosition;
+        Vector3 localPosition = controller.playerTransform.localPosition;
+
+        Vector3 localPos = 2 * factor * localPosition;
         Vector3 targetPos = (controller.targetTransform.localPosition - localPosition) * factor;
         Vector3 enemyPos = (controller.enemyTransform.localPosition - localPosition) * factor;
         Vector3 batteryPos = (controller.batteryTransform.localPosition - localPosition) * factor;
-        sensor.AddObservation(localPosition.x);
-        sensor.AddObservation(localPosition.z);
+        sensor.AddObservation(localPos.x);
+        sensor.AddObservation(localPos.z);
         sensor.AddObservation(targetPos.x);
         sensor.AddObservation(targetPos.z);
         sensor.AddObservation(enemyPos.x);
@@ -123,42 +125,41 @@ public class Env4Agent : Agent
 
     public class MovementDynamics : IControlledDynamics
     {
-        private Env4Controller controller;
-        public MovementDynamics(Env4Controller controller)
+        private Env4Agent agent;
+        public MovementDynamics(Env4Agent agent)
         {
-            this.controller = controller;
+            this.agent = agent;
         }
 
         public float[] ControlledDynamics(ActionBuffers action)
         {
-            return Utility.vec3ToArr(controller.GetMovement(action));
+            return Utility.vec3ToArr(agent.actuatorComponent.GetMovement(action, agent.controller.speed));
         }
 
         public float[] currentState()
         {
-            return Utility.vec3ToArr(controller.playerTransform.localPosition);
+            return Utility.vec3ToArr(agent.controller.playerTransform.localPosition);
         }
     }
 
     public class BatteryDynamics : IControlledDynamics
     {
-        private Env4Controller controller;
-        public BatteryDynamics(Env4Controller controller)
+        private Env4Agent agent;
+        public BatteryDynamics(Env4Agent agent)
         {
-            this.controller = controller;
+            this.agent = agent;
         }
 
         public float[] ControlledDynamics(ActionBuffers action)
         {
-            var movement = controller.GetMovement(action);
-            var batteryChange = controller.getBatteryChange(movement);
+            var movement = agent.actuatorComponent.GetMovement(action, agent.controller.speed);
+            var batteryChange = agent.controller.getBatteryChange(movement);
             return Utility.combineArrs(Utility.vec3ToArr(movement), new float[] { batteryChange });
         }
 
         public float[] currentState()
         {
-            return Utility.combineArrs(Utility.vec3ToArr(controller.playerTransform.localPosition), new float[] { controller.battery });
+            return Utility.combineArrs(Utility.vec3ToArr(agent.controller.playerTransform.localPosition), new float[] { agent.controller.battery });
         }
     }
-
 }

@@ -6,7 +6,6 @@ using Unity.MLAgents.Actuators;
 
 public class Env4Controller : MonoBehaviour
 {
-
     public float speed = 1f;
 
     [SerializeField] public Transform targetTransform;
@@ -49,26 +48,6 @@ public class Env4Controller : MonoBehaviour
 
         // AddReward(-0.5f / MaxStep);
         battery -= getBatteryChange(movement) * Time.fixedDeltaTime;
-    }
-
-        public Vector3 GetMovement(ActionBuffers actions)
-    {
-        var discreteActions = actions.DiscreteActions;
-        var action = discreteActions[0];
-
-        var i = action % 5;
-        var j = action / 5;
-        var movement = new Vector3(i - 2, 0f, j - 2) * speed / 2.0f;
-        return movement;
-
-        // var moveXAction = discreteActions[0];
-        // var moveZAction = discreteActions[1];
-
-        // float moveX = moveXAction - 1;
-        // float moveZ = moveZAction - 1;
-
-        // var movement = new Vector3(moveX, 0f, moveZ) * speed;
-        // return movement;
     }
 
     public float getBatteryChange(Vector3 movement)

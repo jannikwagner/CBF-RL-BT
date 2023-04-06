@@ -962,6 +962,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 1000
   controller: {fileID: 6860196264908551018}
+  actuatorComponent: {fileID: 1519101609706873163}
   decisionRequester: {fileID: 8737789753651330975}
   useCBF: 1
 --- !u!114 &1519101609706873163
@@ -976,7 +977,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a6356296614641f1899176ca87209cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 8747426257990194615}
+  agent: {fileID: 8747426257990194615}
 --- !u!114 &6860196264908551018
 MonoBehaviour:
   m_ObjectHideFlags: 0
