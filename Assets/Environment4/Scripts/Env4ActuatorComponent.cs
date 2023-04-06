@@ -35,7 +35,7 @@ public class Env4Actuator : IActuator
 
     public void OnActionReceived(ActionBuffers actions)
     {
-        Vector3 movement = agent.getMovement(actions);
+        Vector3 movement = agent.controller.GetMovement(actions);
         agent.Move(movement);
     }
 
