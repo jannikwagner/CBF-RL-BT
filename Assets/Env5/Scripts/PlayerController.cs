@@ -40,13 +40,21 @@ public class PlayerController : MonoBehaviour
     //             holdingPole = !holdingPole;
     //         }
     //     }
+    // }
 
+    // public void LateUpdate()
+    // {
     //     ControlPole();
     // }
 
-    private float DistanceToPole()
+    public float DistanceToPole()
     {
         return Vector3.Distance(player.position, pole.position);
+    }
+
+    public float DistanceToTarget()
+    {
+        return Vector3.Distance(player.position, envController.target1Transform.position);
     }
 
     void ControlPole()
@@ -55,5 +63,10 @@ public class PlayerController : MonoBehaviour
         {
             pole.position = player.position + new Vector3(0.6f, 0f, 0f);
         }
+    }
+
+    internal bool isCloseToTarget()
+    {
+        return DistanceToTarget() < 3.0f;
     }
 }

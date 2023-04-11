@@ -15,16 +15,19 @@ public class MoveToTarget : BaseAgent
         sensor.AddObservation(target.position - controller.player.position);
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public override void OnEpisodeBegin()
     {
-
+        base.OnEpisodeBegin();
+        controller.envController.Initialize();
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OnActionReceived(ActionBuffers actions)
     {
-
+        base.OnActionReceived(actions);
+        if (controller.isCloseToTarget())
+        {
+            SetReward(1.0f);
+            Debug.Log("Target reached!");
+        }
     }
-
 }

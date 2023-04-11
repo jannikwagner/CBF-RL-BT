@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class AgentSwitcher : MonoBehaviour
 {
+    public List<BaseAgent> agents;
+    private int currentAgent = 0;
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
