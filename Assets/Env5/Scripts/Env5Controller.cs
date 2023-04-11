@@ -14,7 +14,6 @@ public class Env5Controller : MonoBehaviour
     public GameObject bridgeUp;
     public Transform goalTransform;
 
-    // Start is called before the first frame update
     void Start()
     {
         bridgeDown.SetActive(false);
@@ -52,7 +51,7 @@ public class Env5Controller : MonoBehaviour
     }
     bool buttonsPressed()
     {
-        return Button1Pressed() && Button2Pressed();
+        return Button1Pressed();  // && Button2Pressed();
     }
 
     bool win()
