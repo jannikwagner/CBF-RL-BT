@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Env5Controller : MonoBehaviour
+public class EnvController : MonoBehaviour
 {
     public Transform playerTransform;
     public Transform button1Transform;

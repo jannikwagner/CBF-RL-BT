@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7411889868194625806}
+  - component: {fileID: 1106527828550841517}
+  - component: {fileID: 3241000611441375616}
   m_Layer: 0
   m_Name: PushTargetToButton
   m_TagString: Untagged
@@ -31,6 +33,55 @@ Transform:
   m_Father: {fileID: 6719847250985381461}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1106527828550841517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 51187720744820065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 12
+    NumStackedVectorObservations: 2
+    m_ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 19000000
+    VectorActionSize: 19000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 0
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_BehaviorType: 0
+  m_BehaviorName: PushTargetToButton
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_ObservableAttributeHandling: 0
+--- !u!114 &3241000611441375616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 51187720744820065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5251b05fb92d4d9696a791b516b2a49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  controller: {fileID: 997831690672980582}
+  target: {fileID: 5376050055334409578}
+  button: {fileID: 5374113653461274576}
 --- !u!1 &5348313698519457646
 GameObject:
   m_ObjectHideFlags: 0
@@ -41,7 +92,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6719847250985381461}
   m_Layer: 0
-  m_Name: CompositBehavior
+  m_Name: CompositeBehavior
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1409,6 +1460,7 @@ GameObject:
   - component: {fileID: 5374113655255339823}
   - component: {fileID: 5374113655255339820}
   - component: {fileID: 5374113655255339821}
+  - component: {fileID: 1138499503887913420}
   m_Layer: 0
   m_Name: Pole
   m_TagString: Untagged
@@ -1495,6 +1547,22 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!54 &1138499503887913420
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5374113655255339810}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &5374113655283947988
 GameObject:
   m_ObjectHideFlags: 0
@@ -1687,10 +1755,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94eb32f1415cc4b489485d92ff265563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTransform: {fileID: 5374113655321303203}
+  player: {fileID: 0}
   rb: {fileID: 5374113655321303202}
-  env5Controller: {fileID: 5374113655283947990}
-  poleTransform: {fileID: 5374113655255339822}
+  envController: {fileID: 0}
+  pole: {fileID: 0}
 --- !u!1 &5374113655475350270
 GameObject:
   m_ObjectHideFlags: 0
@@ -1798,6 +1866,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2566073296363261199}
+  - component: {fileID: 4305194784078511005}
+  - component: {fileID: 2867474060633161330}
   m_Layer: 0
   m_Name: MoveToTarget
   m_TagString: Untagged
@@ -1820,6 +1890,54 @@ Transform:
   m_Father: {fileID: 6719847250985381461}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4305194784078511005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7117041047619010745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 6
+    NumStackedVectorObservations: 2
+    m_ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 19000000
+    VectorActionSize: 19000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 0
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_BehaviorType: 0
+  m_BehaviorName: MoveToTarget
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_ObservableAttributeHandling: 0
+--- !u!114 &2867474060633161330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7117041047619010745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d1d19921f2cf430581923f3fa2fde17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  controller: {fileID: 997831690672980582}
+  target: {fileID: 5376050055334409578}
 --- !u!1001 &5374113653549678059
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1945,6 +2063,18 @@ PrefabInstance:
     - target: {fileID: 4009295745737424, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4291324993800576, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -12.09
+      objectReference: {fileID: 0}
+    - target: {fileID: 4291324993800576, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 9.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4291324993800576, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 36.91
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
