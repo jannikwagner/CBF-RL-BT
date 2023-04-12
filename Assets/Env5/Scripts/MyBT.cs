@@ -20,19 +20,13 @@ public class MyBT : MonoBehaviour
         _tree = new BehaviorTreeBuilder(gameObject)
             .Sequence("Root")
                 .Selector("PushSelector")
-                    .Condition("TargetAtGoal", () =>
-                    {
-                        return envController.buttonsPressed();
-                    })
+                    .Condition("TargetAtGoal", envController.ButtonPressed)
                     .Sequence("PushSequence")
                         .Selector("MoveSelector")
-                            .Condition("CloseToTarget", () =>
-                            {
-                                return controller.isCloseToTarget();
-                            })
-                            .LearningAction("MoveToTarget", moveToTarget)
+                            .Condition("CloseToTarget", controller.IsCloseToTarget)
+                            .LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget)
                         .End()
-                        .LearningAction("PushTargetToButton", pushTargetToButton)
+                        .LearningActionWPC("PushTargetToButton", pushTargetToButton, envController.ButtonPressed)
                     .End()
                 .End()
                 .Do("SuccessMessage", () =>
@@ -145,6 +139,15 @@ public static class BehaviorTreeBuilderExtensions
             Agent = agent,
         });
     }
+    public static BehaviorTreeBuilder LearningActionWPC(this BehaviorTreeBuilder builder, string name, Agent agent, System.Func<bool> postCondition)
+    {
+        return builder.AddNode(new LearningActionWithPostCondition
+        {
+            Name = name,
+            Agent = agent,
+            PostCondition = postCondition,
+        });
+    }
     public static BehaviorTreeBuilder CustomSequence(this BehaviorTreeBuilder builder, string name = "My Sequence")
     {
         return builder.ParentTask<CustomSequence>(name);
@@ -168,6 +171,7 @@ public class LearningAction : ActionBase
 
     protected override TaskStatus OnUpdate()
     {
+        Debug.Log(Name + ": OnUpdate");
         stepCount++;
         if (stepCount >= StepsPerDecision)
         {
@@ -180,6 +184,27 @@ public class LearningAction : ActionBase
         }
 
         return TaskStatus.Continue;
+    }
+}
+
+public class LearningActionWithPostCondition : LearningAction
+{
+    private System.Func<bool> postCondition;
+
+    public System.Func<bool> PostCondition { get => postCondition; set => postCondition = value; }
+
+    protected override TaskStatus OnUpdate()
+    {
+        var status = base.OnUpdate();
+        if (PostCondition())
+        // if (status == TaskStatus.Continue && PostCondition())
+        {
+            Debug.Log(Name + ": PostCondition met");
+            Agent.AddReward(1f);
+            // Agent.EndEpisode(); // this would initialize a new episode and spawn at a new location
+            // return TaskStatus.Success;
+        }
+        return status;
     }
 }
 

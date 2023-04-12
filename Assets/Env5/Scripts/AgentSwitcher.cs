@@ -1,19 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.MLAgents;
 using UnityEngine;
 
 public class AgentSwitcher : MonoBehaviour
 {
     public List<BaseAgent> agents;
+    protected SimpleMultiAgentGroup m_AgentGroup;
     private int currentAgent = 0;
-    // Start is called before the first frame update
+
     void Start()
     {
+        m_AgentGroup = new SimpleMultiAgentGroup();
 
+        for (int i = 0; i < agents.Count; i++)
+        {
+            m_AgentGroup.RegisterAgent(agents[i]);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    void Act(BaseAgent agent)
     {
 
     }

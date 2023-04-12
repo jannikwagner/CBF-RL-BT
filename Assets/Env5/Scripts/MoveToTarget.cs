@@ -7,24 +7,23 @@ using UnityEngine;
 
 public class MoveToTarget : BaseAgent
 {
-    public Transform target;
-
     public override void CollectObservations(VectorSensor sensor)
     {
         sensor.AddObservation(controller.player.position);
-        sensor.AddObservation(target.position - controller.player.position);
+        sensor.AddObservation(controller.env.target.position - controller.player.position);
     }
 
     public override void OnEpisodeBegin()
     {
         base.OnEpisodeBegin();
-        controller.envController.Initialize();
+        controller.env.Initialize();
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
         base.OnActionReceived(actions);
-        if (controller.isCloseToTarget())
+        // is never true!
+        if (controller.IsCloseToTarget())
         {
             SetReward(1.0f);
             Debug.Log("Target reached!");

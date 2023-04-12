@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class EnvController : MonoBehaviour
 {
-    public Transform playerTransform;
-    public Transform button1Transform;
-    public Transform button2Transform;
-    public Transform target1Transform;
-    public Transform target2Transform;
-    public Transform poleTransform;
+    public Transform player;
+    public Transform button;
+    public Transform target;
+    public Transform pole;
+    public Transform goal;
     public GameObject bridgeDown;
     public GameObject bridgeUp;
-    public Transform goalTransform;
 
     void Start()
     {
@@ -21,7 +19,7 @@ public class EnvController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (buttonsPressed())
+        if (ButtonPressed())
         {
             bridgeDown.SetActive(true);
             bridgeUp.SetActive(false);
@@ -38,24 +36,25 @@ public class EnvController : MonoBehaviour
         }
     }
 
-    public bool Button1Pressed()
+    // public bool Button1Pressed()
+    // {
+    //     return Vector3.Distance(targetTransform.position, buttonTransform.position) < 1.0f
+    //     || Vector3.Distance(target2Transform.position, buttonTransform.position) < 1.0f;
+    // }
+    // public bool Button2Pressed()
+    // {
+    //     return Vector3.Distance(targetTransform.position, button2Transform.position) < 1.0f
+    //     || Vector3.Distance(target2Transform.position, button2Transform.position) < 1.0f;
+    // }
+
+    public bool ButtonPressed()
     {
-        return Vector3.Distance(target1Transform.position, button1Transform.position) < 1.0f
-        || Vector3.Distance(target2Transform.position, button1Transform.position) < 1.0f;
-    }
-    public bool Button2Pressed()
-    {
-        return Vector3.Distance(target1Transform.position, button2Transform.position) < 1.0f
-        || Vector3.Distance(target2Transform.position, button2Transform.position) < 1.0f;
-    }
-    public bool buttonsPressed()
-    {
-        return Button1Pressed();  // && Button2Pressed();
+        return Vector3.Distance(target.position, button.position) < 1.0f;
     }
 
     public bool win()
     {
-        return Vector3.Distance(poleTransform.position, goalTransform.position) < 1.0f;
+        return Vector3.Distance(pole.position, goal.position) < 1.0f;
     }
 
     public void Initialize()
@@ -66,7 +65,8 @@ public class EnvController : MonoBehaviour
         float maxZ = 14;
         float groundY = 0.5f;
 
-        playerTransform.localPosition = new Vector3(Random.Range(minX, maxX), groundY, Random.Range(minZ, maxZ));
+        player.localPosition = new Vector3(Random.Range(minX, maxX), groundY, Random.Range(minZ, maxZ));
+        target.localPosition = new Vector3(Random.Range(minX, maxX), groundY, Random.Range(minZ, maxZ));
         // button1Transform.position = new Vector3(0, 0.5f, 0);
         // button2Transform.position = new Vector3(0, 0.5f, 0);
         // target1Transform.position = new Vector3(0, 0.5f, 0);
@@ -76,9 +76,4 @@ public class EnvController : MonoBehaviour
         bridgeDown.SetActive(false);
         bridgeUp.SetActive(true);
     }
-
-
-
-
-
 }

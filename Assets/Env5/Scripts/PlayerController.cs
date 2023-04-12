@@ -7,8 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public Transform player;
     public Rigidbody rb;
-    public EnvController envController;
-    public Transform pole;
+    public EnvController env;
     // Start is called before the first frame update
     private bool holdingPole = false;
     void Start()
@@ -49,24 +48,29 @@ public class PlayerController : MonoBehaviour
 
     public float DistanceToPole()
     {
-        return Vector3.Distance(player.position, pole.position);
+        return Vector3.Distance(player.position, env.pole.position);
     }
 
     public float DistanceToTarget()
     {
-        return Vector3.Distance(player.position, envController.target1Transform.position);
+        return Vector3.Distance(player.position, env.target.position);
     }
 
     void ControlPole()
     {
         if (holdingPole)
         {
-            pole.position = player.position + new Vector3(0.6f, 0f, 0f);
+            env.pole.position = player.position + new Vector3(0.6f, 0f, 0f);
         }
     }
 
-    internal bool isCloseToTarget()
+    internal bool IsCloseToTarget()
     {
-        return DistanceToTarget() < 3.0f;
+        var condition = DistanceToTarget() < 3.0f;
+        if (condition)
+        {
+            // Debug.Log("Close to target");
+        }
+        return condition;
     }
 }
