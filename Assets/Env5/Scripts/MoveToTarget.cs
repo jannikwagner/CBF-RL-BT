@@ -22,6 +22,7 @@ public class MoveToTarget : BaseAgent
     public override void OnActionReceived(ActionBuffers actions)
     {
         base.OnActionReceived(actions);
+        Debug.Log("MoveToTarget.OnActionReceived");
         // is never true!
         if (controller.IsCloseToTarget())
         {

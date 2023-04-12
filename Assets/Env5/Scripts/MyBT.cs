@@ -178,6 +178,11 @@ public class LearningAction : ActionBase
             stepCount = 0;
             Agent.RequestDecision();
         }
+        else
+        {
+            Agent.RequestAction();
+        }
+
         if (Agent.StepCount >= MaxSteps)
         {
             Agent.EndEpisode();
