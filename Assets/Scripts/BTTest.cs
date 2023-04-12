@@ -4,6 +4,7 @@ using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
+using System.Collections.Generic;
 
 namespace BTTest
 {
@@ -11,14 +12,16 @@ namespace BTTest
 
     public class BT
     {
-        private Node currentNode;
-        private Node previousNode;
         private Node root;
-        private long executionTime = 0;
+        private HashSet<Node> currentExecutionSet;
+        private HashSet<Node> previousExecutionSet;
+        private HashSet<Node> currentRunningSet;
+        private HashSet<Node> previousRunningSet;
         public Node Root { get => root; set => SetReferenceRec(value); }
-        public Node CurrentNode { get => currentNode; set => currentNode = value; }
-        public Node PreviousNode { get => previousNode; set => previousNode = value; }
-        public long ExecutionTime { get => executionTime; set => executionTime = value; }
+        public HashSet<Node> CurrentExecutionSet { get => currentExecutionSet; set => currentExecutionSet = value; }
+        public HashSet<Node> PreviousExecutionSet { get => previousExecutionSet; set => previousExecutionSet = value; }
+        public HashSet<Node> CurrentRunningSet { get => currentRunningSet; set => currentRunningSet = value; }
+        public HashSet<Node> PreviousRunningSet { get => previousRunningSet; set => previousRunningSet = value; }
 
         private void SetReferenceRec(Node value)
         {
@@ -33,20 +36,36 @@ namespace BTTest
         }
         public void Tick()
         {
-            ExecutionTime++;
-            CurrentNode = null;
+            currentRunningSet = new HashSet<Node>();
+            currentExecutionSet = new HashSet<Node>();
             Root.Tick();
-            if (CurrentNode != PreviousNode && PreviousNode != null)
+            if (previousRunningSet != null)
             {
-                PreviousNode.OnExit();
+                foreach (Node node in previousRunningSet)
+                {
+                    if (!currentRunningSet.Contains(node))
+                    {
+                        node.OnStopRunning();
+                    }
+                }
             }
-            previousNode = CurrentNode;
+            if (previousExecutionSet != null)
+            {
+                foreach (Node node in previousExecutionSet)
+                {
+                    if (!currentExecutionSet.Contains(node))
+                    {
+                        node.OnStopExecution();
+                    }
+                }
+            }
+            previousRunningSet = currentRunningSet;
+            previousExecutionSet = currentExecutionSet;
         }
     }
 
     public class Node
     {
-        private long lastExecutionTime = -2;
         private bool initialized = false;
         private BT bt;
         private String name;
@@ -60,12 +79,13 @@ namespace BTTest
             get => parent; set => parent = value;
         }
         public BT Bt { get => bt; set => bt = value; }
-        public long LastExecutionTime { get => lastExecutionTime; set => lastExecutionTime = value; }
         public bool Initialized { get => initialized; set => initialized = value; }
 
         public virtual ReturnStatus OnUpdate() { return ReturnStatus.FAILURE; }
-        public virtual void OnExit() { }
-        public virtual void OnEnter() { }
+        public virtual void OnStopRunning() { }
+        public virtual void OnStartRunning() { }
+        public virtual void OnStopExecution() { }
+        public virtual void OnSartExecution() { }
         public virtual void OnInit() { }
         public virtual ReturnStatus Tick()
         {
@@ -74,22 +94,25 @@ namespace BTTest
                 OnInit();
                 Initialized = true;
             }
-
-            if (Bt.ExecutionTime > LastExecutionTime + 1)
+            Bt.CurrentExecutionSet.Add(this);
+            if (Bt.PreviousExecutionSet != null && !Bt.PreviousExecutionSet.Contains(this))
             {
-                OnEnter();
+                OnSartExecution();
+            }
+            if (Bt.PreviousRunningSet != null && !Bt.PreviousRunningSet.Contains(this))
+            {
+                OnStartRunning();
             }
 
             ReturnStatus status = OnUpdate();
 
             if (status == ReturnStatus.RUNNING)
             {
-                LastExecutionTime = Bt.ExecutionTime;
-                Bt.CurrentNode = this;
+                Bt.CurrentRunningSet.Add(this);
             }
-            else if (Bt.PreviousNode != this)
+            else if (Bt.PreviousRunningSet != null && !Bt.PreviousRunningSet.Contains(this))
             {
-                OnExit();
+                OnStopRunning();
             }
 
             return status;
