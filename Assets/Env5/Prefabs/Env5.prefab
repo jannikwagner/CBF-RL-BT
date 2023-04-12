@@ -1751,9 +1751,9 @@ MonoBehaviour:
   button: {fileID: 5374113653461274576}
   target: {fileID: 760777750296815071}
   pole: {fileID: 5374113655255339822}
+  goal: {fileID: 5374113655007801597}
   bridgeDown: {fileID: 5374113654110747701}
   bridgeUp: {fileID: 5374113654036704707}
-  goal: {fileID: 5374113655007801597}
 --- !u!1 &5374113655321303207
 GameObject:
   m_ObjectHideFlags: 0
@@ -1899,7 +1899,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agentSwitcher: {fileID: 8901589885135210536}
-  envController: {fileID: 5374113655283947990}
   moveToTarget: {fileID: 2867474060633161330}
   pushTargetToButton: {fileID: 3241000611441375616}
   controller: {fileID: 997831690672980582}
@@ -2092,10 +2091,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BrickPyramid2
       objectReference: {fileID: 0}
-    - target: {fileID: 1891363201150404, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4009295745737424, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
       propertyPath: m_RootOrder
       value: 8
@@ -2157,10 +2152,6 @@ PrefabInstance:
     - target: {fileID: 1891363201150404, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
       propertyPath: m_Name
       value: BrickPyramid1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1891363201150404, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4009295745737424, guid: 71f6a5e1bbd34c7489e8d918c2fcb298, type: 3}
       propertyPath: m_RootOrder

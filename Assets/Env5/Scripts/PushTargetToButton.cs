@@ -17,6 +17,6 @@ public class PushTargetToButton : BaseAgent
     public override void OnActionReceived(ActionBuffers actions)
     {
         base.OnActionReceived(actions);
-        Debug.Log("PushTargetToButton.OnActionReceived");
+        // Debug.Log("PushTargetToButton.OnActionReceived");
     }
 }

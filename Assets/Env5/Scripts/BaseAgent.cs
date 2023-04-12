@@ -36,6 +36,7 @@ public class BaseAgent : Agent
     {
         var force = GetForce(actions);
         controller.ApplyForce(force);
+        // Debug.Log("BaseAgent.OnActionReceived: " + force);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)

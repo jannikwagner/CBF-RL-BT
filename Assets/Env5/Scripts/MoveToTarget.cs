@@ -16,17 +16,14 @@ public class MoveToTarget : BaseAgent
     public override void OnEpisodeBegin()
     {
         base.OnEpisodeBegin();
-        controller.env.Initialize();
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
         base.OnActionReceived(actions);
-        Debug.Log("MoveToTarget.OnActionReceived");
-        // is never true!
+        // Debug.Log("MoveToTarget.OnActionReceived");
         if (controller.IsCloseToTarget())
         {
-            SetReward(1.0f);
             Debug.Log("Target reached!");
         }
     }

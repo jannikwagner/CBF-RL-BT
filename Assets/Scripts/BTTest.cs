@@ -9,21 +9,91 @@ namespace BTTest
 {
     public enum ReturnStatus { SUCCESS, FAILURE, RUNNING };
 
+    public class BT
+    {
+        private Node currentNode;
+        private Node previousNode;
+        private Node root;
+        private long executionTime = 0;
+        public Node Root { get => root; set => SetReferenceRec(value); }
+        public Node CurrentNode { get => currentNode; set => currentNode = value; }
+        public Node PreviousNode { get => previousNode; set => previousNode = value; }
+        public long ExecutionTime { get => executionTime; set => executionTime = value; }
+
+        private void SetReferenceRec(Node value)
+        {
+            value.Bt = this;
+            if (value is CompositeNode)
+            {
+                foreach (Node child in (value as CompositeNode).Children)
+                {
+                    SetReferenceRec(child);
+                }
+            }
+        }
+        public void Tick()
+        {
+            ExecutionTime++;
+            CurrentNode = null;
+            Root.Tick();
+            if (CurrentNode != PreviousNode && PreviousNode != null)
+            {
+                PreviousNode.OnExit();
+            }
+            previousNode = CurrentNode;
+        }
+    }
+
     public class Node
     {
+        private long lastExecutionTime = -2;
+        private bool initialized = false;
+        private BT bt;
         private String name;
         public String Name
         {
-            get { return name; }
-            set { name = value; }
+            get => name; set => name = value;
         }
         private Node parent;
         public Node Parent
         {
-            get { return parent; }
-            set { parent = value; }
+            get => parent; set => parent = value;
         }
-        public virtual ReturnStatus Tick() { return ReturnStatus.FAILURE; }
+        public BT Bt { get => bt; set => bt = value; }
+        public long LastExecutionTime { get => lastExecutionTime; set => lastExecutionTime = value; }
+        public bool Initialized { get => initialized; set => initialized = value; }
+
+        public virtual ReturnStatus OnUpdate() { return ReturnStatus.FAILURE; }
+        public virtual void OnExit() { }
+        public virtual void OnEnter() { }
+        public virtual void OnInit() { }
+        public virtual ReturnStatus Tick()
+        {
+            if (!Initialized)
+            {
+                OnInit();
+                Initialized = true;
+            }
+
+            if (Bt.ExecutionTime > LastExecutionTime + 1)
+            {
+                OnEnter();
+            }
+
+            ReturnStatus status = OnUpdate();
+
+            if (status == ReturnStatus.RUNNING)
+            {
+                LastExecutionTime = Bt.ExecutionTime;
+                Bt.CurrentNode = this;
+            }
+            else if (Bt.PreviousNode != this)
+            {
+                OnExit();
+            }
+
+            return status;
+        }
         public Node(String name, Node parent = null)
         {
             this.name = name;
@@ -32,24 +102,26 @@ namespace BTTest
     }
     public class CompositeNode : Node
     {
-        public Node[] children;
+        private Node[] children;
         public CompositeNode(String name, Node[] children, Node parent = null) : base(name, parent)
         {
-            this.children = children;
+            this.Children = children;
             foreach (Node child in children)
             {
                 child.Parent = this;
             }
         }
+
+        public Node[] Children { get => children; set => children = value; }
     }
     public class Sequence : CompositeNode
     {
         public Sequence(String name, Node[] children, Node parent = null) : base(name, children, parent)
         {
         }
-        public override ReturnStatus Tick()
+        public override ReturnStatus OnUpdate()
         {
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 ReturnStatus status = child.Tick();
                 if (status != ReturnStatus.SUCCESS)
@@ -65,9 +137,9 @@ namespace BTTest
         public Selector(String name, Node[] children, Node parent = null) : base(name, children, parent)
         {
         }
-        public override ReturnStatus Tick()
+        public override ReturnStatus OnUpdate()
         {
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 ReturnStatus status = child.Tick();
                 if (status != ReturnStatus.FAILURE)
@@ -103,7 +175,7 @@ namespace BTTest
         {
             this.cbfApplicator = cbfApplicator;
         }
-        public override ReturnStatus Tick()
+        public override ReturnStatus OnUpdate()
         {
             return cbfApplicator.isSafe() ? ReturnStatus.SUCCESS : ReturnStatus.FAILURE;
         }
@@ -117,7 +189,7 @@ namespace BTTest
         public LearningAction(String name, Node parent = null) : base(name, parent)
         {
         }
-        public override ReturnStatus Tick()
+        public override ReturnStatus OnUpdate()
         {
             return ReturnStatus.FAILURE;
         }
@@ -131,7 +203,7 @@ namespace BTTest
         public LearningCompositeNode(String name, Node[] children, Node parent = null) : base(name, children, parent)
         {
         }
-        public override ReturnStatus Tick()
+        public override ReturnStatus OnUpdate()
         {
             return ReturnStatus.FAILURE;
         }

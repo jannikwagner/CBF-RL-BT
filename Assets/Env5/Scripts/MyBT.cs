@@ -10,7 +10,6 @@ public class MyBT : MonoBehaviour
     [SerializeField]
     private BehaviorTree _tree;
     public AgentSwitcher agentSwitcher;
-    public EnvController envController;
     public MoveToTarget moveToTarget;
     public PushTargetToButton pushTargetToButton;
     public PlayerController controller;
@@ -20,13 +19,13 @@ public class MyBT : MonoBehaviour
         _tree = new BehaviorTreeBuilder(gameObject)
             .Sequence("Root")
                 .Selector("PushSelector")
-                    .Condition("TargetAtGoal", envController.ButtonPressed)
+                    .Condition("TargetAtGoal", controller.env.ButtonPressed)
                     .Sequence("PushSequence")
                         .Selector("MoveSelector")
                             .Condition("CloseToTarget", controller.IsCloseToTarget)
                             .LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget)
                         .End()
-                        .LearningActionWPC("PushTargetToButton", pushTargetToButton, envController.ButtonPressed)
+                        .LearningActionWPC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed)
                     .End()
                 .End()
                 .Do("SuccessMessage", () =>
@@ -131,7 +130,7 @@ public static class BehaviorTreeBuilderExtensions
             Name = name,
         });
     }
-    public static BehaviorTreeBuilder LearningAction(this BehaviorTreeBuilder builder, string name, Agent agent)
+    public static BehaviorTreeBuilder LearningAction(this BehaviorTreeBuilder builder, string name, BaseAgent agent)
     {
         return builder.AddNode(new LearningAction
         {
@@ -139,7 +138,7 @@ public static class BehaviorTreeBuilderExtensions
             Agent = agent,
         });
     }
-    public static BehaviorTreeBuilder LearningActionWPC(this BehaviorTreeBuilder builder, string name, Agent agent, System.Func<bool> postCondition)
+    public static BehaviorTreeBuilder LearningActionWPC(this BehaviorTreeBuilder builder, string name, BaseAgent agent, System.Func<bool> postCondition)
     {
         return builder.AddNode(new LearningActionWithPostCondition
         {
@@ -160,18 +159,18 @@ public static class BehaviorTreeBuilderExtensions
 
 public class LearningAction : ActionBase
 {
-    private Agent agent;
+    private BaseAgent agent;
     private int stepsPerDecision = 10;
     private int stepCount = 0;
     private int maxSteps = 1000;
 
-    public Agent Agent { get => agent; set => agent = value; }
+    public BaseAgent Agent { get => agent; set => agent = value; }
     public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
     public int MaxSteps { get => maxSteps; set => maxSteps = value; }
 
     protected override TaskStatus OnUpdate()
     {
-        Debug.Log(Name + ": OnUpdate");
+        // Debug.Log(Name + ": OnUpdate");
         stepCount++;
         if (stepCount >= StepsPerDecision)
         {
@@ -186,6 +185,7 @@ public class LearningAction : ActionBase
         if (Agent.StepCount >= MaxSteps)
         {
             Agent.EndEpisode();
+            Agent.controller.env.Initialize();
         }
 
         return TaskStatus.Continue;
@@ -201,13 +201,14 @@ public class LearningActionWithPostCondition : LearningAction
     protected override TaskStatus OnUpdate()
     {
         var status = base.OnUpdate();
-        if (PostCondition())
-        // if (status == TaskStatus.Continue && PostCondition())
+        // if (PostCondition())
+        Debug.Log(Name + ": PostCondition: " + PostCondition());
+        if (status == TaskStatus.Continue && PostCondition())
         {
             Debug.Log(Name + ": PostCondition met");
             Agent.AddReward(1f);
-            // Agent.EndEpisode(); // this would initialize a new episode and spawn at a new location
-            // return TaskStatus.Success;
+            Agent.EndEpisode();
+            return TaskStatus.Success;
         }
         return status;
     }
