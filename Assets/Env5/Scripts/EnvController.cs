@@ -60,13 +60,13 @@ public class EnvController : MonoBehaviour
 
     public void Initialize()
     {
-        float minX = -25;
+        float minX = -26;
         float maxX = 10;
         float minZ = -23;
         float maxZ = 14;
-        float groundZ = 0.5f;
+        float groundY = 0.5f;
 
-        playerTransform.position = new Vector3(Random.Range(minX, maxX), groundZ, Random.Range(minZ, maxZ));
+        playerTransform.localPosition = new Vector3(Random.Range(minX, maxX), groundY, Random.Range(minZ, maxZ));
         // button1Transform.position = new Vector3(0, 0.5f, 0);
         // button2Transform.position = new Vector3(0, 0.5f, 0);
         // target1Transform.position = new Vector3(0, 0.5f, 0);

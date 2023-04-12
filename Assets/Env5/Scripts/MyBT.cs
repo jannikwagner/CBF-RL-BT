@@ -3,6 +3,7 @@ using CleverCrow.Fluid.BTs.Tasks;
 using CleverCrow.Fluid.BTs.Trees;
 using CleverCrow.Fluid.BTs.Tasks.Actions;
 using Unity.MLAgents;
+using CleverCrow.Fluid.BTs.TaskParents.Composites;
 
 public class MyBT : MonoBehaviour
 {
@@ -31,8 +32,8 @@ public class MyBT : MonoBehaviour
                             })
                             .LearningAction("MoveToTarget", moveToTarget)
                         .End()
+                        .LearningAction("PushTargetToButton", pushTargetToButton)
                     .End()
-                    .LearningAction("PushTargetToButton", pushTargetToButton)
                 .End()
                 .Do("SuccessMessage", () =>
                 {
@@ -42,15 +43,55 @@ public class MyBT : MonoBehaviour
             .End()
             .Build();
 
+        // int count1 = 0;
+        // int count2 = 0;
+
+        // _tree = new BehaviorTreeBuilder(gameObject)
+        //     .Sequence("Root")
+        //         .Selector("Selector")
+        //             .Condition("Count1", () =>
+        //             {
+        //                 count1++;
+        //                 Debug.Log("Count1: " + count1);
+        //                 return (count1 > 5);
+        //             })
+        //             .Do("Count2", () =>
+        //             {
+        //                 count2++;
+        //                 Debug.Log("Count2: " + count2);
+        //                 if (count2 > 10)
+        //                 {
+        //                     return TaskStatus.Success;
+        //                 }
+        //                 return TaskStatus.Continue;
+        //             })
+        //         .End()
+        //         .Do("SuccessMessage", () =>
+        //         {
+        //             Debug.Log("Success!");
+        //             return TaskStatus.Success;
+        //         })
+        //     .End()
+        //     .Build();
+
+        // _tree = new BehaviorTreeBuilder(gameObject)
+        //     .Sequence("Root")
+        //         .CustomAction("CustomAction")
+        //         .Do("SuccessMessage", () =>
+        //         {
+        //             Debug.Log("Success!");
+        //             return TaskStatus.Success;
+        //         })
+        //     .End()
+        //     .Build();
     }
 
     private void Update()
     {
         // Update our tree every frame
         _tree.Tick();
+        _tree.Reset();
     }
-
-
 }
 
 public class CustomAction : ActionBase
@@ -58,13 +99,14 @@ public class CustomAction : ActionBase
 
     protected override void OnInit()
     {
+        base.OnInit();
         Debug.Log("CustomAction.OnInit");
     }
 
     protected override TaskStatus OnUpdate()
     {
         Debug.Log("CustomAction.OnUpdate");
-        return TaskStatus.Success;
+        return TaskStatus.Continue;
     }
 
     protected override TaskStatus GetUpdate()
@@ -84,10 +126,7 @@ public class CustomAction : ActionBase
         Debug.Log("CustomAction.OnExit");
         base.OnExit();
     }
-
 }
-
-
 
 public static class BehaviorTreeBuilderExtensions
 {
@@ -106,6 +145,14 @@ public static class BehaviorTreeBuilderExtensions
             Agent = agent,
         });
     }
+    public static BehaviorTreeBuilder CustomSequence(this BehaviorTreeBuilder builder, string name = "My Sequence")
+    {
+        return builder.ParentTask<CustomSequence>(name);
+    }
+    public static BehaviorTreeBuilder CustomSelector(this BehaviorTreeBuilder builder, string name = "My Selector")
+    {
+        return builder.ParentTask<CustomSelector>(name);
+    }
 }
 
 public class LearningAction : ActionBase
@@ -113,18 +160,11 @@ public class LearningAction : ActionBase
     private Agent agent;
     private int stepsPerDecision = 10;
     private int stepCount = 0;
-    private int MaxSteps = 1000;
+    private int maxSteps = 1000;
 
     public Agent Agent { get => agent; set => agent = value; }
     public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
-    public int MaxSteps1 { get => MaxSteps; set => MaxSteps = value; }
-
-    protected override void OnStart()
-    {
-        base.OnStart();
-        stepCount = 0;
-        Debug.Log(Name + " OnStart");
-    }
+    public int MaxSteps { get => maxSteps; set => maxSteps = value; }
 
     protected override TaskStatus OnUpdate()
     {
@@ -134,14 +174,54 @@ public class LearningAction : ActionBase
             stepCount = 0;
             Agent.RequestDecision();
         }
+        if (Agent.StepCount >= MaxSteps)
+        {
+            Agent.EndEpisode();
+        }
 
         return TaskStatus.Continue;
     }
+}
 
-    protected override void OnExit()
+
+public class CustomSequence : CompositeBase
+{
+    protected override TaskStatus OnUpdate()
     {
-        base.OnExit();
-        Debug.Log(Name + " OnExit");
-        agent.EndEpisode();
+        for (var i = ChildIndex; i < Children.Count; i++)
+        {
+            var child = Children[ChildIndex];
+
+            var status = child.Update();
+            if (status != TaskStatus.Success)
+            {
+                return status;
+            }
+
+            ChildIndex++;
+        }
+
+        return TaskStatus.Success;
+    }
+}
+
+public class CustomSelector : CompositeBase
+{
+    protected override TaskStatus OnUpdate()
+    {
+        for (var i = ChildIndex; i < Children.Count; i++)
+        {
+            var child = Children[ChildIndex];
+
+            var status = child.Update();
+            if (status != TaskStatus.Failure)
+            {
+                return status;
+            }
+
+            ChildIndex++;
+        }
+
+        return TaskStatus.Failure;
     }
 }

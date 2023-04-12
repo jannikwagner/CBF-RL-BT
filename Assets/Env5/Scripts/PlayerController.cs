@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
 
     public void ApplyForce(Vector3 force)
     {
-        rb.AddForce(force * rb.mass * 10f);
+        rb.AddForce(force * rb.mass * 20f);
     }
 
     // // Update is called once per frame
