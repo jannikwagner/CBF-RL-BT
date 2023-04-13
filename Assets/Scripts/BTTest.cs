@@ -97,11 +97,11 @@ namespace BTTest
                 Initialized = true;
             }
             Bt.CurrentExecutionSet.Add(this);
-            if (Bt.PreviousExecutionSet != null && !Bt.PreviousExecutionSet.Contains(this))
+            if (Bt.PreviousExecutionSet == null || !Bt.PreviousExecutionSet.Contains(this))
             {
                 OnSartExecution();
             }
-            if (Bt.PreviousRunningSet != null && !Bt.PreviousRunningSet.Contains(this))
+            if (Bt.PreviousRunningSet == null || !Bt.PreviousRunningSet.Contains(this))
             {
                 OnStartRunning();
             }
@@ -113,7 +113,7 @@ namespace BTTest
                 Bt.CurrentRunningSet.Add(this);
             }
             // if it were in previous, it would be stopped in BT
-            else if (Bt.PreviousRunningSet != null && !Bt.PreviousRunningSet.Contains(this))
+            else if (Bt.PreviousRunningSet == null || !Bt.PreviousRunningSet.Contains(this))
             {
                 OnStopRunning();
             }

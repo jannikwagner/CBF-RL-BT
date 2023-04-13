@@ -64,8 +64,11 @@ public class MyBTTest : MonoBehaviour
             })
         );
 
+        int count3 = 0;
+
         _tree = new BT(
             new Sequence("Root", new Node[]{
+                new PredicateCondition("Switcher", () => {var condition = ++count3 % 3 != 0; Debug.Log(condition); return condition;}),
                 new PrintAction("CustomAction"),
                 new Do("SuccessMessage", () =>
                 {
@@ -79,6 +82,7 @@ public class MyBTTest : MonoBehaviour
     private void Update()
     {
         // Update our tree every frame
+        Debug.Log("Tick");
         _tree.Tick();
     }
 }
@@ -96,7 +100,7 @@ public class PrintAction : Action
     public override TaskStatus OnUpdate()
     {
         Debug.Log("PrintAction.OnUpdate");
-        return TaskStatus.Running;
+        return TaskStatus.Success;
     }
 
     public override void OnStartRunning()
