@@ -8,16 +8,17 @@ using System.Collections.Generic;
 
 namespace BTTest
 {
-    public enum ReturnStatus { SUCCESS, FAILURE, RUNNING };
+    public enum TaskStatus { Success, Failure, Running };
 
     public class BT
     {
+        public BT(Node root) { this.Root = root; }
         private Node root;
         private HashSet<Node> currentExecutionSet;
         private HashSet<Node> previousExecutionSet;
         private HashSet<Node> currentRunningSet;
         private HashSet<Node> previousRunningSet;
-        public Node Root { get => root; set => SetReferenceRec(value); }
+        public Node Root { get => root; set { this.root = value; SetReferenceRec(value); } }
         public HashSet<Node> CurrentExecutionSet { get => currentExecutionSet; set => currentExecutionSet = value; }
         public HashSet<Node> PreviousExecutionSet { get => previousExecutionSet; set => previousExecutionSet = value; }
         public HashSet<Node> CurrentRunningSet { get => currentRunningSet; set => currentRunningSet = value; }
@@ -81,14 +82,15 @@ namespace BTTest
         public BT Bt { get => bt; set => bt = value; }
         public bool Initialized { get => initialized; set => initialized = value; }
 
-        public virtual ReturnStatus OnUpdate() { return ReturnStatus.FAILURE; }
+        public virtual TaskStatus OnUpdate() { return TaskStatus.Failure; }
         public virtual void OnStopRunning() { }
         public virtual void OnStartRunning() { }
         public virtual void OnStopExecution() { }
         public virtual void OnSartExecution() { }
         public virtual void OnInit() { }
-        public virtual ReturnStatus Tick()
+        public virtual TaskStatus Tick()
         {
+            // Debug.Log(name);
             if (!Initialized)
             {
                 OnInit();
@@ -104,12 +106,13 @@ namespace BTTest
                 OnStartRunning();
             }
 
-            ReturnStatus status = OnUpdate();
+            TaskStatus status = OnUpdate();
 
-            if (status == ReturnStatus.RUNNING)
+            if (status == TaskStatus.Running)
             {
                 Bt.CurrentRunningSet.Add(this);
             }
+            // if it were in previous, it would be stopped in BT
             else if (Bt.PreviousRunningSet != null && !Bt.PreviousRunningSet.Contains(this))
             {
                 OnStopRunning();
@@ -117,7 +120,7 @@ namespace BTTest
 
             return status;
         }
-        public Node(String name, Node parent = null)
+        public Node(String name, CompositeNode parent = null)
         {
             this.name = name;
             this.parent = parent;
@@ -126,95 +129,124 @@ namespace BTTest
     public class CompositeNode : Node
     {
         private Node[] children;
-        public CompositeNode(String name, Node[] children, Node parent = null) : base(name, parent)
+        public CompositeNode(String name, Node[] children) : base(name)
         {
-            this.Children = children;
+            this.children = children;
             foreach (Node child in children)
             {
                 child.Parent = this;
             }
         }
 
-        public Node[] Children { get => children; set => children = value; }
+        public Node[] Children { get => children; }
     }
     public class Sequence : CompositeNode
     {
-        public Sequence(String name, Node[] children, Node parent = null) : base(name, children, parent)
+        public Sequence(String name, Node[] children) : base(name, children)
         {
         }
-        public override ReturnStatus OnUpdate()
+        public override TaskStatus OnUpdate()
         {
             foreach (Node child in Children)
             {
-                ReturnStatus status = child.Tick();
-                if (status != ReturnStatus.SUCCESS)
+                TaskStatus status = child.Tick();
+                if (status != TaskStatus.Success)
                 {
                     return status;
                 }
             }
-            return ReturnStatus.SUCCESS;
+            return TaskStatus.Success;
         }
     }
     public class Selector : CompositeNode
     {
-        public Selector(String name, Node[] children, Node parent = null) : base(name, children, parent)
+        public Selector(String name, Node[] children) : base(name, children)
         {
         }
-        public override ReturnStatus OnUpdate()
+        public override TaskStatus OnUpdate()
         {
             foreach (Node child in Children)
             {
-                ReturnStatus status = child.Tick();
-                if (status != ReturnStatus.FAILURE)
+                TaskStatus status = child.Tick();
+                if (status != TaskStatus.Failure)
                 {
                     return status;
                 }
             }
-            return ReturnStatus.FAILURE;
+            return TaskStatus.Failure;
         }
     }
     public class ExecutionNode : Node
     {
-        public ExecutionNode(String name, Node parent = null) : base(name, parent)
+        public ExecutionNode(String name) : base(name)
         {
         }
     }
     public class Action : ExecutionNode
     {
-        public Action(String name, Node parent = null) : base(name, parent)
+        public Action(String name) : base(name)
         {
+        }
+    }
+    public class Do : Action
+    {
+        private Func<TaskStatus> payload;
+        public Do(String name, Func<TaskStatus> payload) : base(name)
+        {
+            this.payload = payload;
+        }
+        public override TaskStatus OnUpdate()
+        {
+            return payload();
         }
     }
     public class Condition : ExecutionNode
     {
-        public Condition(String name, Node parent = null) : base(name, parent)
+        public Condition(String name) : base(name) { }
+    }
+    public class PredicateCondition : ExecutionNode
+    {
+        private Func<bool> predicate;
+        public PredicateCondition(String name, Func<bool> predicate = null) : base(name)
         {
+            this.predicate = predicate;
+        }
+        public override TaskStatus OnUpdate()
+        {
+            return predicate() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
     public class CBFCondition : Condition
     {
         private CBFApplicator cbfApplicator;
-        public CBFCondition(String name, CBFApplicator cbfApplicator, Node parent = null) : base(name, parent)
+        public CBFCondition(String name, CBFApplicator cbfApplicator) : base(name)
         {
             this.cbfApplicator = cbfApplicator;
         }
-        public override ReturnStatus OnUpdate()
+        public override TaskStatus OnUpdate()
         {
-            return cbfApplicator.isSafe() ? ReturnStatus.SUCCESS : ReturnStatus.FAILURE;
+            return cbfApplicator.isSafe() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
     public class LearningAction : Action
     {
         // TODO
-        private BehaviorParameters behaviorParameters;
-        private IActuator actuator;
-        private ISensor sensor;
-        public LearningAction(String name, Node parent = null) : base(name, parent)
+        private Agent agent;
+        public LearningAction(String name, Agent agent) : base(name)
         {
+            this.agent = agent;
         }
-        public override ReturnStatus OnUpdate()
+        public override TaskStatus OnUpdate()
         {
-            return ReturnStatus.FAILURE;
+            return TaskStatus.Failure;
+        }
+    }
+    public class LearningActionWPC : LearningAction
+    {
+        private Func<bool> postcondition;
+        public LearningActionWPC(String name, Agent agent, Func<bool> postcondition) : base(name, agent)
+        {
+            this.postcondition = postcondition;
         }
     }
     public class LearningCompositeNode : CompositeNode
@@ -223,12 +255,12 @@ namespace BTTest
         private BehaviorParameters behaviorParameters;
         private IActuator actuator;
         private ISensor sensor;
-        public LearningCompositeNode(String name, Node[] children, Node parent = null) : base(name, children, parent)
+        public LearningCompositeNode(String name, Node[] children) : base(name, children)
         {
         }
-        public override ReturnStatus OnUpdate()
+        public override TaskStatus OnUpdate()
         {
-            return ReturnStatus.FAILURE;
+            return TaskStatus.Failure;
         }
     }
 }
