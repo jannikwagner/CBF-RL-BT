@@ -269,9 +269,9 @@ namespace BTTest
         }
         public override void OnStopRunning()
         {
-            base.OnStopRunning();
             Debug.Log(Name + ": steps: " + stepCount);
             Agent.EndEpisode();
+            base.OnStopRunning();
         }
     }
 
@@ -284,7 +284,6 @@ namespace BTTest
         }
         public override void OnStopRunning()
         {
-            base.OnStopRunning();
             if (postcondition())
             {
                 Agent.AddReward(1f);
@@ -295,6 +294,27 @@ namespace BTTest
                 Agent.AddReward(-1f);
                 Debug.Log(Name + " did not reach postcondition");
             }
+            base.OnStopRunning();
+        }
+    }
+    public class LearningActionWPCACC : LearningActionWPC
+    {
+        private Func<bool>[] accs;
+        public LearningActionWPCACC(string name, BaseAgent agent, Func<bool> postcondition, Func<bool>[] accs) : base(name, agent, postcondition)
+        {
+            this.accs = accs;
+        }
+        public override void OnStopRunning()
+        {
+            foreach (var acc in accs)
+            {
+                if (!acc())
+                {
+                    Agent.AddReward(-1f);
+                    Debug.Log(Name + " violated ACC");
+                }
+            }
+            base.OnStopRunning();
         }
     }
     public class LearningCompositeNode : CompositeNode

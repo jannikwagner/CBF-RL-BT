@@ -22,7 +22,7 @@ public class MyBTTest : MonoBehaviour
                             new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
                             new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
                         } ),
-                        new LearningActionWPC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed)
+                        new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget})
                     }),
                 }),
 
