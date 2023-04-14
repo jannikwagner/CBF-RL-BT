@@ -243,21 +243,21 @@ namespace BTTest
         public override TaskStatus OnUpdate()
         {
             // Debug.Log(Name + ": OnUpdate");
-            stepCount++;
-            if (stepCount >= StepsPerDecision)
+            if (stepCount % StepsPerDecision == 0)
             {
-                stepCount = 0;
                 Agent.RequestDecision();
             }
             else
             {
                 Agent.RequestAction();
             }
+            stepCount++;
 
             if (stepCount >= MaxSteps)
             {
                 Agent.EndEpisode();
                 Agent.controller.env.Initialize();
+                return TaskStatus.Failure;
             }
 
             return TaskStatus.Running;
@@ -270,6 +270,7 @@ namespace BTTest
         public override void OnStopRunning()
         {
             base.OnStopRunning();
+            Debug.Log(Name + ": steps: " + stepCount);
             Agent.EndEpisode();
         }
     }
@@ -288,6 +289,11 @@ namespace BTTest
             {
                 Agent.AddReward(1f);
                 Debug.Log(Name + " reached postcondition");
+            }
+            else
+            {
+                Agent.AddReward(-1f);
+                Debug.Log(Name + " did not reach postcondition");
             }
         }
     }
