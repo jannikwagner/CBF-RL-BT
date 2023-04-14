@@ -1,9 +1,5 @@
 using System;
 using UnityEngine;
-using Unity.MLAgents;
-using Unity.MLAgents.Sensors;
-using Unity.MLAgents.Actuators;
-using Unity.MLAgents.Policies;
 using System.Collections.Generic;
 
 namespace BTTest
@@ -35,11 +31,11 @@ namespace BTTest
                 }
             }
         }
-        public void Tick()
+        public TaskStatus Tick()
         {
             currentRunningSet = new HashSet<Node>();
             currentExecutionSet = new HashSet<Node>();
-            Root.Tick();
+            var status = Root.Tick();
             if (previousRunningSet != null)
             {
                 foreach (Node node in previousRunningSet)
@@ -62,6 +58,7 @@ namespace BTTest
             }
             previousRunningSet = currentRunningSet;
             previousExecutionSet = currentExecutionSet;
+            return status;
         }
     }
 
@@ -70,15 +67,9 @@ namespace BTTest
         private bool initialized = false;
         private BT bt;
         private String name;
-        public String Name
-        {
-            get => name; set => name = value;
-        }
+        public String Name { get => name; set => name = value; }
         private Node parent;
-        public Node Parent
-        {
-            get => parent; set => parent = value;
-        }
+        public Node Parent { get => parent; set => parent = value; }
         public BT Bt { get => bt; set => bt = value; }
         public bool Initialized { get => initialized; set => initialized = value; }
 
@@ -142,9 +133,7 @@ namespace BTTest
     }
     public class Sequence : CompositeNode
     {
-        public Sequence(String name, Node[] children) : base(name, children)
-        {
-        }
+        public Sequence(String name, Node[] children) : base(name, children) { }
         public override TaskStatus OnUpdate()
         {
             foreach (Node child in Children)
@@ -160,9 +149,7 @@ namespace BTTest
     }
     public class Selector : CompositeNode
     {
-        public Selector(String name, Node[] children) : base(name, children)
-        {
-        }
+        public Selector(String name, Node[] children) : base(name, children) { }
         public override TaskStatus OnUpdate()
         {
             foreach (Node child in Children)
@@ -178,15 +165,11 @@ namespace BTTest
     }
     public class ExecutionNode : Node
     {
-        public ExecutionNode(String name) : base(name)
-        {
-        }
+        public ExecutionNode(String name) : base(name) { }
     }
     public class Action : ExecutionNode
     {
-        public Action(String name) : base(name)
-        {
-        }
+        public Action(String name) : base(name) { }
     }
     public class Do : Action
     {
@@ -207,7 +190,7 @@ namespace BTTest
     public class PredicateCondition : ExecutionNode
     {
         private Func<bool> predicate;
-        public PredicateCondition(String name, Func<bool> predicate = null) : base(name)
+        public PredicateCondition(String name, Func<bool> predicate) : base(name)
         {
             this.predicate = predicate;
         }
@@ -320,9 +303,6 @@ namespace BTTest
     public class LearningCompositeNode : CompositeNode
     {
         // TODO
-        private BehaviorParameters behaviorParameters;
-        private IActuator actuator;
-        private ISensor sensor;
         public LearningCompositeNode(String name, Node[] children) : base(name, children)
         {
         }
