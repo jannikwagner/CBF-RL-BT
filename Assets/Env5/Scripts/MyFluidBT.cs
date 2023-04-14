@@ -5,7 +5,7 @@ using CleverCrow.Fluid.BTs.Tasks.Actions;
 using Unity.MLAgents;
 using CleverCrow.Fluid.BTs.TaskParents.Composites;
 
-public class MyBT : MonoBehaviour
+public class MyFluidBT : MonoBehaviour
 {
     [SerializeField]
     private BehaviorTree _tree;

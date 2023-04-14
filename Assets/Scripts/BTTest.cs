@@ -252,7 +252,7 @@ namespace BTTest
         }
         public override void OnStopRunning()
         {
-            Debug.Log(Name + ": steps: " + stepCount);
+            Debug.Log(Name + ": stopped running after step: " + stepCount);
             Agent.EndEpisode();
             base.OnStopRunning();
         }
