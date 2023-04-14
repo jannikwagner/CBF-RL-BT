@@ -86,7 +86,7 @@ namespace BTTest
         public virtual void OnStopRunning() { }
         public virtual void OnStartRunning() { }
         public virtual void OnStopExecution() { }
-        public virtual void OnSartExecution() { }
+        public virtual void OnStartExecution() { }
         public virtual void OnInit() { }
         public virtual TaskStatus Tick()
         {
@@ -99,7 +99,7 @@ namespace BTTest
             Bt.CurrentExecutionSet.Add(this);
             if (Bt.PreviousExecutionSet == null || !Bt.PreviousExecutionSet.Contains(this))
             {
-                OnSartExecution();
+                OnStartExecution();
             }
             if (Bt.PreviousRunningSet == null || !Bt.PreviousRunningSet.Contains(this))
             {
@@ -230,23 +230,65 @@ namespace BTTest
     }
     public class LearningAction : Action
     {
-        // TODO
-        private Agent agent;
-        public LearningAction(String name, Agent agent) : base(name)
-        {
-            this.agent = agent;
-        }
+        public LearningAction(String name, BaseAgent agent) : base(name) { this.agent = agent; }
+        private BaseAgent agent;
+        private int stepsPerDecision = 10;
+        private int stepCount = 0;
+        private int maxSteps = 1000;
+
+        public BaseAgent Agent { get => agent; set => agent = value; }
+        public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
+        public int MaxSteps { get => maxSteps; set => maxSteps = value; }
+
         public override TaskStatus OnUpdate()
         {
-            return TaskStatus.Failure;
+            // Debug.Log(Name + ": OnUpdate");
+            stepCount++;
+            if (stepCount >= StepsPerDecision)
+            {
+                stepCount = 0;
+                Agent.RequestDecision();
+            }
+            else
+            {
+                Agent.RequestAction();
+            }
+
+            if (stepCount >= MaxSteps)
+            {
+                Agent.EndEpisode();
+                Agent.controller.env.Initialize();
+            }
+
+            return TaskStatus.Running;
+        }
+        public override void OnStartRunning()
+        {
+            base.OnStartRunning();
+            stepCount = 0;
+        }
+        public override void OnStopRunning()
+        {
+            base.OnStopRunning();
+            Agent.EndEpisode();
         }
     }
+
     public class LearningActionWPC : LearningAction
     {
         private Func<bool> postcondition;
-        public LearningActionWPC(String name, Agent agent, Func<bool> postcondition) : base(name, agent)
+        public LearningActionWPC(String name, BaseAgent agent, Func<bool> postcondition) : base(name, agent)
         {
             this.postcondition = postcondition;
+        }
+        public override void OnStopRunning()
+        {
+            base.OnStopRunning();
+            if (postcondition())
+            {
+                Agent.AddReward(1f);
+                Debug.Log(Name + " reached postcondition");
+            }
         }
     }
     public class LearningCompositeNode : CompositeNode

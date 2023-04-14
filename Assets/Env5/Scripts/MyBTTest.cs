@@ -33,56 +33,55 @@ public class MyBTTest : MonoBehaviour
                 })
             })
         );
-        int count1 = 0;
-        int count2 = 0;
 
-        _tree = new BT(
-            new Sequence("Root", new Node[]{
-                new Selector("Selector", new Node[]{
-                    new PredicateCondition("Count1", () =>
-                    {
-                        count1++;
-                        Debug.Log("Count1: " + count1);
-                        return (count1 > 5);
-                    }),
-                    new Do("Count2", () =>
-                    {
-                        count2++;
-                        Debug.Log("Count2: " + count2);
-                        if (count2 > 10)
-                        {
-                            return TaskStatus.Success;
-                        }
-                        return TaskStatus.Running;
-                    }),
-                }),
-                new Do("SuccessMessage", () =>
-                {
-                    Debug.Log("Success!");
-                    return TaskStatus.Success;
-                })
-            })
-        );
+        // int count1 = 0;
+        // int count2 = 0;
+        // _tree = new BT(
+        //     new Sequence("Root", new Node[]{
+        //         new Selector("Selector", new Node[]{
+        //             new PredicateCondition("Count1", () =>
+        //             {
+        //                 count1++;
+        //                 Debug.Log("Count1: " + count1);
+        //                 return (count1 > 5);
+        //             }),
+        //             new Do("Count2", () =>
+        //             {
+        //                 count2++;
+        //                 Debug.Log("Count2: " + count2);
+        //                 if (count2 > 10)
+        //                 {
+        //                     return TaskStatus.Success;
+        //                 }
+        //                 return TaskStatus.Running;
+        //             }),
+        //         }),
+        //         new Do("SuccessMessage", () =>
+        //         {
+        //             Debug.Log("Success!");
+        //             return TaskStatus.Success;
+        //         })
+        //     })
+        // );
 
-        int count3 = 0;
-
-        _tree = new BT(
-            new Sequence("Root", new Node[]{
-                new PredicateCondition("Switcher", () => {var condition = ++count3 % 3 != 0; Debug.Log(condition); return condition;}),
-                new PrintAction("CustomAction"),
-                new Do("SuccessMessage", () =>
-                {
-                    Debug.Log("Success!");
-                    return TaskStatus.Success;
-                })
-            })
-        );
+        // int count3 = 0;
+        // _tree = new BT(
+        //     new Sequence("Root", new Node[]{
+        //         new PredicateCondition("Switcher", () => {var condition = ++count3 % 3 != 0; Debug.Log(condition); return condition;}),
+        //         new PrintAction("CustomAction"),
+        //         new Do("SuccessMessage", () =>
+        //         {
+        //             Debug.Log("Success!");
+        //             return TaskStatus.Success;
+        //         })
+        //     })
+        // );
     }
 
     private void Update()
     {
         // Update our tree every frame
-        Debug.Log("Tick");
+        // Debug.Log("Tick");
         _tree.Tick();
     }
 }
@@ -100,7 +99,7 @@ public class PrintAction : Action
     public override TaskStatus OnUpdate()
     {
         Debug.Log("PrintAction.OnUpdate");
-        return TaskStatus.Success;
+        return TaskStatus.Running;
     }
 
     public override void OnStartRunning()
@@ -109,9 +108,9 @@ public class PrintAction : Action
         base.OnStartRunning();
     }
 
-    public override void OnSartExecution()
+    public override void OnStartExecution()
     {
-        Debug.Log("PrintAction.OnSartExecution");
+        Debug.Log("PrintAction.OnStartExecution");
         base.OnStartRunning();
     }
 
