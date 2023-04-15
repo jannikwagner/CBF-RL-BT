@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using Unity.MLAgents;
 using UnityEngine;
 
-public class AgentSwitcher : MonoBehaviour
+namespace Env5
 {
-    public List<BaseAgent> agents;
-    protected SimpleMultiAgentGroup m_AgentGroup;
-    private int currentAgent = 0;
-
-    void Start()
+    public class AgentSwitcher : MonoBehaviour
     {
-        m_AgentGroup = new SimpleMultiAgentGroup();
+        public List<EnvBaseAgent> agents;
+        protected SimpleMultiAgentGroup m_AgentGroup;
+        private int currentAgent = 0;
 
-        for (int i = 0; i < agents.Count; i++)
+        void Start()
         {
-            m_AgentGroup.RegisterAgent(agents[i]);
+            m_AgentGroup = new SimpleMultiAgentGroup();
+
+            for (int i = 0; i < agents.Count; i++)
+            {
+                m_AgentGroup.RegisterAgent(agents[i]);
+            }
         }
-    }
 
-    void Act(BaseAgent agent)
-    {
+        void Act(EnvBaseAgent agent)
+        {
 
+        }
     }
 }

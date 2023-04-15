@@ -61,13 +61,17 @@ public class EnvController : MonoBehaviour
     {
         float minX = -26;
         float maxX = 10;
+        float maxXTarget = 0f;
         float minZ = -23;
         float maxZ = 14;
-        float groundY = 0.5f;
+        float elevatedGroundY = 0.5f;
+        float elevatedGroundYTarget = elevatedGroundY - 1;
+        float lowerGroundY = elevatedGroundY - 4;
+        float lowerGroundYTarget = lowerGroundY = 1;
 
-        player.localPosition = new Vector3(Random.Range(minX, maxX), groundY, Random.Range(minZ, maxZ));
-        target.localPosition = new Vector3(Random.Range(minX, maxX), groundY, Random.Range(minZ, maxZ));
-        // button1Transform.position = new Vector3(0, 0.5f, 0);
+        player.localPosition = new Vector3(Random.Range(minX, maxX), elevatedGroundY, Random.Range(minZ, maxZ));
+        target.localPosition = new Vector3(Random.Range(minX, maxXTarget), elevatedGroundY, Random.Range(minZ, maxZ));
+        // button.localPosition = new Vector3(Random.Range(minX, maxXTarget), groundY, Random.Range(minZ, maxZ));
         // button2Transform.position = new Vector3(0, 0.5f, 0);
         // target1Transform.position = new Vector3(0, 0.5f, 0);
         // target2Transform.position = new Vector3(0, 0.5f, 0);

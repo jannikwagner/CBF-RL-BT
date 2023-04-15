@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Env5;
 
 namespace BTTest
 {
@@ -14,7 +15,7 @@ namespace BTTest
         private HashSet<Node> previousExecutionSet;
         private HashSet<Node> currentRunningSet;
         private HashSet<Node> previousRunningSet;
-        public Node Root { get => root; set { this.root = value; SetReferenceRec(value); } }
+        private Node Root { get => root; set { this.root = value; SetReferenceRec(value); } }
         public HashSet<Node> CurrentExecutionSet { get => currentExecutionSet; set => currentExecutionSet = value; }
         public HashSet<Node> PreviousExecutionSet { get => previousExecutionSet; set => previousExecutionSet = value; }
         public HashSet<Node> CurrentRunningSet { get => currentRunningSet; set => currentRunningSet = value; }
@@ -128,7 +129,6 @@ namespace BTTest
                 child.Parent = this;
             }
         }
-
         public Node[] Children { get => children; }
     }
     public class Sequence : CompositeNode
@@ -187,7 +187,7 @@ namespace BTTest
     {
         public Condition(String name) : base(name) { }
     }
-    public class PredicateCondition : ExecutionNode
+    public class PredicateCondition : Condition
     {
         private Func<bool> predicate;
         public PredicateCondition(String name, Func<bool> predicate) : base(name)
@@ -238,13 +238,14 @@ namespace BTTest
 
             if (stepCount >= MaxSteps)
             {
-                Agent.EndEpisode();
-                Agent.controller.env.Initialize();
+                Agent.EpisodeInterrupted();
+                Agent.ResetEnv();
                 return TaskStatus.Failure;
             }
 
             return TaskStatus.Running;
         }
+
         public override void OnStartRunning()
         {
             base.OnStartRunning();
@@ -311,4 +312,46 @@ namespace BTTest
             return TaskStatus.Failure;
         }
     }
+
+    public class PrintAction : Action
+    {
+        public PrintAction(string name) : base(name) { }
+
+        public override void OnInit()
+        {
+            base.OnInit();
+            Debug.Log("PrintAction.OnInit");
+        }
+
+        public override TaskStatus OnUpdate()
+        {
+            Debug.Log("PrintAction.OnUpdate");
+            return TaskStatus.Running;
+        }
+
+        public override void OnStartRunning()
+        {
+            Debug.Log("PrintAction.OnStartRunning");
+            base.OnStartRunning();
+        }
+
+        public override void OnStartExecution()
+        {
+            Debug.Log("PrintAction.OnStartExecution");
+            base.OnStartRunning();
+        }
+
+        public override void OnStopExecution()
+        {
+            Debug.Log("PrintAction.OnStopExecution");
+            base.OnStartRunning();
+        }
+
+        public override void OnStopRunning()
+        {
+            Debug.Log("PrintAction.OnStopRunning");
+            base.OnStartRunning();
+        }
+    }
+
 }
