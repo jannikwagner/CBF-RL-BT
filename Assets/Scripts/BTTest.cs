@@ -9,17 +9,28 @@ namespace BTTest
 
     public class BT
     {
-        public BT(Node root) { this.Root = root; }
+        public BT(Node root) { this.Root = root; Init(); }
         private Node root;
         private HashSet<Node> currentExecutionSet;
         private HashSet<Node> previousExecutionSet;
         private HashSet<Node> currentRunningSet;
         private HashSet<Node> previousRunningSet;
+        private long step;
         private Node Root { get => root; set { this.root = value; SetReferenceRec(value); } }
         public HashSet<Node> CurrentExecutionSet { get => currentExecutionSet; set => currentExecutionSet = value; }
         public HashSet<Node> PreviousExecutionSet { get => previousExecutionSet; set => previousExecutionSet = value; }
         public HashSet<Node> CurrentRunningSet { get => currentRunningSet; set => currentRunningSet = value; }
         public HashSet<Node> PreviousRunningSet { get => previousRunningSet; set => previousRunningSet = value; }
+        public long Step { get => step; }
+
+        private void Init()
+        {
+            currentExecutionSet = null;
+            previousExecutionSet = null;
+            currentRunningSet = null;
+            previousRunningSet = null;
+            step = 0;
+        }
 
         private void SetReferenceRec(Node value)
         {
@@ -59,7 +70,14 @@ namespace BTTest
             }
             previousRunningSet = currentRunningSet;
             previousExecutionSet = currentExecutionSet;
+            step++;
             return status;
+        }
+
+        public void Reset()
+        {
+            this.Root.OnReset();
+            Init();
         }
     }
 
@@ -80,6 +98,7 @@ namespace BTTest
         public virtual void OnStopExecution() { }
         public virtual void OnStartExecution() { }
         public virtual void OnInit() { }
+        public virtual void OnReset() { }
         public virtual TaskStatus Tick()
         {
             // Debug.Log(name);
@@ -130,6 +149,14 @@ namespace BTTest
             }
         }
         public Node[] Children { get => children; }
+        public override void OnReset()
+        {
+            foreach (var child in children)
+            {
+                child.OnReset();
+            }
+            base.OnReset();
+        }
     }
     public class Sequence : CompositeNode
     {
@@ -238,24 +265,41 @@ namespace BTTest
 
             if (stepCount >= MaxSteps)
             {
+                Debug.Log(GetLog("Local Reset"));
                 Agent.EpisodeInterrupted();
+                Agent.SetReward(0);
                 Agent.ResetEnv();
                 return TaskStatus.Failure;
             }
 
             return TaskStatus.Running;
         }
-
         public override void OnStartRunning()
         {
             base.OnStartRunning();
+
+            Debug.Log(GetLog("OnStartRunning"));
+            Agent.SetReward(0);
             stepCount = 0;
         }
         public override void OnStopRunning()
         {
-            Debug.Log(Name + ": stopped running after step: " + stepCount);
+            Debug.Log(GetLog("OnStopRunning"));
             Agent.EndEpisode();
+            Agent.SetReward(0);
             base.OnStopRunning();
+        }
+        public override void OnReset()
+        {
+            Debug.Log(GetLog("OnReset"));
+            Agent.EpisodeInterrupted();
+            Agent.SetReward(0);
+            stepCount = 0;
+            base.OnReset();
+        }
+        protected string GetLog(string message)
+        {
+            return Name + ": " + message + ",\t step: " + stepCount + ",\t reward: " + Agent.GetCumulativeReward() + ",\t BT step: " + Bt.Step;
         }
     }
 
@@ -271,16 +315,17 @@ namespace BTTest
             if (postcondition())
             {
                 Agent.AddReward(1f);
-                Debug.Log(Name + " reached postcondition");
+                Debug.Log(GetLog("Reached Postcondition"));
             }
             else
             {
                 Agent.AddReward(-1f);
-                Debug.Log(Name + " did not reach postcondition");
+                Debug.Log(GetLog("Did Not Reach Postcondition"));
             }
             base.OnStopRunning();
         }
     }
+
     public class LearningActionWPCACC : LearningActionWPC
     {
         private Func<bool>[] accs;
@@ -295,7 +340,7 @@ namespace BTTest
                 if (!acc())
                 {
                     Agent.AddReward(-1f);
-                    Debug.Log(Name + " violated ACC");
+                    Debug.Log(GetLog("Violated ACC"));
                 }
             }
             base.OnStopRunning();

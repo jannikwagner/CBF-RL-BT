@@ -12,9 +12,14 @@ namespace Env5
         public MoveToTarget moveToTarget;
         public PushTargetToButton pushTargetToButton;
         public PlayerController controller;
+        private int maxSteps = 2000;
+        private int stepCount;
+
+        public int MaxSteps { get => maxSteps; set => maxSteps = value; }
 
         private void Awake()
         {
+            stepCount = 0;
             _tree = new BT(
                 new Sequence("Root", new Node[] {
                 new Selector("PushSelector", new Node[] {
@@ -77,6 +82,7 @@ namespace Env5
             //         })
             //     })
             // );
+
         }
 
         private void Update()
@@ -84,6 +90,13 @@ namespace Env5
             // Update our tree every frame
             // Debug.Log("Tick");
             _tree.Tick();
+            if (++stepCount % MaxSteps == 0)
+            {
+                Debug.Log("Global Reset!");
+                _tree.Reset();
+                controller.env.Initialize();
+                stepCount = 0;
+            }
         }
     }
 }
