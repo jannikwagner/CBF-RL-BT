@@ -10,16 +10,15 @@ namespace Env5
         public Transform player;
         public Rigidbody rb;
         public EnvController env;
+        public float speed = 5f;
         // Start is called before the first frame update
         private bool holdingPole = false;
         void Start()
-        {
-
-        }
+        { }
 
         public void ApplyForce(Vector3 force)
         {
-            rb.AddForce(force * rb.mass * 20f);
+            rb.AddForce(force * rb.mass * speed);
         }
 
         // // Update is called once per frame
@@ -68,7 +67,7 @@ namespace Env5
 
         internal bool IsCloseToTarget()
         {
-            var condition = DistanceToTarget() < 3.0f;
+            var condition = DistanceToTarget() < 5.0f;
             if (condition)
             {
                 // Debug.Log("Close to target");
