@@ -98,7 +98,7 @@ namespace BTTest
         public virtual void OnStopExecution() { }
         public virtual void OnStartExecution() { }
         public virtual void OnInit() { }
-        public virtual void OnReset() { }
+        public virtual void OnReset() { Initialized = false; }
         public virtual TaskStatus Tick()
         {
             // Debug.Log(name);
@@ -275,11 +275,18 @@ namespace BTTest
 
             return TaskStatus.Running;
         }
+        public override void OnInit()
+        {
+            base.OnInit();
+            Agent.gameObject.SetActive(false);
+        }
         public override void OnStartRunning()
         {
             base.OnStartRunning();
 
             Debug.Log(GetLog("OnStartRunning"));
+
+            Agent.gameObject.SetActive(true);
             Agent.SetReward(0);
             stepCount = 0;
         }
@@ -288,6 +295,7 @@ namespace BTTest
             Debug.Log(GetLog("OnStopRunning"));
             Agent.EndEpisode();
             Agent.SetReward(0);
+            Agent.gameObject.SetActive(false);
             base.OnStopRunning();
         }
         public override void OnReset()
