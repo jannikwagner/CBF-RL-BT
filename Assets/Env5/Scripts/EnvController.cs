@@ -69,9 +69,16 @@ public class EnvController : MonoBehaviour
         float lowerGroundY = elevatedGroundY - 4;
         float lowerGroundYTarget = lowerGroundY = 1;
 
+        float buttonMaxX = -8;
+        float buttonTiltStartX = -20;
+        float buttonSmallMaxZ = -2;
+        float buttonSmallMinZ = -6;
+
         player.localPosition = new Vector3(Random.Range(minX, maxX), elevatedGroundY, Random.Range(minZ, maxZ));
         target.localPosition = new Vector3(Random.Range(minX, maxXTarget), elevatedGroundY, Random.Range(minZ, maxZ));
-        // button.localPosition = new Vector3(Random.Range(minX, maxXTarget), groundY, Random.Range(minZ, maxZ));
+        float buttonX = Random.Range(minX, buttonMaxX);
+        float buttonZ = buttonX < buttonTiltStartX ? Random.Range(minZ, maxZ) : Random.Range(buttonSmallMinZ, buttonSmallMaxZ);
+        button.localPosition = new Vector3(buttonX, elevatedGroundYTarget, buttonZ);
         // button2Transform.position = new Vector3(0, 0.5f, 0);
         // target1Transform.position = new Vector3(0, 0.5f, 0);
         // target2Transform.position = new Vector3(0, 0.5f, 0);

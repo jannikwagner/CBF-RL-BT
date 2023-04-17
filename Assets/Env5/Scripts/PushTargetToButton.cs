@@ -20,6 +20,10 @@ namespace Env5
         {
             base.OnActionReceived(actions);
             // Debug.Log("PushTargetToButton.OnActionReceived");
+            if (controller.DistanceToTarget() < 1.0f)
+            {
+                AddReward(0.2f / 1000f);
+            }
         }
     }
 }

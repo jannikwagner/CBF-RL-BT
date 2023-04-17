@@ -85,7 +85,7 @@ namespace Env5
 
         }
 
-        private void Update()
+        void FixedUpdate()
         {
             // Update our tree every frame
             // Debug.Log("Tick");

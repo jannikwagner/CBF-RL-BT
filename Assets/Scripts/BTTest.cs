@@ -261,6 +261,7 @@ namespace BTTest
             {
                 Agent.RequestAction();
             }
+            Agent.AddReward(-0.1f / MaxSteps);
             stepCount++;
 
             if (stepCount >= MaxSteps)
