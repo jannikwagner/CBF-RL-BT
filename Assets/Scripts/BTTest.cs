@@ -266,7 +266,7 @@ namespace BTTest
 
             if (stepCount >= MaxSteps)
             {
-                Debug.Log(GetLog("Local Reset"));
+                Log("Local Reset");
                 Agent.EpisodeInterrupted();
                 Agent.SetReward(0);
                 Agent.ResetEnv();
@@ -284,7 +284,7 @@ namespace BTTest
         {
             base.OnStartRunning();
 
-            Debug.Log(GetLog("OnStartRunning"));
+            Log("OnStartRunning");
 
             Agent.gameObject.SetActive(true);
             Agent.SetReward(0);
@@ -292,7 +292,7 @@ namespace BTTest
         }
         public override void OnStopRunning()
         {
-            Debug.Log(GetLog("OnStopRunning"));
+            Log("OnStopRunning");
             Agent.EndEpisode();
             Agent.SetReward(0);
             Agent.gameObject.SetActive(false);
@@ -300,7 +300,7 @@ namespace BTTest
         }
         public override void OnReset()
         {
-            Debug.Log(GetLog("OnReset"));
+            Log("OnReset");
             Agent.EpisodeInterrupted();
             Agent.SetReward(0);
             stepCount = 0;
@@ -308,7 +308,11 @@ namespace BTTest
         }
         protected string GetLog(string message)
         {
-            return Name + ": " + message + ",\t step: " + stepCount + ",\t reward: " + Agent.GetCumulativeReward() + ",\t BT step: " + Bt.Step;
+            return "step: " + stepCount + ",\t reward: " + Utility.Round(Agent.GetCumulativeReward(), 4) + ",\t BT step: " + Bt.Step + ", \t" + Name + ": \t" + message;
+        }
+        protected void Log(string message)
+        {
+            Debug.Log(GetLog(message));
         }
     }
 
@@ -324,12 +328,12 @@ namespace BTTest
             if (postcondition())
             {
                 Agent.AddReward(1f);
-                Debug.Log(GetLog("Reached Postcondition"));
+                Log("Reached Postcondition");
             }
             else
             {
                 Agent.AddReward(-1f);
-                Debug.Log(GetLog("Did Not Reach Postcondition"));
+                Log("Did Not Reach Postcondition");
             }
             base.OnStopRunning();
         }
@@ -349,7 +353,7 @@ namespace BTTest
                 if (!acc())
                 {
                     Agent.AddReward(-1f);
-                    Debug.Log(GetLog("Violated ACC"));
+                    Log("Violated ACC");
                 }
             }
             base.OnStopRunning();
