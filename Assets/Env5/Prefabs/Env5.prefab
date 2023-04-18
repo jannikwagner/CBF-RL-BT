@@ -530,7 +530,7 @@ GameObject:
   - component: {fileID: 7481095165463034401}
   - component: {fileID: 7481095165463034400}
   m_Layer: 0
-  m_Name: ElevatedGround2
+  m_Name: ElevatedGroundRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -857,7 +857,7 @@ GameObject:
   - component: {fileID: 7481095165683739845}
   - component: {fileID: 7481095165683739844}
   m_Layer: 0
-  m_Name: ElevatedGround3
+  m_Name: Podium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -872,7 +872,7 @@ Transform:
   m_GameObject: {fileID: 7481095165683739867}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -10, y: 2, z: 0}
-  m_LocalScale: {x: 20, y: 4, z: 7}
+  m_LocalScale: {x: 20, y: 4, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7481095165645402472}
@@ -1163,7 +1163,7 @@ Transform:
   m_GameObject: {fileID: 7481095166044813525}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -2, y: 4.0001, z: -2}
-  m_LocalScale: {x: 2, y: 0.0001, z: 2}
+  m_LocalScale: {x: 1, y: 0.0002, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7481095166365429462}
@@ -1559,6 +1559,8 @@ MonoBehaviour:
   goal: {fileID: 7481095166641309692}
   bridgeDown: {fileID: 7481095165390883636}
   bridgeUp: {fileID: 7481095165469514434}
+  groundY: 0
+  elevatedGroundY: 4
 --- !u!1 &7481095166394033187
 GameObject:
   m_ObjectHideFlags: 0
@@ -1587,7 +1589,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7481095166394033187}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -4, y: 4, z: 0}
+  m_LocalPosition: {x: -4, y: 4.05, z: 0}
   m_LocalScale: {x: 0.1, y: 2, z: 0.10000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1702,7 +1704,7 @@ Transform:
   m_GameObject: {fileID: 7481095166641309680}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 15, y: 4.0001, z: 0}
-  m_LocalScale: {x: 4, y: 0.0001, z: 4}
+  m_LocalScale: {x: 1, y: 0.0002, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7481095166365429462}
@@ -1916,7 +1918,7 @@ GameObject:
   - component: {fileID: 7481095167085200307}
   - component: {fileID: 7481095167085200306}
   m_Layer: 0
-  m_Name: ElevatedGround1
+  m_Name: ElevatedGroundLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

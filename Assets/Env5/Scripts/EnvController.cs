@@ -12,6 +12,11 @@ public class EnvController : MonoBehaviour
     public GameObject bridgeDown;
     public GameObject bridgeUp;
 
+    public float groundY = 0f;
+    public float elevatedGroundY = 4f;
+    public readonly float width = 40f;
+
+
     void Start()
     {
         Initialize();
@@ -59,15 +64,40 @@ public class EnvController : MonoBehaviour
 
     public void Initialize()
     {
-        float minX = -26;
-        float maxX = 10;
-        float maxXTarget = 0f;
-        float minZ = -23;
-        float maxZ = 14;
-        float elevatedGroundY = 0.5f;
-        float elevatedGroundYTarget = elevatedGroundY - 1;
-        float lowerGroundY = elevatedGroundY - 4;
-        float lowerGroundYTarget = lowerGroundY - 1;
+        float part1 = 0.25f;
+        float part2 = 0.25f;
+        float part3 = 0.25f;
+        float part4 = 0.25f;
+        float x0 = -width / 2;
+        float x1 = x0 + width * part1;
+        float x2 = x1 + width * part2;
+        float x3 = x2 + width * part3;
+        float x4 = x3 + width * part4;
+        float playerScale = 1f;
+        float buttonHeight = 0.0002f;
+        float margin = 1f;
+        float podiumBredth = 10f;
+        float height = elevatedGroundY - groundY;
+
+        float minX = x0 + margin + playerScale;
+        float maxX = x4 - margin - playerScale;
+        float maxXTarget = x3 - margin - playerScale;
+        float minZ = -width / 2 + margin + playerScale;
+        float maxZ = width / 2 - margin - playerScale;
+        float x1WithScale = x1 - playerScale;
+        float playerY = elevatedGroundY + playerScale / 2;
+        float buttonY = elevatedGroundY + buttonHeight / 2;
+        float podiumZ1 = -podiumBredth / 2;
+        float podiumZ2 = podiumBredth / 2;
+
+        player.localPosition = new Vector3(-15, playerY, -2);
+        player.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        target.localPosition = new Vector3(-8, playerY, -2);
+        target.localRotation = Quaternion.Euler(0, 0, 0);
+
+        button.localPosition = new Vector3(-2, buttonY, -2);
+
+
 
         float buttonMaxX = -8;
         float buttonTiltStartX = -20;
