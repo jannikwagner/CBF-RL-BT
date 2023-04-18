@@ -10,37 +10,45 @@ namespace Env5
         public Transform player;
         public Rigidbody rb;
         public EnvController env;
-        public float speed = 5f;
+        public float forceFactor = 5f;
         // Start is called before the first frame update
+        public float maxSpeed = 5f;
         private bool holdingPole = false;
         void Start()
         { }
 
         public void ApplyForce(Vector3 force)
         {
-            rb.AddForce(force * rb.mass * speed);
+            rb.AddForce(force * rb.mass * forceFactor);
+
+            if (rb.velocity.magnitude > maxSpeed)
+            {
+                rb.velocity = rb.velocity.normalized * maxSpeed;
+            }
         }
 
         // // Update is called once per frame
-        // void FixedUpdate()
-        // {
-        //     var fx = Input.GetAxis("Horizontal");
-        //     var fz = Input.GetAxis("Vertical");
-        //     var movement = new Vector3(fx, 0, fz);
-        //     rb.AddForce(movement * rb.mass * 10f);
+        void FixedUpdate()
+        {
+            //     var fx = Input.GetAxis("Horizontal");
+            //     var fz = Input.GetAxis("Vertical");
+            //     var movement = new Vector3(fx, 0, fz);
+            //     rb.AddForce(movement * rb.mass * 10f);
 
-        //     if (Input.GetKeyDown(KeyCode.Space))
-        //     {
-        //         rb.AddForce(new Vector3(0, 1, 0) * rb.mass * 1f, ForceMode.Impulse);
-        //     }
-        //     if (Input.GetKeyDown(KeyCode.V))
-        //     {
-        //         if (DistanceToPole() < 1.0f)
-        //         {
-        //             holdingPole = !holdingPole;
-        //         }
-        //     }
-        // }
+            //     if (Input.GetKeyDown(KeyCode.Space))
+            //     {
+            //         rb.AddForce(new Vector3(0, 1, 0) * rb.mass * 1f, ForceMode.Impulse);
+            //     }
+            //     if (Input.GetKeyDown(KeyCode.V))
+            //     {
+            //         if (DistanceToPole() < 1.0f)
+            //         {
+            //             holdingPole = !holdingPole;
+            //         }
+            //     }
+
+
+        }
 
         // public void LateUpdate()
         // {

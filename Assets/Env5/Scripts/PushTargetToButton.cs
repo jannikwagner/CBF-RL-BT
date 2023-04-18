@@ -19,7 +19,7 @@ namespace Env5
             Vector3 buttonPos = controller.env.button.localPosition;
             sensor.AddObservation((buttonPos - playerPos) / controller.env.width);
             sensor.AddObservation((buttonPos - targetPos) / controller.env.width);
-            // sensor.AddObservation(controller.rb.velocity);
+            sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
 
         public override void OnEpisodeBegin()
@@ -37,6 +37,11 @@ namespace Env5
             const float rFactor = 0.1f;
 
             base.OnActionReceived(actions);
+            if (controller.env.ButtonPressed())
+            {
+                Debug.Log("Button pressed!");
+                AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
+            }
             // Debug.Log("PushTargetToButton.OnActionReceived");
             if (controller.DistanceToTarget() < 1.0f)
             {
