@@ -113,4 +113,9 @@ public class Utility
         return samplePosition;
     }
 
+    public static float Round(float value, int digits)
+    {
+        var mult = Mathf.Pow(10.0f, digits);
+        return Mathf.Round(value * mult) / mult;
+    }
 }
