@@ -267,6 +267,7 @@ namespace BTTest
             if (stepCount >= MaxSteps)
             {
                 Log("Local Reset");
+                Agent.AddReward(-1f);
                 Agent.EpisodeInterrupted();
                 Agent.SetReward(0);
                 Agent.ResetEnv();
