@@ -8,8 +8,11 @@ namespace Env5
     {
         public override void CollectObservations(VectorSensor sensor)
         {
-            sensor.AddObservation(controller.player.position);
-            sensor.AddObservation(controller.env.target.position - controller.player.position);
+            Vector3 playerPos = controller.player.localPosition;
+            Vector3 playerPosObs = playerPos / controller.env.width * 2f;
+            sensor.AddObservation(playerPosObs);
+            Vector3 distanceObs = (controller.env.target.localPosition - playerPos) / controller.env.width;
+            sensor.AddObservation(distanceObs);
         }
 
         public override void OnEpisodeBegin()
