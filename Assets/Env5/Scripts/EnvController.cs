@@ -6,8 +6,8 @@ public class EnvController : MonoBehaviour
 {
     public Transform player;
     public Transform button;
-    public Transform target;
-    public Transform pole;
+    public Transform buttonTrigger;
+    public Transform goalTrigger;
     public Transform goal;
     public GameObject bridgeDown;
     public GameObject bridgeUp;
@@ -69,17 +69,17 @@ public class EnvController : MonoBehaviour
 
     public bool ButtonPressed()
     {
-        return Vector3.Distance(target.position, button.position) < 1.0f;
+        return Vector3.Distance(buttonTrigger.position, button.position) < 1.0f;
     }
 
     public bool win()
     {
-        return Vector3.Distance(pole.position, goal.position) < 1.0f;
+        return Vector3.Distance(goalTrigger.position, goal.position) < 1.0f;
     }
 
     public bool TargetUp()
     {
-        return target.position.y >= elevatedGroundY + 0.5f;
+        return buttonTrigger.position.y >= elevatedGroundY + 0.5f;
     }
 
     public float DistanceTargetUp()
@@ -90,7 +90,7 @@ public class EnvController : MonoBehaviour
         }
         else
         {
-            return target.position.x - x1 - playerScale;
+            return buttonTrigger.position.x - x1 - playerScale;
         }
     }
 
@@ -116,8 +116,8 @@ public class EnvController : MonoBehaviour
 
         player.localPosition = new Vector3(-15, playerY, -2);
         player.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        target.localPosition = new Vector3(-8, playerY, -2);
-        target.localRotation = Quaternion.Euler(0, 0, 0);
+        buttonTrigger.localPosition = new Vector3(-8, playerY, -2);
+        buttonTrigger.localRotation = Quaternion.Euler(0, 0, 0);
 
         button.localPosition = new Vector3(-2, buttonY, -2);
 
@@ -126,9 +126,9 @@ public class EnvController : MonoBehaviour
         float buttonSmallMaxZ = -2;
         float buttonSmallMinZ = -6;
 
-        player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
+        // player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
         // target.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
-        target.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
+        // buttonTrigger.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
         // float buttonX = Random.Range(minX, buttonMaxX);
         // float buttonZ = buttonX < buttonTiltStartX ? Random.Range(minZ, maxZ) : Random.Range(buttonSmallMinZ, buttonSmallMaxZ);
         // button.localPosition = new Vector3(buttonX, elevatedGroundYTarget, buttonZ);

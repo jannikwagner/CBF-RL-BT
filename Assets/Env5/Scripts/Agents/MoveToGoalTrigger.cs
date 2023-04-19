@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace Env5
 {
-    public class MoveToTarget : EnvBaseAgent
+    public class MoveToGoalTrigger : EnvBaseAgent
     {
-        private float startDistancePlayerTarget;
-        private float lastDistancePlayerTarget;
+        private DistanceRewarder playerTriggerDistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
             Vector3 playerPosObs = playerPos / controller.env.width * 2f;
             sensor.AddObservation(playerPosObs);
-            Vector3 distanceObs = (controller.env.target.localPosition - playerPos) / controller.env.width;
+            Vector3 goalTriggerPos = controller.env.goalTrigger.localPosition;
+            Vector3 distanceObs = (goalTriggerPos - playerPos) / controller.env.width;
             sensor.AddObservation(distanceObs);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
@@ -21,8 +21,7 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            startDistancePlayerTarget = Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition);
-            lastDistancePlayerTarget = startDistancePlayerTarget;
+            playerTriggerDistanceRewarder = new DistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.goalTrigger.localPosition));
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -39,10 +38,7 @@ namespace Env5
                 // Debug.Log("velocityPunishment: " + velocityPunishment);
                 AddReward(velocityPunishment);
             }
-
-            float distancePlayerTarget = Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition);
-            AddReward((lastDistancePlayerTarget - distancePlayerTarget) / startDistancePlayerTarget * rFactor);
-            lastDistancePlayerTarget = distancePlayerTarget;
+            AddReward(playerTriggerDistanceRewarder.Reward() * rFactor);
         }
     }
 }

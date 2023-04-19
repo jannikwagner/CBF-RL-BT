@@ -6,15 +6,13 @@ namespace Env5
 {
     public class PushTargetToButton : EnvBaseAgent
     {
-        private float startDistanceTargetButton;
-        private float lastDistanceTargetButton;
-        private float startDistancePlayerTarget;
-        private float lastDistancePlayerTarget;
+        private DistanceRewarder playerTargetDistanceRewarder;
+        private DistanceRewarder targetButtonDistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.width * 2f);
-            Vector3 targetPos = controller.env.target.localPosition;
+            Vector3 targetPos = controller.env.buttonTrigger.localPosition;
             sensor.AddObservation((targetPos - playerPos) / controller.env.width);
             Vector3 buttonPos = controller.env.button.localPosition;
             sensor.AddObservation((buttonPos - playerPos) / controller.env.width);
@@ -25,11 +23,9 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            startDistanceTargetButton = Vector3.Distance(controller.env.target.localPosition, controller.env.button.localPosition);
-            lastDistanceTargetButton = startDistanceTargetButton;
+            targetButtonDistanceRewarder = new DistanceRewarder(() => Vector3.Distance(controller.env.buttonTrigger.localPosition, controller.env.button.localPosition));
 
-            startDistancePlayerTarget = Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition);
-            lastDistancePlayerTarget = startDistancePlayerTarget;
+            playerTargetDistanceRewarder = new DistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.buttonTrigger.localPosition));
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -47,13 +43,9 @@ namespace Env5
             {
                 AddReward(rFactor / 1000f);
             }
-            float distanceTargetButton = Vector3.Distance(controller.env.target.localPosition, controller.env.button.localPosition);
-            AddReward((lastDistanceTargetButton - distanceTargetButton) / startDistanceTargetButton * rFactor * 3);
-            lastDistanceTargetButton = distanceTargetButton;
+            AddReward(targetButtonDistanceRewarder.Reward() * rFactor * 3);
 
-            float distancePlayerTarget = Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition);
-            AddReward((lastDistancePlayerTarget - distancePlayerTarget) / startDistancePlayerTarget * rFactor);
-            lastDistancePlayerTarget = distancePlayerTarget;
+            AddReward(playerTargetDistanceRewarder.Reward() * rFactor);
         }
     }
 }

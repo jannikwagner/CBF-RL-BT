@@ -10,6 +10,7 @@ namespace Env5
         public Transform player;
         public Rigidbody rb;
         public EnvController env;
+        public float closenessDistance = 3.0f;
         public float forceFactor = 10f;
         // Start is called before the first frame update
         public float maxSpeed = 5f;
@@ -27,59 +28,23 @@ namespace Env5
             }
         }
 
-        // // Update is called once per frame
-        void FixedUpdate()
-        {
-            //     var fx = Input.GetAxis("Horizontal");
-            //     var fz = Input.GetAxis("Vertical");
-            //     var movement = new Vector3(fx, 0, fz);
-            //     rb.AddForce(movement * rb.mass * 10f);
-
-            //     if (Input.GetKeyDown(KeyCode.Space))
-            //     {
-            //         rb.AddForce(new Vector3(0, 1, 0) * rb.mass * 1f, ForceMode.Impulse);
-            //     }
-            //     if (Input.GetKeyDown(KeyCode.V))
-            //     {
-            //         if (DistanceToPole() < 1.0f)
-            //         {
-            //             holdingPole = !holdingPole;
-            //         }
-            //     }
-
-
-        }
-
-        // public void LateUpdate()
-        // {
-        //     ControlPole();
-        // }
-
-        public float DistanceToPole()
-        {
-            return Vector3.Distance(player.position, env.pole.position);
-        }
-
         public float DistanceToTarget()
         {
-            return Vector3.Distance(player.position, env.target.position);
+            return Vector3.Distance(player.position, env.buttonTrigger.position);
         }
-
-        void ControlPole()
+        public float DistanceToGoalTrigger()
         {
-            if (holdingPole)
-            {
-                env.pole.position = player.position + new Vector3(0.6f, 0f, 0f);
-            }
+            return Vector3.Distance(player.position, env.goalTrigger.position);
         }
 
         internal bool IsCloseToTarget()
         {
-            var condition = DistanceToTarget() < 5.0f;
-            if (condition)
-            {
-                // Debug.Log("Close to target");
-            }
+            var condition = DistanceToTarget() < closenessDistance;
+            return condition;
+        }
+        internal bool IsCloseToGoalTrigger()
+        {
+            var condition = DistanceToGoalTrigger() < closenessDistance;
             return condition;
         }
     }
