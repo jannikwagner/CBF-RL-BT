@@ -10,7 +10,7 @@ namespace Env5
         public Transform player;
         public Rigidbody rb;
         public EnvController env;
-        public float forceFactor = 5f;
+        public float forceFactor = 10f;
         // Start is called before the first frame update
         public float maxSpeed = 5f;
         private bool holdingPole = false;

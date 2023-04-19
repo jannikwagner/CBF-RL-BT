@@ -34,7 +34,10 @@ namespace Env5
             if (controller.IsCloseToTarget())
             {
                 Debug.Log("Target reached!");
-                AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
+
+                float velocityPunishment = -rFactor * controller.rb.velocity.magnitude / controller.maxSpeed;
+                // Debug.Log("velocityPunishment: " + velocityPunishment);
+                AddReward(velocityPunishment);
             }
 
             float distancePlayerTarget = Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition);

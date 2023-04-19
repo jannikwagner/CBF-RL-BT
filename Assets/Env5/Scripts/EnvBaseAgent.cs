@@ -39,7 +39,7 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            Debug.Log("OnEpisodeBegin");
+            // Debug.Log("OnEpisodeBegin");
         }
     }
 

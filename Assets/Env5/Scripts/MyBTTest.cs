@@ -21,6 +21,31 @@ namespace Env5
         private void Awake()
         {
             stepCount = 0;
+
+            _tree = new BT(
+                new Sequence("Root", new Node[] {
+                    new Selector("PushTargetToButtonSelector", new Node[] {
+                        new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
+                        new Sequence("PushTargetToButtonSequence", new Node[]{
+                            new Selector("MoveSelector", new Node[]{
+                                new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
+                                new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
+                            } ),
+                            new Selector("PushTargetUpSelector", new Node[]{
+                                new PredicateCondition("TargetUp", controller.env.TargetUp),
+                                new LearningActionWPCACC("PushTargetUp", pushTargetUp, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
+                            } ),
+                            new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
+                        }),
+                    }),
+                    new Do("SuccessMessage", () =>
+                    {
+                        Debug.Log("Success!");
+                        return TaskStatus.Success;
+                    })
+                })
+            );
+
             _tree = new BT(
                 new Sequence("Root", new Node[] {
                     new Selector("PushTargetToButtonSelector", new Node[] {

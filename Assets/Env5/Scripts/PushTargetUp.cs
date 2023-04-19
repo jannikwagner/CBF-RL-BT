@@ -47,6 +47,10 @@ namespace Env5
             float distanceTargetUp = controller.env.DistanceTargetUp();
             AddReward((lastDistanceTargetUp - distanceTargetUp) / startDistanceTargetUp * rFactor * 3);
             lastDistanceTargetUp = distanceTargetUp;
+
+            float distancePlayerTarget = Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition);
+            AddReward((lastDistancePlayerTarget - distancePlayerTarget) / startDistancePlayerTarget * rFactor);
+            lastDistancePlayerTarget = distancePlayerTarget;
         }
     }
 }

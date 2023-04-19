@@ -126,8 +126,9 @@ public class EnvController : MonoBehaviour
         float buttonSmallMaxZ = -2;
         float buttonSmallMinZ = -6;
 
-        // player.localPosition = new Vector3(Random.Range(minX, maxX), elevatedGroundY, Random.Range(minZ, maxZ));
-        // target.localPosition = new Vector3(Random.Range(minX, maxXTarget), elevatedGroundY, Random.Range(minZ, maxZ));
+        player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
+        // target.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
+        target.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
         // float buttonX = Random.Range(minX, buttonMaxX);
         // float buttonZ = buttonX < buttonTiltStartX ? Random.Range(minZ, maxZ) : Random.Range(buttonSmallMinZ, buttonSmallMaxZ);
         // button.localPosition = new Vector3(buttonX, elevatedGroundYTarget, buttonZ);
