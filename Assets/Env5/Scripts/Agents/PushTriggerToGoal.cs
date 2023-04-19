@@ -36,7 +36,7 @@ namespace Env5
             base.OnActionReceived(actions);
             if (controller.env.ButtonPressed())
             {
-                Debug.Log("Button pressed!");
+                // Debug.Log("Button pressed!");
                 AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");

@@ -12,6 +12,8 @@ namespace Env5
         public MoveToTarget moveToTarget;
         public PushTargetToButton pushTargetToButton;
         public PushTargetUp pushTargetUp;
+        public MoveToGoalTrigger moveToGoalTrigger;
+        public PushTriggerToGoal pushTriggerToGoal;
         public PlayerController controller;
         private int maxSteps = 2000;
         private int stepCount;
@@ -24,20 +26,38 @@ namespace Env5
 
             _tree = new BT(
                 new Sequence("Root", new Node[] {
-                    new Selector("PushTargetToButtonSelector", new Node[] {
-                        new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
-                        new Sequence("PushTargetToButtonSequence", new Node[]{
-                            new Selector("MoveSelector", new Node[]{
-                                new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
-                                new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
-                            } ),
-                            new Selector("PushTargetUpSelector", new Node[]{
-                                new PredicateCondition("TargetUp", controller.env.TargetUp),
-                                new LearningActionWPCACC("PushTargetUp", pushTargetUp, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
-                            } ),
-                            new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
+                    new Selector("PushTriggerToGoalSelector", new Node[] {
+                        new PredicateCondition("TriggerAtGoal", controller.env.win),
+                        new Sequence("PushTriggerToGoalSequence", new Node[]{
+
+                            new Selector("PushTargetToButtonSelector", new Node[] {
+                                new PredicateCondition("TargetAtButton", controller.env.ButtonPressed),
+                                new Sequence("PushTargetToButtonSequence", new Node[]{
+
+                                    new Selector("MoveSelector", new Node[]{
+                                        new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
+                                        new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
+                                    } ),
+
+                                    new Selector("PushTargetUpSelector", new Node[]{
+                                        new PredicateCondition("TargetUp", controller.env.TargetUp),
+                                        new LearningActionWPCACC("PushTargetUp", pushTargetUp, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
+                                    } ),
+
+                                    new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
+                                }),
+                            }),
+
+                            new Selector("MoveToGoalTriggerSelector", new Node[]{
+                                new PredicateCondition("CloseToTrigger", controller.IsCloseToGoalTrigger),
+                                new LearningActionWPCACC("MoveToTrigger", moveToGoalTrigger, controller.IsCloseToGoalTrigger, new System.Func<bool>[] {controller.env.ButtonPressed}),
+                            }),
+
+                            new LearningActionWPCACC("PushTriggerToGoal", pushTriggerToGoal, controller.env.win, new System.Func<bool>[] {controller.IsCloseToGoalTrigger, controller.env.ButtonPressed})
                         }),
                     }),
+
+
                     new Do("SuccessMessage", () =>
                     {
                         Debug.Log("Success!");
@@ -46,29 +66,29 @@ namespace Env5
                 })
             );
 
-            _tree = new BT(
-                new Sequence("Root", new Node[] {
-                    new Selector("PushTargetToButtonSelector", new Node[] {
-                        new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
-                        new Sequence("PushTargetToButtonSequence", new Node[]{
-                            new Selector("MoveSelector", new Node[]{
-                                new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
-                                new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
-                            } ),
-                            new Selector("PushTargetUpSelector", new Node[]{
-                                new PredicateCondition("TargetUp", controller.env.TargetUp),
-                                new LearningActionWPCACC("PushTargetUp", pushTargetUp, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
-                            } ),
-                            new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
-                        }),
-                    }),
-                    new Do("SuccessMessage", () =>
-                    {
-                        Debug.Log("Success!");
-                        return TaskStatus.Success;
-                    })
-                })
-            );
+            // _tree = new BT(
+            //     new Sequence("Root", new Node[] {
+            //         new Selector("PushTargetToButtonSelector", new Node[] {
+            //             new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
+            //             new Sequence("PushTargetToButtonSequence", new Node[]{
+            //                 new Selector("MoveSelector", new Node[]{
+            //                     new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
+            //                     new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
+            //                 } ),
+            //                 new Selector("PushTargetUpSelector", new Node[]{
+            //                     new PredicateCondition("TargetUp", controller.env.TargetUp),
+            //                     new LearningActionWPCACC("PushTargetUp", pushTargetUp, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
+            //                 } ),
+            //                 new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
+            //             }),
+            //         }),
+            //         new Do("SuccessMessage", () =>
+            //         {
+            //             Debug.Log("Success!");
+            //             return TaskStatus.Success;
+            //         })
+            //     })
+            // );
 
             // _tree = new BT(
             //     new Sequence("Root", new Node[] {

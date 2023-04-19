@@ -118,6 +118,7 @@ public class EnvController : MonoBehaviour
         player.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
         buttonTrigger.localPosition = new Vector3(-8, playerY, -2);
         buttonTrigger.localRotation = Quaternion.Euler(0, 0, 0);
+        goalTrigger.localPosition = new Vector3(-4, playerY, 0);
 
         button.localPosition = new Vector3(-2, buttonY, -2);
 

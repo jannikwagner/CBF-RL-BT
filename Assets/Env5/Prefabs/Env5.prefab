@@ -1758,6 +1758,8 @@ MonoBehaviour:
   moveToTarget: {fileID: 760492578527463795}
   pushTargetToButton: {fileID: 125194164082413185}
   pushTargetUp: {fileID: 3626383228367997308}
+  moveToGoalTrigger: {fileID: 1961971100187755110}
+  pushTriggerToGoal: {fileID: 280573827063923440}
   controller: {fileID: 2350770349054637415}
 --- !u!1 &7481095166365429461
 GameObject:
