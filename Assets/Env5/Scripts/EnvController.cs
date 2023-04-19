@@ -16,6 +16,21 @@ public class EnvController : MonoBehaviour
     public float elevatedGroundY = 4f;
     public readonly float width = 40f;
 
+    float part1 = 0.25f;
+    float part2 = 0.25f;
+    float part3 = 0.25f;
+    float part4 = 0.25f;
+    float playerScale = 1f;
+    float buttonHeight = 0.0002f;
+    float margin = 1f;
+    float podiumBredth = 10f;
+
+    float x0;
+    float x1;
+    float x2;
+    float x3;
+    float x4;
+    float height;
 
     void Start()
     {
@@ -62,22 +77,31 @@ public class EnvController : MonoBehaviour
         return Vector3.Distance(pole.position, goal.position) < 1.0f;
     }
 
+    public bool TargetUp()
+    {
+        return target.position.y >= elevatedGroundY + 0.5f;
+    }
+
+    public float DistanceTargetUp()
+    {
+        if (TargetUp())
+        {
+            return 0f;
+        }
+        else
+        {
+            return target.position.x - x1 - playerScale;
+        }
+    }
+
     public void Initialize()
     {
-        float part1 = 0.25f;
-        float part2 = 0.25f;
-        float part3 = 0.25f;
-        float part4 = 0.25f;
-        float x0 = -width / 2;
-        float x1 = x0 + width * part1;
-        float x2 = x1 + width * part2;
-        float x3 = x2 + width * part3;
-        float x4 = x3 + width * part4;
-        float playerScale = 1f;
-        float buttonHeight = 0.0002f;
-        float margin = 1f;
-        float podiumBredth = 10f;
-        float height = elevatedGroundY - groundY;
+        x0 = -width / 2;
+        x1 = x0 + width * part1;
+        x2 = x1 + width * part2;
+        x3 = x2 + width * part3;
+        x4 = x3 + width * part4;
+        height = elevatedGroundY - groundY;
 
         float minX = x0 + margin + playerScale;
         float maxX = x4 - margin - playerScale;
@@ -96,8 +120,6 @@ public class EnvController : MonoBehaviour
         target.localRotation = Quaternion.Euler(0, 0, 0);
 
         button.localPosition = new Vector3(-2, buttonY, -2);
-
-
 
         float buttonMaxX = -8;
         float buttonTiltStartX = -20;

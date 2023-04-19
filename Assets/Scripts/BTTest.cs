@@ -267,7 +267,7 @@ namespace BTTest
             if (stepCount >= MaxSteps)
             {
                 Log("Local Reset");
-                Agent.AddReward(-1f);
+                // Agent.AddReward(-1f);
                 Agent.EpisodeInterrupted();
                 Agent.SetReward(0);
                 Agent.ResetEnv();
@@ -331,11 +331,11 @@ namespace BTTest
                 Agent.AddReward(1f);
                 Log("Reached Postcondition");
             }
-            else
-            {
-                Agent.AddReward(-1f);
-                Log("Did Not Reach Postcondition");
-            }
+            // else
+            // {
+            //     Agent.AddReward(-1f);
+            //     Log("Did Not Reach Postcondition");
+            // }
             base.OnStopRunning();
         }
     }
@@ -353,7 +353,7 @@ namespace BTTest
             {
                 if (!acc())
                 {
-                    Agent.AddReward(-1f);
+                    Agent.AddReward(-0.1f);
                     Log("Violated ACC");
                 }
             }

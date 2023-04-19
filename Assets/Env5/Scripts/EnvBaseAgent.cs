@@ -13,7 +13,7 @@ namespace Env5
         private IEnvActuator actuator;
         void Start()
         {
-            actuator = new EnvActuator5();
+            actuator = new EnvActuator25();
         }
         public Vector3 GetForce(ActionBuffers actions)
         {

@@ -11,6 +11,7 @@ namespace Env5
         public AgentSwitcher agentSwitcher;
         public MoveToTarget moveToTarget;
         public PushTargetToButton pushTargetToButton;
+        public PushTargetUp pushTargetUp;
         public PlayerController controller;
         private int maxSteps = 2000;
         private int stepCount;
@@ -22,23 +23,47 @@ namespace Env5
             stepCount = 0;
             _tree = new BT(
                 new Sequence("Root", new Node[] {
-                new Selector("PushSelector", new Node[] {
-                    new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
-                    new Sequence("PushSequence", new Node[]{
-                        new Selector("MoveSelector", new Node[]{
-                            new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
-                            new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
-                        } ),
-                        new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget})
+                    new Selector("PushTargetToButtonSelector", new Node[] {
+                        new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
+                        new Sequence("PushTargetToButtonSequence", new Node[]{
+                            new Selector("MoveSelector", new Node[]{
+                                new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
+                                new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
+                            } ),
+                            new Selector("PushTargetUpSelector", new Node[]{
+                                new PredicateCondition("TargetUp", controller.env.TargetUp),
+                                new LearningActionWPCACC("PushTargetUp", pushTargetUp, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
+                            } ),
+                            new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
+                        }),
                     }),
-                }),
-                new Do("SuccessMessage", () =>
-                {
-                    Debug.Log("Success!");
-                    return TaskStatus.Success;
-                })
+                    new Do("SuccessMessage", () =>
+                    {
+                        Debug.Log("Success!");
+                        return TaskStatus.Success;
+                    })
                 })
             );
+
+            // _tree = new BT(
+            //     new Sequence("Root", new Node[] {
+            //         new Selector("PushSelector", new Node[] {
+            //             new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
+            //             new Sequence("PushSequence", new Node[]{
+            //                 new Selector("MoveSelector", new Node[]{
+            //                     new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
+            //                     new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
+            //                 } ),
+            //                 new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget})
+            //             }),
+            //         }),
+            //         new Do("SuccessMessage", () =>
+            //         {
+            //             Debug.Log("Success!");
+            //             return TaskStatus.Success;
+            //         })
+            //     })
+            // );
 
             // int count1 = 0;
             // int count2 = 0;
