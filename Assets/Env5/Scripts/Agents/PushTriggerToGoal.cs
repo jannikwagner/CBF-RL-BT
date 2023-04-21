@@ -6,8 +6,8 @@ namespace Env5
 {
     public class PushTriggerToGoal : EnvBaseAgent
     {
-        private DistanceRewarder triggerGoalDistanceRewarder;
-        private DistanceRewarder playerTriggerDistanceRewarder;
+        private IDistanceRewarder triggerGoalDistanceRewarder;
+        private IDistanceRewarder playerTriggerDistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
@@ -23,9 +23,9 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            triggerGoalDistanceRewarder = new DistanceRewarder(() => Vector3.Distance(controller.env.goalTrigger.localPosition, controller.env.goal.localPosition));
+            triggerGoalDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.goalTrigger.localPosition, controller.env.goal.localPosition));
 
-            playerTriggerDistanceRewarder = new DistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.buttonTrigger.localPosition));
+            playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.buttonTrigger.localPosition));
 
         }
 

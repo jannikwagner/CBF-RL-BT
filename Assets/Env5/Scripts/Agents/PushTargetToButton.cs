@@ -6,8 +6,8 @@ namespace Env5
 {
     public class PushTargetToButton : EnvBaseAgent
     {
-        private DistanceRewarder playerTargetDistanceRewarder;
-        private DistanceRewarder targetButtonDistanceRewarder;
+        private IDistanceRewarder playerTargetDistanceRewarder;
+        private IDistanceRewarder targetButtonDistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
@@ -23,9 +23,9 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            targetButtonDistanceRewarder = new DistanceRewarder(() => Vector3.Distance(controller.env.buttonTrigger.localPosition, controller.env.button.localPosition));
+            targetButtonDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.buttonTrigger.localPosition, controller.env.button.localPosition));
 
-            playerTargetDistanceRewarder = new DistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.buttonTrigger.localPosition));
+            playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.buttonTrigger.localPosition));
         }
 
         public override void OnActionReceived(ActionBuffers actions)
