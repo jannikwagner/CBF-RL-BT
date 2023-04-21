@@ -22,6 +22,7 @@ public class EnvController : MonoBehaviour
     float part4 = 0.25f;
     float playerScale = 1f;
     float buttonHeight = 0.0002f;
+    float buttonScale = 2f;
     float margin = 1f;
     float podiumBredth = 10f;
 
@@ -32,7 +33,7 @@ public class EnvController : MonoBehaviour
     float x4;
     float height;
 
-    void Start()
+    void Awake()
     {
         Initialize();
     }
@@ -69,12 +70,12 @@ public class EnvController : MonoBehaviour
 
     public bool ButtonPressed()
     {
-        return Vector3.Distance(buttonTrigger.position, button.position) < 1.0f;
+        return Vector3.Distance(buttonTrigger.position, button.position) < buttonScale;
     }
 
     public bool win()
     {
-        return Vector3.Distance(goalTrigger.position, goal.position) < 1.0f;
+        return Vector3.Distance(goalTrigger.position, goal.position) < buttonScale;
     }
 
     public bool TargetUp()
@@ -128,7 +129,7 @@ public class EnvController : MonoBehaviour
         float buttonSmallMinZ = -6;
 
         // player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
-        // target.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
+        // buttonTrigger.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
         // buttonTrigger.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
         // float buttonX = Random.Range(minX, buttonMaxX);
         // float buttonZ = buttonX < buttonTiltStartX ? Random.Range(minZ, maxZ) : Random.Range(buttonSmallMinZ, buttonSmallMaxZ);

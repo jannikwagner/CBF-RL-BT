@@ -261,7 +261,7 @@ namespace BTTest
             {
                 Agent.RequestAction();
             }
-            Agent.AddReward(-0.1f / MaxSteps);
+            Agent.AddReward(-1f / MaxSteps);
             stepCount++;
 
             if (stepCount >= MaxSteps)
@@ -294,8 +294,8 @@ namespace BTTest
         public override void OnStopRunning()
         {
             Log("OnStopRunning");
-            Agent.EndEpisode();
-            Agent.SetReward(0);
+            // Agent.EndEpisode();
+            // Agent.SetReward(0);
             Agent.gameObject.SetActive(false);
             base.OnStopRunning();
         }
