@@ -13,10 +13,7 @@ namespace Env5
         public float closenessDistance = 3.0f;
         public float forceFactor = 10f;
         // Start is called before the first frame update
-        public float maxSpeed = 5f;
-        private bool holdingPole = false;
-        void Start()
-        { }
+        public float maxSpeed = 10f;
 
         public void ApplyForce(Vector3 force)
         {
