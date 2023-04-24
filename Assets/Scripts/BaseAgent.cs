@@ -8,7 +8,7 @@ public class BaseAgent : Agent
 {
     private int actionCount;
     private int maxActions = 500;
-    private int stepsPerDecision = 10;
+    private int stepsPerDecision = 5;
     private Func<bool> postCondition;
     private List<Func<bool>> accs;
 
@@ -72,5 +72,4 @@ public class BaseAgent : Agent
             Debug.Log(this + "EpisodeShouldEnd, negative reward");
         }
     }
-
 }

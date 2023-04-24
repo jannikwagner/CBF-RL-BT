@@ -16,7 +16,7 @@ namespace Env5
         public MoveToGoalTrigger moveToGoalTrigger;
         public PushTriggerToGoal pushTriggerToGoal;
         public PlayerController controller;
-        private int maxSteps = 2000;
+        private int maxSteps = 10000;
         private int stepCount;
 
         public int MaxSteps { get => maxSteps; set => maxSteps = value; }
