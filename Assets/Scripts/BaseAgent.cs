@@ -15,7 +15,6 @@ public class BaseAgent : Agent
     public override void OnEpisodeBegin()
     {
         base.OnEpisodeBegin();
-        ResetEnv();
         actionCount = 0;
         Debug.Log("OnEpisodeBegin");
     }
@@ -33,7 +32,7 @@ public class BaseAgent : Agent
         actionCount++;
     }
 
-    public bool EpisodeEnded()
+    public bool EpisodeShouldEnd()
     {
         return actionCount == maxActions;
     }

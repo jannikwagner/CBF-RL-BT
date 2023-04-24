@@ -238,6 +238,19 @@ namespace BTTest
             return cbfApplicator.isSafe() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
+    public class LearningActionAgentSwitcher : Action
+    {
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, AgentSwitcher switcher) : base(name) { this.agent = agent; this.switcher = switcher; }
+        protected BaseAgent agent;
+        protected AgentSwitcher switcher;
+
+        public override TaskStatus OnUpdate()
+        {
+            Debug.Log(Name + ": OnUpdate");
+            switcher.Act(agent);
+            return TaskStatus.Running;
+        }
+    }
     public class LearningAction : Action
     {
         public LearningAction(String name, BaseAgent agent) : base(name) { this.agent = agent; }
