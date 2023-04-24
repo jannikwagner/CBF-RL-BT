@@ -125,12 +125,13 @@ public class AgentSwitcherWithAgentGroup : IAgentSwitcher
     protected List<BaseAgent> agents;
     protected SimpleMultiAgentGroup m_AgentGroup;
     protected BaseAgent currentAgent;
-    protected AgentSwitcherStatus status;
+    protected Dictionary<BaseAgent, AgentSwitcherStatus> statusMap;
 
     public AgentSwitcherWithAgentGroup()
     {
         agents = new List<BaseAgent>();
         m_AgentGroup = new SimpleMultiAgentGroup();
+        statusMap = new Dictionary<BaseAgent, AgentSwitcherStatus>();
     }
 
     public void AddAgent(BaseAgent agent)
@@ -138,7 +139,9 @@ public class AgentSwitcherWithAgentGroup : IAgentSwitcher
         if (!agents.Contains(agent))
         {
             agents.Add(agent);
-            m_AgentGroup.RegisterAgent(agent);
+            agent.gameObject.SetActive(false);
+            // m_AgentGroup.RegisterAgent(agent);
+            statusMap[agent] = AgentSwitcherStatus.GlobalReset;
         }
         // Debug.Log(agents.Count);
         // Debug.Log(m_AgentGroup.GetRegisteredAgents().Count);
@@ -160,14 +163,13 @@ public class AgentSwitcherWithAgentGroup : IAgentSwitcher
         }
 
         currentAgent.Act();
-        status = AgentSwitcherStatus.Running;
+        statusMap[currentAgent] = AgentSwitcherStatus.Running;
 
         if (currentAgent.EpisodeShouldEnd())
         {
             Debug.Log("LocalReset");
-            currentAgent.EpisodeInterrupted();  // not sure if this should be done TODO
             currentAgent.ResetEnvLocal();
-            status = AgentSwitcherStatus.LocalReset;
+            statusMap[currentAgent] = AgentSwitcherStatus.LocalReset;
         }
     }
 
@@ -183,22 +185,32 @@ public class AgentSwitcherWithAgentGroup : IAgentSwitcher
             throw new Exception("Agent already active");
         }
 
-        if (currentAgent != null && status == AgentSwitcherStatus.Running)
+        currentAgent = agent;
+
+        if (statusMap[currentAgent] == AgentSwitcherStatus.Running)
         {
             currentAgent.EndEpisode();
         }
+        if (statusMap[currentAgent] == AgentSwitcherStatus.LocalReset)
+        {
+            currentAgent.EpisodeInterrupted();
+        }
 
-        currentAgent = agent;
-        currentAgent.EpisodeInterrupted();  // So that a new episode is started
+        currentAgent.gameObject.SetActive(true);
+        m_AgentGroup.RegisterAgent(currentAgent);
 
         Debug.Log("Switched to " + currentAgent);
         // Debug.Log(agents.Count);
-        // Debug.Log(m_AgentGroup.GetRegisteredAgents().Count);
+        Debug.Log(m_AgentGroup.GetRegisteredAgents().Count);
     }
 
     public void Reset()
     {
         m_AgentGroup.GroupEpisodeInterrupted();
-        status = AgentSwitcherStatus.GlobalReset;
+        foreach (var agent in agents)
+        {
+            agent.gameObject.SetActive(false);
+            statusMap[agent] = AgentSwitcherStatus.GlobalReset;
+        }
     }
 }
