@@ -42,7 +42,6 @@ public class AgentSwitcher : IAgentSwitcher
             agents.Add(agent);
             agent.gameObject.SetActive(false);
         }
-        // Debug.Log(agents);
     }
 
     public void Act(BaseAgent agent)
@@ -60,18 +59,29 @@ public class AgentSwitcher : IAgentSwitcher
         {
             Debug.Log("LocalReset");
             // currentAgent.EpisodeInterrupted();  // not sure if this should be done TODO
-            currentAgent.gameObject.SetActive(false);
+            DeactivateAgent();
             currentAgent.ResetEnvLocal();
-            currentAgent = null;
             status = AgentSwitcherStatus.LocalReset;
         }
+    }
+
+    private void DeactivateAgent()
+    {
+        Debug.Log("DeactivateAgent" + currentAgent + ", reward: " + currentAgent.GetCumulativeReward());
+        currentAgent.gameObject.SetActive(false);
+        currentAgent = null;
+    }
+    private void ActivateAgent(BaseAgent agent)
+    {
+        Debug.Log("ActivateAgent " + agent);
+        currentAgent = agent;
+        currentAgent.gameObject.SetActive(true);
     }
 
     protected void SwitchAgent(BaseAgent agent)
     {
         if (!agents.Contains(agent))
         {
-            // AddAgent(agent);
             throw new Exception("Agent not registered");
         }
         if (currentAgent == agent)
@@ -81,21 +91,10 @@ public class AgentSwitcher : IAgentSwitcher
 
         if (currentAgent != null && status == AgentSwitcherStatus.Running)
         {
-            currentAgent.gameObject.SetActive(false);
+            DeactivateAgent();
         }
 
-        currentAgent = agent;
-        Debug.Log("Switched to " + currentAgent);
-        currentAgent.gameObject.SetActive(true);
-
-        // foreach (var item in agents)
-        // {
-        //     if (item != currentAgent)
-        //     {
-        //         item.gameObject.SetActive(false);
-        //     }
-        // }
-        // Debug.Log(agents.Count);
+        ActivateAgent(agent);
     }
 
     public void Reset()

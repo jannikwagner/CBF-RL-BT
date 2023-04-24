@@ -56,18 +56,20 @@ public class BaseAgent : Agent
     {
         if (ACCs != null && !ACCs.TrueForAll(x => x()))
         {
-            AddReward(-0.1f);
-            Debug.Log("ACC not met");
+            AddReward(-1f);
+            Debug.Log("ACC violated");
         }
     }
     public override void OnActionReceived(ActionBuffers actions)
     {
         base.OnActionReceived(actions);
+        AddReward(-1f / maxActions);
         ApplyPostConditionReward();
         ApplyACCReward();
         if (EpisodeShouldEnd())
         {
             AddReward(-1f);
+            Debug.Log(this + "EpisodeShouldEnd, negative reward");
         }
     }
 
