@@ -61,6 +61,7 @@ public class AgentSwitcher : IAgentSwitcher
             // currentAgent.EpisodeInterrupted();  // not sure if this should be done TODO
             DeactivateAgent();
             currentAgent.ResetEnvLocal();
+            currentAgent = null;
             status = AgentSwitcherStatus.LocalReset;
         }
     }
@@ -69,7 +70,6 @@ public class AgentSwitcher : IAgentSwitcher
     {
         Debug.Log("DeactivateAgent" + currentAgent + ", reward: " + currentAgent.GetCumulativeReward());
         currentAgent.gameObject.SetActive(false);
-        currentAgent = null;
     }
     private void ActivateAgent(BaseAgent agent)
     {
