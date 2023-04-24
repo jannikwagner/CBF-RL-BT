@@ -10,7 +10,7 @@ namespace Env5
     {
         [SerializeField]
         private BehaviorTree _tree;
-        public AgentSwitcher agentSwitcher;
+        public IAgentSwitcher agentSwitcher;
         public MoveToTarget moveToTarget;
         public PushTargetToButton pushTargetToButton;
         public PlayerController controller;

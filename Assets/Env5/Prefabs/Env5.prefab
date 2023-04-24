@@ -537,7 +537,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8072472495678200148}
-  - component: {fileID: 6255028577409777449}
   m_Layer: 0
   m_Name: CompositeBehavior
   m_TagString: Untagged
@@ -565,24 +564,6 @@ Transform:
   m_Father: {fileID: 7481095166327812002}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6255028577409777449
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7457848245877172335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9eb85fff01a24d4bb36e69c5913daf9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agents:
-  - {fileID: 760492578527463795}
-  - {fileID: 125194164082413185}
-  - {fileID: 3626383228367997308}
-  - {fileID: 1961971100187755110}
-  - {fileID: 280573827063923440}
 --- !u!1 &7481095165260450069
 GameObject:
   m_ObjectHideFlags: 0
@@ -1738,7 +1719,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cdc00f31f396499d9d0357259fc29ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSwitcher: {fileID: 6255028577409777449}
   moveToTarget: {fileID: 760492578527463795}
   pushTargetToButton: {fileID: 125194164082413185}
   controller: {fileID: 2350770349054637415}
@@ -1749,12 +1729,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7481095166327812006}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 38016cde6a83e44319b2da201eb49387, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSwitcher: {fileID: 6255028577409777449}
   moveToTarget: {fileID: 760492578527463795}
   pushTargetToButton: {fileID: 125194164082413185}
   pushTargetUp: {fileID: 3626383228367997308}

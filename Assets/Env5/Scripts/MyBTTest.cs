@@ -8,7 +8,7 @@ namespace Env5
     {
         [SerializeField]
         private BT _tree;
-        public AgentSwitcher agentSwitcher;
+        public IAgentSwitcher agentSwitcher;
         public MoveToTarget moveToTarget;
         public PushTargetToButton pushTargetToButton;
         public PushTargetUp pushTargetUp;
@@ -22,6 +22,11 @@ namespace Env5
 
         private void Awake()
         {
+            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, pushTargetUp, moveToGoalTrigger, pushTriggerToGoal };
+
+            agentSwitcher = new AgentSwitcher();
+            agentSwitcher.AddAgents(agents);
+
             stepCount = 0;
 
             _tree = new BT(

@@ -24,7 +24,6 @@ namespace Env5
         {
             var force = GetForce(actions);
             controller.ApplyForce(force);
-            // Debug.Log("BaseAgent.OnActionReceived: " + force);
         }
 
         public override void Heuristic(in ActionBuffers actionsOut)
@@ -32,14 +31,13 @@ namespace Env5
             actuator.Heuristic(actionsOut);
         }
 
-        public override void ResetEnv()
+        public override void ResetEnvLocal()
         {
             this.controller.env.Initialize();
         }
-        public override void OnEpisodeBegin()
+        public override void ResetEnvGlobal()
         {
-            base.OnEpisodeBegin();
-            // Debug.Log("OnEpisodeBegin");
+            this.controller.env.Initialize();
         }
     }
 
