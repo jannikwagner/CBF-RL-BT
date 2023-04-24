@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.MLAgents;
 using BTTest;
+using System.Collections.Generic;
 
 namespace Env5
 {
@@ -41,24 +42,24 @@ namespace Env5
 
                                     new Selector("MoveSelector", new Node[]{
                                         new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
-                                        new LearningActionAgentSwitcher("MoveToTarget", moveToTarget, agentSwitcher) // , controller.IsCloseToTarget),
+                                        new LearningActionAgentSwitcher("MoveToTarget", moveToTarget, agentSwitcher, controller.IsCloseToTarget),
                                     } ),
 
                                     new Selector("PushTargetUpSelector", new Node[]{
                                         new PredicateCondition("TargetUp", controller.env.TargetUp),
-                                        new LearningActionAgentSwitcher("PushTargetUp", pushTargetUp, agentSwitcher) //, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
+                                        new LearningActionAgentSwitcher("PushTargetUp", pushTargetUp, agentSwitcher, controller.env.TargetUp, new List<System.Func<bool>> {controller.IsCloseToTarget}),
                                     } ),
 
-                                    new LearningActionAgentSwitcher("PushTargetToButton", pushTargetToButton, agentSwitcher) //, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
+                                    new LearningActionAgentSwitcher("PushTargetToButton", pushTargetToButton, agentSwitcher, controller.env.ButtonPressed, new List<System.Func<bool>> {controller.IsCloseToTarget, controller.env.TargetUp})
                                 }),
                             }),
 
                             new Selector("MoveToGoalTriggerSelector", new Node[]{
                                 new PredicateCondition("CloseToTrigger", controller.IsCloseToGoalTrigger),
-                                new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher)//, controller.IsCloseToGoalTrigger, new System.Func<bool>[] {controller.env.ButtonPressed}),
+                                new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher, controller.IsCloseToGoalTrigger, new List<System.Func<bool>> {controller.env.ButtonPressed}),
                             }),
 
-                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher)//, controller.env.win, new System.Func<bool>[] {controller.IsCloseToGoalTrigger, controller.env.ButtonPressed})
+                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, controller.env.win, new List<System.Func<bool>> {controller.IsCloseToGoalTrigger, controller.env.ButtonPressed})
                         }),
                     }),
 

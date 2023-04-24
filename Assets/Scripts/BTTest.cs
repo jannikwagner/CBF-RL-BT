@@ -241,12 +241,18 @@ namespace BTTest
     public class LearningActionAgentSwitcher : Action
     {
         public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher) : base(name) { this.agent = agent; this.switcher = switcher; }
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Func<bool> postCondition) : this(name, agent, switcher) { this.postCondition = postCondition; }
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Func<bool> postCondition, List<Func<bool>> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
         protected BaseAgent agent;
         protected IAgentSwitcher switcher;
+        private Func<bool> postCondition;
+        private List<Func<bool>> accs;
 
         public override TaskStatus OnUpdate()
         {
             // Debug.Log(Name + ": OnUpdate");
+            agent.PostCondition = postCondition;
+            agent.ACCs = accs;
             switcher.Act(agent);
             return TaskStatus.Running;
         }

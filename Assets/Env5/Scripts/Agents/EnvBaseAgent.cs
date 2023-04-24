@@ -24,6 +24,7 @@ namespace Env5
         {
             var force = GetForce(actions);
             controller.ApplyForce(force);
+            base.OnActionReceived(actions);
         }
 
         public override void Heuristic(in ActionBuffers actionsOut)
