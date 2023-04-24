@@ -7,9 +7,9 @@ public class BaseAgent : Agent
     private int maxActions = 500;
     private int stepsPerDecision = 10;
 
-    public int ActionCount { get => actionCount; set => actionCount = value; }
-    public int MaxActions { get => maxActions; set => maxActions = value; }
-    public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
+    // public int ActionCount { get => actionCount; set => actionCount = value; }
+    // public int MaxActions { get => maxActions; set => maxActions = value; }
+    // public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
 
     public virtual void ResetEnvLocal() { }
     public virtual void ResetEnvGlobal() { }
@@ -22,7 +22,7 @@ public class BaseAgent : Agent
 
     public void Act()
     {
-        if (actionCount % stepsPerDecision == 0)
+        if (actionCount++ % stepsPerDecision == 0)
         {
             RequestDecision();
         }
@@ -30,7 +30,6 @@ public class BaseAgent : Agent
         {
             RequestAction();
         }
-        actionCount++;
     }
 
     public bool EpisodeShouldEnd()

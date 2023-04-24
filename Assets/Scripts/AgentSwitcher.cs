@@ -62,6 +62,7 @@ public class AgentSwitcher : IAgentSwitcher
             // currentAgent.EpisodeInterrupted();  // not sure if this should be done TODO
             currentAgent.gameObject.SetActive(false);
             currentAgent.ResetEnvLocal();
+            currentAgent = null;
             status = AgentSwitcherStatus.LocalReset;
         }
     }
@@ -103,7 +104,7 @@ public class AgentSwitcher : IAgentSwitcher
         {
             item.gameObject.SetActive(false);
         }
-        currentAgent.ResetEnvGlobal();
+        // currentAgent.ResetEnvGlobal();
         currentAgent = null;
     }
 

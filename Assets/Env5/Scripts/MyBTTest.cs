@@ -209,6 +209,7 @@ namespace Env5
             {
                 Debug.Log("Global Reset!");
                 _tree.Reset();
+                agentSwitcher.Reset();
                 controller.env.Initialize();
                 stepCount = 0;
             }
