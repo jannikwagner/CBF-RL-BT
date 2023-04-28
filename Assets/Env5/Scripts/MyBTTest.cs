@@ -33,7 +33,7 @@ namespace Env5
             _tree = new BT(
                 new Sequence("Root", new Node[] {
                     new Selector("PushTriggerToGoalSelector", new Node[] {
-                        new PredicateCondition("TriggerAtGoal", controller.env.win),
+                        new PredicateCondition("TriggerAtGoal", controller.env.GoalPressed),
                         new Sequence("PushTriggerToGoalSequence", new Node[]{
 
                             new Selector("PushTargetToButtonSelector", new Node[] {
@@ -59,15 +59,15 @@ namespace Env5
                                 new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher, controller.IsCloseToGoalTrigger, new List<System.Func<bool>> {controller.env.ButtonPressed}),
                             }),
 
-                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, controller.env.win, new List<System.Func<bool>> {controller.IsCloseToGoalTrigger, controller.env.ButtonPressed})
+                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, controller.env.GoalPressed, new List<System.Func<bool>> {controller.IsCloseToGoalTrigger, controller.env.ButtonPressed})
                         }),
                     }),
 
-                    new Do("SuccessMessage", () =>
-                    {
-                        Debug.Log("Success!");
-                        return TaskStatus.Success;
-                    })
+                    // new Do("SuccessMessage", () =>
+                    // {
+                    //     Debug.Log("Success!");
+                    //     return TaskStatus.Success;
+                    // })
                 })
             );
 

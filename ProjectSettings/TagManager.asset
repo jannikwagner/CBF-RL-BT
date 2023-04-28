@@ -5,9 +5,17 @@ TagManager:
   serializedVersion: 2
   tags:
   - Wall
-  - Target
   - Enemy
   - Battery
+  - ButtonTrigger
+  - Ground
+  - Button
+  - Goal
+  - GoalTrigger
+  - Bridge
+  - goal
+  - pyramid
+  - block
   layers:
   - Default
   - TransparentFX

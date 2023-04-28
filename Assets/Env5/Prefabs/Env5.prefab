@@ -256,7 +256,7 @@ GameObject:
   - component: {fileID: 523812042972453012}
   m_Layer: 0
   m_Name: ButtonTrigger
-  m_TagString: goal
+  m_TagString: ButtonTrigger
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -578,7 +578,7 @@ GameObject:
   - component: {fileID: 7481095165390883637}
   m_Layer: 0
   m_Name: BridgeDown
-  m_TagString: Untagged
+  m_TagString: Bridge
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -675,7 +675,7 @@ GameObject:
   - component: {fileID: 7481095165463034400}
   m_Layer: 0
   m_Name: ElevatedGroundRight
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -772,7 +772,7 @@ GameObject:
   - component: {fileID: 7481095165469514435}
   m_Layer: 0
   m_Name: BridgeUp
-  m_TagString: Untagged
+  m_TagString: Bridge
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -904,7 +904,7 @@ GameObject:
   - component: {fileID: 7481095165655966506}
   m_Layer: 0
   m_Name: Wall2
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1001,7 +1001,7 @@ GameObject:
   - component: {fileID: 7481095165711603862}
   m_Layer: 0
   m_Name: Wall1
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1098,7 +1098,7 @@ GameObject:
   - component: {fileID: 7481095165976368929}
   m_Layer: 0
   m_Name: Wall4
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1193,9 +1193,10 @@ GameObject:
   - component: {fileID: 7481095166044813520}
   - component: {fileID: 7481095166044813527}
   - component: {fileID: 7481095166044813526}
+  - component: {fileID: 4967997009771715476}
   m_Layer: 0
-  m_Name: Button1
-  m_TagString: Untagged
+  m_Name: Button
+  m_TagString: Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1278,6 +1279,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4967997009771715476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7481095166044813525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfb2b4b89e5904d2f82ca61a409c16b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetTag: ButtonTrigger
 --- !u!1 &7481095166178352639
 GameObject:
   m_ObjectHideFlags: 0
@@ -1292,7 +1306,7 @@ GameObject:
   - component: {fileID: 7481095166178352632}
   m_Layer: 0
   m_Name: TiltedGround
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1392,9 +1406,10 @@ GameObject:
   - component: {fileID: 2350770349054637415}
   - component: {fileID: 5139993652238417315}
   - component: {fileID: 5997831232032838397}
+  - component: {fileID: 1685125455920507372}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1531,7 +1546,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7481095166327812006}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 38016cde6a83e44319b2da201eb49387, type: 3}
   m_Name: 
@@ -1541,6 +1556,19 @@ MonoBehaviour:
   pushTargetUp: {fileID: 3626383228367997308}
   moveToGoalTrigger: {fileID: 1961971100187755110}
   pushTriggerToGoal: {fileID: 280573827063923440}
+  controller: {fileID: 2350770349054637415}
+--- !u!114 &1685125455920507372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7481095166327812006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b762a020feff94ffd97b1e3ff87f1ef5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   controller: {fileID: 2350770349054637415}
 --- !u!1 &7481095166365429461
 GameObject:
@@ -1620,7 +1648,7 @@ GameObject:
   - component: {fileID: 3714945725004927011}
   m_Layer: 0
   m_Name: GoalTrigger
-  m_TagString: Untagged
+  m_TagString: GoalTrigger
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1745,9 +1773,10 @@ GameObject:
   - component: {fileID: 7481095166641309683}
   - component: {fileID: 7481095166641309682}
   - component: {fileID: 7481095166641309681}
+  - component: {fileID: 5111128132570391130}
   m_Layer: 0
   m_Name: Goal
-  m_TagString: Untagged
+  m_TagString: Goal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1830,6 +1859,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5111128132570391130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7481095166641309680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfb2b4b89e5904d2f82ca61a409c16b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetTag: GoalTrigger
 --- !u!1 &7481095166705782638
 GameObject:
   m_ObjectHideFlags: 0
@@ -1879,7 +1921,7 @@ GameObject:
   - component: {fileID: 7481095166764860393}
   m_Layer: 0
   m_Name: Wall3
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1976,7 +2018,7 @@ GameObject:
   - component: {fileID: 7481095167085200306}
   m_Layer: 0
   m_Name: ElevatedGroundLeft
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2073,7 +2115,7 @@ GameObject:
   - component: {fileID: 7481095167135030202}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
