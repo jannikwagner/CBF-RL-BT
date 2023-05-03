@@ -34,7 +34,7 @@ namespace Env5
             const float rFactor = 0.1f;
 
             base.OnActionReceived(actions);
-            if (controller.env.GoalPressed())
+            if (PostCondition != null && PostCondition())
             {
                 Debug.Log("Goal pressed!");
                 AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);

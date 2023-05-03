@@ -30,7 +30,7 @@ namespace Env5
 
             base.OnActionReceived(actions);
             // Debug.Log("MoveToTarget.OnActionReceived");
-            if (controller.IsCloseToTarget())
+            if (PostCondition != null && PostCondition())
             {
                 Debug.Log("Target reached!");
 

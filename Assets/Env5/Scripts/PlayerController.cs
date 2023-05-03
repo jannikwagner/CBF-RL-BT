@@ -78,33 +78,35 @@ namespace Env5
 
         private void StopControlTarget()
         {
-            ControlOther controlOther = this.GetComponent<ControlOther>();
-            if (IsControllingTarget(controlOther))
+            if (IsControllingTarget())
             {
+                ControlOther controlOther = this.GetComponent<ControlOther>();
                 controlOther.enabled = false;
                 env.target.position = new Vector3(env.button.position.x, env.button.position.y + 0.5f, env.button.position.z);
                 env.target.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
             }
         }
 
-        public bool IsControllingTarget(ControlOther controlOther)
+        public bool IsControllingTarget()
         {
+            ControlOther controlOther = this.GetComponent<ControlOther>();
             return controlOther.enabled && controlOther.other == env.target.GetComponent<Rigidbody>();
         }
 
         private void StopControlGoalTrigger()
         {
-            ControlOther controlOther = this.GetComponent<ControlOther>();
-            if (IsControllingGoalTrigger(controlOther))
+            if (IsControllingGoalTrigger())
             {
+                ControlOther controlOther = this.GetComponent<ControlOther>();
                 controlOther.enabled = false;
                 env.goalTrigger.position = new Vector3(env.goal.position.x, env.goal.position.y + 0.5f, env.goal.position.z);
                 env.goalTrigger.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
             }
         }
 
-        public bool IsControllingGoalTrigger(ControlOther controlOther)
+        public bool IsControllingGoalTrigger()
         {
+            ControlOther controlOther = this.GetComponent<ControlOther>();
             return controlOther.enabled && controlOther.other == env.goalTrigger.GetComponent<Rigidbody>();
         }
 

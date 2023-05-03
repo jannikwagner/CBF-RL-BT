@@ -30,7 +30,7 @@ namespace Env5
             const float rFactor = 0.1f;
 
             base.OnActionReceived(actions);
-            if (controller.env.TargetUp())
+            if (PostCondition != null && PostCondition())
             {
                 Debug.Log("Target up!");
                 AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
