@@ -55,7 +55,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 390063d70bdd543fb91883013465bd17, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 20c95c8076b9c4b4e9d53f4bd0f738f0, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: PushTargetUp
@@ -135,7 +135,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 10bdc093736e844c5afa9279f455b119, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 3198de5b94a2d4429b6319f332c3a910, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: PushTriggerToGoal
@@ -215,7 +215,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: a4ef2336c3478410fad7b9b88d882fbf, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: ad88413a2e3aa4b30ac185075d97d94c, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: PushTargetToButton
@@ -423,7 +423,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 14d14e28421aa49a3ab2207669b8bd88, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 38895ad607fd84dbc9fd174dd63e0472, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MoveToTarget
@@ -503,7 +503,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: d800ae411fd4d4a6992cdb8bd54e6d12, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: f8e3034049d454aedbd8a009bfc37a61, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MoveToGoalTrigger

@@ -34,7 +34,7 @@ namespace Env5
             if (PostCondition != null && PostCondition())
             {
                 Debug.Log("Button pressed!");
-                AddReward(-0.1f * controller.rb.velocity.magnitude / controller.maxSpeed);
+                AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
             // if (controller.DistanceToTarget() <= 1.0f)
