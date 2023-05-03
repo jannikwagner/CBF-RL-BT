@@ -123,6 +123,7 @@ namespace Env5
 
             player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
             target.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
+            // target.position = button.position;
             // target.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
 
             bridgeDown.SetActive(false);
@@ -132,6 +133,9 @@ namespace Env5
         {
             var playerController = player.GetComponentInParent<PlayerController>();
             playerController.StopControl();
+            // It is manually set to true in PlayerController.StopControl() when the player touches the goal or button for the BT to behave correctly.
+            button.GetComponentInParent<CollisionDetector>().Pressed = false;
+            goal.GetComponentInParent<CollisionDetector>().Pressed = false;
             Initialize();
         }
     }

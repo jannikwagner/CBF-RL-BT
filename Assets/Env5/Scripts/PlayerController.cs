@@ -62,11 +62,11 @@ namespace Env5
             }
             else if (collision.gameObject.tag == "Button")
             {
-                StopControlTarget();
+                StopControlTarget(true);
             }
             else if (collision.gameObject.tag == "Goal")
             {
-                StopControlGoalTrigger();
+                StopControlGoalTrigger(true);
             }
         }
 
@@ -76,7 +76,7 @@ namespace Env5
             StopControlGoalTrigger();
         }
 
-        private void StopControlTarget()
+        private void StopControlTarget(bool press = false)
         {
             if (IsControllingTarget())
             {
@@ -84,6 +84,9 @@ namespace Env5
                 controlOther.enabled = false;
                 env.target.position = new Vector3(env.button.position.x, env.button.position.y + 0.5f, env.button.position.z);
                 env.target.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
+                // The physics engine would be one FixedUpdate behind if we don't do this. This would lead to the BT executing MoveToTarget for one FixedUpdate.
+                if (press)
+                    env.button.GetComponentInParent<CollisionDetector>().Pressed = true;
             }
         }
 
@@ -93,7 +96,7 @@ namespace Env5
             return controlOther.enabled && controlOther.other == env.target.GetComponent<Rigidbody>();
         }
 
-        private void StopControlGoalTrigger()
+        private void StopControlGoalTrigger(bool press = false)
         {
             if (IsControllingGoalTrigger())
             {
@@ -101,6 +104,9 @@ namespace Env5
                 controlOther.enabled = false;
                 env.goalTrigger.position = new Vector3(env.goal.position.x, env.goal.position.y + 0.5f, env.goal.position.z);
                 env.goalTrigger.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
+                // The physics engine would be one FixedUpdate behind if we don't do this. This would lead to the BT executing MoveToGoalTrigger for one FixedUpdate.
+                if (press)
+                    env.goal.GetComponentInParent<CollisionDetector>().Pressed = true;
             }
         }
 

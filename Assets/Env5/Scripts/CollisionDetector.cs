@@ -10,9 +10,16 @@ namespace Env5
         public string targetTag;
         private bool pressed = false;
 
-        public bool Pressed { get => pressed; }
+        public bool Pressed { get => pressed; set => pressed = value; }
 
         void OnCollisionEnter(UnityEngine.Collision collision)
+        {
+            if (collision.gameObject.tag == targetTag)
+            {
+                pressed = true;
+            }
+        }
+        void OnCollisionStay(UnityEngine.Collision collision)
         {
             if (collision.gameObject.tag == targetTag)
             {

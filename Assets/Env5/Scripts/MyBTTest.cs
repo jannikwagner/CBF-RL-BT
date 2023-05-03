@@ -41,8 +41,8 @@ namespace Env5
                                 new Sequence("PushTargetToButtonSequence", new Node[]{
 
                                     new Selector("MoveSelector", new Node[]{
-                                        new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
-                                        new LearningActionAgentSwitcher("MoveToTarget", moveToTarget, agentSwitcher, controller.IsCloseToTarget),
+                                        new PredicateCondition("CloseToTarget", controller.IsControllingTarget),
+                                        new LearningActionAgentSwitcher("MoveToTarget", moveToTarget, agentSwitcher, controller.IsControllingTarget),
                                     } ),
 
                                     new Selector("PushTargetUpSelector", new Node[]{
@@ -55,8 +55,8 @@ namespace Env5
                             }),
 
                             new Selector("MoveToGoalTriggerSelector", new Node[]{
-                                new PredicateCondition("CloseToTrigger", controller.IsCloseToGoalTrigger),
-                                new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher, controller.IsCloseToGoalTrigger, new List<System.Func<bool>> {controller.env.ButtonPressed}),
+                                new PredicateCondition("CloseToTrigger", controller.IsControllingGoalTrigger),
+                                new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher, controller.IsControllingGoalTrigger, new List<System.Func<bool>> {controller.env.ButtonPressed}),
                             }),
 
                             new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, controller.env.GoalPressed, new List<System.Func<bool>> {controller.env.ButtonPressed})
@@ -66,6 +66,8 @@ namespace Env5
                     new Do("Reset", () =>
                     {
                         Debug.Log("Success Reset!");
+                        // Debug.Log(controller.env.ButtonPressed());
+                        // Debug.Log(controller.env.GoalPressed());
                         Reset();
                         return TaskStatus.Success;
                     })
