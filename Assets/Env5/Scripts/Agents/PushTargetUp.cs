@@ -22,7 +22,7 @@ namespace Env5
             base.OnEpisodeBegin();
             targetUpDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistanceTargetUp);
 
-            playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition));
+            playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -30,16 +30,16 @@ namespace Env5
             const float rFactor = 0.1f;
 
             base.OnActionReceived(actions);
-            if (controller.env.ButtonPressed())
+            if (controller.env.TargetUp())
             {
-                Debug.Log("Button pressed!");
+                Debug.Log("Target up!");
                 AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
-            if (controller.DistanceToTarget() < 1.0f)
-            {
-                AddReward(rFactor / 1000f);
-            }
+            // if (controller.DistanceToTarget() < 1.0f)
+            // {
+            //     AddReward(rFactor / 1000f);
+            // }
             AddReward(targetUpDistanceRewarder.Reward() * rFactor);
 
             AddReward(playerTargetDistanceRewarder.Reward() * rFactor);

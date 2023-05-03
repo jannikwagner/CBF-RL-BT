@@ -25,7 +25,7 @@ namespace Env5
             base.OnEpisodeBegin();
             triggerGoalDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.goalTrigger.localPosition, controller.env.goal.localPosition));
 
-            playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition));
+            playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
 
         }
 
@@ -34,16 +34,16 @@ namespace Env5
             const float rFactor = 0.1f;
 
             base.OnActionReceived(actions);
-            if (controller.env.ButtonPressed())
+            if (controller.env.GoalPressed())
             {
-                // Debug.Log("Button pressed!");
+                Debug.Log("Goal pressed!");
                 AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
-            if (controller.DistanceToTarget() < 1.0f)
-            {
-                AddReward(rFactor / 1000f);
-            }
+            // if (controller.DistanceToTarget() < 1.0f)
+            // {
+            //     AddReward(rFactor / 1000f);
+            // }
 
             AddReward(triggerGoalDistanceRewarder.Reward() * rFactor * 3);
 

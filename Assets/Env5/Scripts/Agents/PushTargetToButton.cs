@@ -25,7 +25,7 @@ namespace Env5
             base.OnEpisodeBegin();
             targetButtonDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.target.localPosition, controller.env.button.localPosition));
 
-            playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition));
+            playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -39,10 +39,10 @@ namespace Env5
                 AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
-            if (controller.DistanceToTarget() < 1.0f)
-            {
-                AddReward(rFactor / 1000f);
-            }
+            // if (controller.DistanceToTarget() < 1.0f)
+            // {
+            //     AddReward(rFactor / 1000f);
+            // }
             AddReward(targetButtonDistanceRewarder.Reward() * rFactor * 3);
 
             AddReward(playerTargetDistanceRewarder.Reward() * rFactor);

@@ -21,7 +21,7 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.goalTrigger.localPosition));
+            playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -30,9 +30,9 @@ namespace Env5
 
             base.OnActionReceived(actions);
             // Debug.Log("MoveToTarget.OnActionReceived");
-            if (controller.IsCloseToTarget())
+            if (controller.IsCloseToGoalTrigger())
             {
-                Debug.Log("Target reached!");
+                Debug.Log("GoalTrigger reached!");
 
                 float velocityPunishment = -rFactor * controller.rb.velocity.magnitude / controller.maxSpeed;
                 // Debug.Log("velocityPunishment: " + velocityPunishment);
