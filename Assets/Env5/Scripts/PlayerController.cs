@@ -27,7 +27,7 @@ namespace Env5
 
         public float DistanceToTarget()
         {
-            return Vector3.Distance(player.position, env.buttonTrigger.position);
+            return Vector3.Distance(player.position, env.target.position);
         }
         public float DistanceToGoalTrigger()
         {
@@ -43,6 +43,66 @@ namespace Env5
         {
             var condition = DistanceToGoalTrigger() < closenessDistance;
             return condition;
+        }
+        void OnCollisionEnter(UnityEngine.Collision collision)
+        {
+            if (collision.gameObject.tag == "Target")
+            {
+                if (!env.ButtonPressed())
+                {
+                    StartControlTarget();
+                }
+            }
+            else if (collision.gameObject.tag == "GoalTrigger")
+            {
+                if (env.ButtonPressed() && !env.GoalPressed())
+                {
+                    StartControlGoalTrigger();
+                }
+            }
+            else if (collision.gameObject.tag == "Button")
+            {
+                StopControlTarget();
+            }
+            else if (collision.gameObject.tag == "Goal")
+            {
+                StopControlGoalTrigger();
+            }
+        }
+
+        private void StopControlTarget()
+        {
+            ControlOther controlOther = this.GetComponent<ControlOther>();
+            if (controlOther.enabled && controlOther.other == env.target.GetComponent<Rigidbody>())
+            {
+                controlOther.enabled = false;
+                env.target.position = new Vector3(env.button.position.x, env.button.position.y + 0.5f, env.button.position.z);
+                env.target.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
+            }
+        }
+        private void StopControlGoalTrigger()
+        {
+            ControlOther controlOther = this.GetComponent<ControlOther>();
+            if (controlOther.enabled && controlOther.other == env.goalTrigger.GetComponent<Rigidbody>())
+            {
+                controlOther.enabled = false;
+                env.goalTrigger.position = new Vector3(env.goal.position.x, env.goal.position.y + 0.5f, env.goal.position.z);
+                env.goalTrigger.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
+            }
+        }
+
+        private void StartControlGoalTrigger()
+        {
+            ControlOther controlOther = this.GetComponent<ControlOther>();
+            controlOther.enabled = true;
+            controlOther.other = env.goalTrigger.GetComponent<Rigidbody>();
+        }
+
+        private void StartControlTarget()
+        {
+            ControlOther controlOther = this.GetComponent<ControlOther>();
+            controlOther.enabled = true;
+            controlOther.other = env.target.GetComponent<Rigidbody>();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Env5
     {
         public Transform player;
         public Transform button;
-        public Transform buttonTrigger;
+        public Transform target;
         public Transform goalTrigger;
         public Transform goal;
         public GameObject bridgeDown;
@@ -60,20 +60,9 @@ namespace Env5
             // Debug.Log(button.gameObject.GetComponent<CollisionDetector>().Pressed);
         }
 
-        // public bool Button1Pressed()
-        // {
-        //     return Vector3.Distance(targetTransform.position, buttonTransform.position) < 1.0f
-        //     || Vector3.Distance(target2Transform.position, buttonTransform.position) < 1.0f;
-        // }
-        // public bool Button2Pressed()
-        // {
-        //     return Vector3.Distance(targetTransform.position, button2Transform.position) < 1.0f
-        //     || Vector3.Distance(target2Transform.position, button2Transform.position) < 1.0f;
-        // }
-
         public bool ButtonPressed()
         {
-            // return Vector3.Distance(buttonTrigger.position, button.position) < buttonScale;
+            // return Vector3.Distance(target.position, button.position) < buttonScale;
             return button.gameObject.GetComponent<CollisionDetector>().Pressed;
         }
 
@@ -85,7 +74,7 @@ namespace Env5
 
         public bool TargetUp()
         {
-            return buttonTrigger.position.y >= elevatedGroundY + 0.5f;
+            return target.position.y >= elevatedGroundY + 0.5f;
         }
 
         public float DistanceTargetUp()
@@ -96,7 +85,7 @@ namespace Env5
             }
             else
             {
-                return buttonTrigger.position.x - x1 - playerScale;
+                return target.position.x - x1 - playerScale;
             }
         }
 
@@ -122,8 +111,8 @@ namespace Env5
 
             player.localPosition = new Vector3(-18, playerY, -2);
             player.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            buttonTrigger.localPosition = new Vector3(-14, playerY, -2);
-            buttonTrigger.localRotation = Quaternion.Euler(0, 0, 0);
+            target.localPosition = new Vector3(-14, playerY, -2);
+            target.localRotation = Quaternion.Euler(0, 0, 0);
             goalTrigger.localPosition = new Vector3(-17, playerY, 0);
 
             button.localPosition = new Vector3(-12, buttonY, -2);
@@ -139,8 +128,8 @@ namespace Env5
             button.localPosition = new Vector3(Random.Range(minX + 1, x1 - buttonScale), buttonY, Random.Range(minZ + 1, maxZ - 1));
 
             player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
-            buttonTrigger.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
-            // buttonTrigger.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
+            target.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
+            // target.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
 
             bridgeDown.SetActive(false);
             bridgeUp.SetActive(true);

@@ -12,7 +12,7 @@ namespace Env5
             Vector3 playerPos = controller.player.localPosition;
             Vector3 playerPosObs = playerPos / controller.env.width * 2f;
             sensor.AddObservation(playerPosObs);
-            Vector3 targetPos = controller.env.buttonTrigger.localPosition;
+            Vector3 targetPos = controller.env.target.localPosition;
             Vector3 distanceObs = (targetPos - playerPos) / controller.env.width;
             sensor.AddObservation(distanceObs);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
@@ -21,7 +21,7 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.buttonTrigger.localPosition));
+            playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, controller.env.target.localPosition));
         }
 
         public override void OnActionReceived(ActionBuffers actions)

@@ -255,8 +255,8 @@ GameObject:
   - component: {fileID: 4365650724078122613}
   - component: {fileID: 523812042972453012}
   m_Layer: 0
-  m_Name: ButtonTrigger
-  m_TagString: ButtonTrigger
+  m_Name: Target
+  m_TagString: Target
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -274,7 +274,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7481095166365429462}
-  m_RootOrder: 8
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &9080888087300584276
 MeshFilter:
@@ -888,7 +888,7 @@ Transform:
   - {fileID: 7481095165463034403}
   - {fileID: 7481095166178352635}
   m_Father: {fileID: 7481095166365429462}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7481095165655966505
 GameObject:
@@ -1291,7 +1291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfb2b4b89e5904d2f82ca61a409c16b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetTag: ButtonTrigger
+  targetTag: Target
 --- !u!1 &7481095166178352639
 GameObject:
   m_ObjectHideFlags: 0
@@ -1407,6 +1407,7 @@ GameObject:
   - component: {fileID: 5139993652238417315}
   - component: {fileID: 5997831232032838397}
   - component: {fileID: 1685125455920507372}
+  - component: {fileID: 3446715112260403477}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1570,6 +1571,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 2350770349054637415}
+--- !u!114 &3446715112260403477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7481095166327812006}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4496e7177dd434b9d8fbf95369fe2f7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  other: {fileID: 239936688466277072}
 --- !u!1 &7481095166365429461
 GameObject:
   m_ObjectHideFlags: 0
@@ -1603,11 +1617,11 @@ Transform:
   - {fileID: 7481095165390883632}
   - {fileID: 7481095165469514446}
   - {fileID: 7481095166044813521}
-  - {fileID: 7481095166394033199}
+  - {fileID: 2866625666179830494}
   - {fileID: 7481095166641309692}
+  - {fileID: 7481095166394033199}
   - {fileID: 7481095166705782639}
   - {fileID: 7481095165645402472}
-  - {fileID: 2866625666179830494}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1625,7 +1639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 7481095166327812002}
   button: {fileID: 7481095166044813521}
-  buttonTrigger: {fileID: 2866625666179830494}
+  target: {fileID: 2866625666179830494}
   goalTrigger: {fileID: 7481095166394033199}
   goal: {fileID: 7481095166641309692}
   bridgeDown: {fileID: 7481095165390883636}
@@ -1666,7 +1680,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7481095166365429462}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!33 &7481095166394033198
 MeshFilter:
@@ -1905,7 +1919,7 @@ Transform:
   - {fileID: 7481095166764859924}
   - {fileID: 7481095165976368940}
   m_Father: {fileID: 7481095166365429462}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7481095166764860392
 GameObject:
