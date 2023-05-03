@@ -16,6 +16,7 @@ TagManager:
   - goal
   - pyramid
   - block
+  - Target
   layers:
   - Default
   - TransparentFX

@@ -29,7 +29,7 @@ public class BaseAgent : Agent
 
     public void Act()
     {
-        if (actionCount++ % stepsPerDecision == 0)
+        if (actionCount % stepsPerDecision == 0)
         {
             RequestDecision();
         }
@@ -62,6 +62,7 @@ public class BaseAgent : Agent
     }
     public override void OnActionReceived(ActionBuffers actions)
     {
+        actionCount++;
         base.OnActionReceived(actions);
         AddReward(-1f / maxActions);
         ApplyPostConditionReward();
