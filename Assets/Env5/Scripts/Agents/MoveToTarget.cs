@@ -26,19 +26,17 @@ namespace Env5
 
         public override void OnActionReceived(ActionBuffers actions)
         {
-            const float rFactor = 0.1f;
-
             base.OnActionReceived(actions);
             // Debug.Log("MoveToTarget.OnActionReceived");
             if (PostCondition != null && PostCondition())
             {
                 Debug.Log("Target reached!");
 
-                float velocityPunishment = -rFactor * controller.rb.velocity.magnitude / controller.maxSpeed;
+                float velocityPunishment = -0.1f * controller.rb.velocity.magnitude / controller.maxSpeed;
                 // Debug.Log("velocityPunishment: " + velocityPunishment);
                 AddReward(velocityPunishment);
             }
-            AddReward(playerTargetDistanceRewarder.Reward() * rFactor);
+            AddReward(playerTargetDistanceRewarder.Reward() * 1f);
         }
     }
 }

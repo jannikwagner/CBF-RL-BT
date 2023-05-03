@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Env5
 {
-
     public class EnvController : MonoBehaviour
     {
         public Transform player;

@@ -30,22 +30,20 @@ namespace Env5
 
         public override void OnActionReceived(ActionBuffers actions)
         {
-            const float rFactor = 0.1f;
-
             base.OnActionReceived(actions);
             if (PostCondition != null && PostCondition())
             {
                 Debug.Log("Button pressed!");
-                AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
+                AddReward(-0.1f * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
             // if (controller.DistanceToTarget() <= 1.0f)
             // {
             //     AddReward(rFactor / maxActions);
             // }
-            AddReward(targetButtonDistanceRewarder.Reward() * rFactor * 3);
+            AddReward(targetButtonDistanceRewarder.Reward() * 1f);
 
-            AddReward(playerTargetDistanceRewarder.Reward() * rFactor);
+            // AddReward(playerTargetDistanceRewarder.Reward() * rFactor);
         }
     }
 }

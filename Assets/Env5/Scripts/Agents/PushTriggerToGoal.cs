@@ -31,13 +31,11 @@ namespace Env5
 
         public override void OnActionReceived(ActionBuffers actions)
         {
-            const float rFactor = 0.1f;
-
             base.OnActionReceived(actions);
             if (PostCondition != null && PostCondition())
             {
                 Debug.Log("Goal pressed!");
-                AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
+                AddReward(-0.1f * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
             // if (controller.DistanceToTarget() <= 1.0f)
@@ -45,9 +43,9 @@ namespace Env5
             //     AddReward(rFactor / maxActions);
             // }
 
-            AddReward(triggerGoalDistanceRewarder.Reward() * rFactor * 3);
+            AddReward(triggerGoalDistanceRewarder.Reward() * 1f);
 
-            AddReward(playerTriggerDistanceRewarder.Reward() * rFactor);
+            // AddReward(playerTriggerDistanceRewarder.Reward() * rFactor);
         }
     }
 }

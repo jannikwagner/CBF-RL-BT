@@ -1,5 +1,3 @@
-default_settings: null
-
 default_settings:
   trainer_type: ppo
   hyperparameters:
