@@ -70,25 +70,42 @@ namespace Env5
             }
         }
 
+        public void StopControl()
+        {
+            StopControlTarget();
+            StopControlGoalTrigger();
+        }
+
         private void StopControlTarget()
         {
             ControlOther controlOther = this.GetComponent<ControlOther>();
-            if (controlOther.enabled && controlOther.other == env.target.GetComponent<Rigidbody>())
+            if (IsControllingTarget(controlOther))
             {
                 controlOther.enabled = false;
                 env.target.position = new Vector3(env.button.position.x, env.button.position.y + 0.5f, env.button.position.z);
                 env.target.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
             }
         }
+
+        public bool IsControllingTarget(ControlOther controlOther)
+        {
+            return controlOther.enabled && controlOther.other == env.target.GetComponent<Rigidbody>();
+        }
+
         private void StopControlGoalTrigger()
         {
             ControlOther controlOther = this.GetComponent<ControlOther>();
-            if (controlOther.enabled && controlOther.other == env.goalTrigger.GetComponent<Rigidbody>())
+            if (IsControllingGoalTrigger(controlOther))
             {
                 controlOther.enabled = false;
                 env.goalTrigger.position = new Vector3(env.goal.position.x, env.goal.position.y + 0.5f, env.goal.position.z);
                 env.goalTrigger.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
             }
+        }
+
+        public bool IsControllingGoalTrigger(ControlOther controlOther)
+        {
+            return controlOther.enabled && controlOther.other == env.goalTrigger.GetComponent<Rigidbody>();
         }
 
         private void StartControlGoalTrigger()

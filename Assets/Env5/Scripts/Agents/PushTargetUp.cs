@@ -36,9 +36,9 @@ namespace Env5
                 AddReward(-rFactor * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
-            // if (controller.DistanceToTarget() < 1.0f)
+            // if (controller.DistanceToTarget() <= 1.0f)
             // {
-            //     AddReward(rFactor / 1000f);
+            //     AddReward(rFactor / maxActions);
             // }
             AddReward(targetUpDistanceRewarder.Reward() * rFactor);
 

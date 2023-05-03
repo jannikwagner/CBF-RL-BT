@@ -74,19 +74,13 @@ namespace Env5
 
         public bool TargetUp()
         {
-            return target.position.y >= elevatedGroundY + 0.5f;
+            return DistanceTargetUp() == 0;
         }
 
         public float DistanceTargetUp()
         {
-            if (TargetUp())
-            {
-                return 0f;
-            }
-            else
-            {
-                return target.position.x - x1 - playerScale;
-            }
+            var distance = target.position.x - x1;
+            return Mathf.Max(distance, 0);
         }
 
         public void Initialize()
@@ -133,6 +127,12 @@ namespace Env5
 
             bridgeDown.SetActive(false);
             bridgeUp.SetActive(true);
+        }
+        public void Reset()
+        {
+            var playerController = player.GetComponentInParent<PlayerController>();
+            playerController.StopControl();
+            Initialize();
         }
     }
 }

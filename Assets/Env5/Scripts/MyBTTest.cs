@@ -47,10 +47,10 @@ namespace Env5
 
                                     new Selector("PushTargetUpSelector", new Node[]{
                                         new PredicateCondition("TargetUp", controller.env.TargetUp),
-                                        new LearningActionAgentSwitcher("PushTargetUp", pushTargetUp, agentSwitcher, controller.env.TargetUp, new List<System.Func<bool>> {controller.IsCloseToTarget}),
+                                        new LearningActionAgentSwitcher("PushTargetUp", pushTargetUp, agentSwitcher, controller.env.TargetUp),
                                     } ),
 
-                                    new LearningActionAgentSwitcher("PushTargetToButton", pushTargetToButton, agentSwitcher, controller.env.ButtonPressed, new List<System.Func<bool>> {controller.IsCloseToTarget, controller.env.TargetUp})
+                                    new LearningActionAgentSwitcher("PushTargetToButton", pushTargetToButton, agentSwitcher, controller.env.ButtonPressed, new List<System.Func<bool>> {controller.env.TargetUp})
                                 }),
                             }),
 
@@ -59,15 +59,16 @@ namespace Env5
                                 new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher, controller.IsCloseToGoalTrigger, new List<System.Func<bool>> {controller.env.ButtonPressed}),
                             }),
 
-                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, controller.env.GoalPressed, new List<System.Func<bool>> {controller.IsCloseToGoalTrigger, controller.env.ButtonPressed})
+                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, controller.env.GoalPressed, new List<System.Func<bool>> {controller.env.ButtonPressed})
                         }),
                     }),
 
-                    // new Do("SuccessMessage", () =>
-                    // {
-                    //     Debug.Log("Success!");
-                    //     return TaskStatus.Success;
-                    // })
+                    new Do("Reset", () =>
+                    {
+                        Debug.Log("Success Reset!");
+                        Reset();
+                        return TaskStatus.Success;
+                    })
                 })
             );
 
@@ -209,11 +210,16 @@ namespace Env5
             if (++stepCount % MaxSteps == 0)
             {
                 Debug.Log("Global Reset!");
-                _tree.Reset();
-                agentSwitcher.Reset();
-                controller.env.Initialize();
-                stepCount = 0;
+                Reset();
             }
+        }
+
+        private void Reset()
+        {
+            _tree.Reset();
+            agentSwitcher.Reset();
+            controller.env.Reset();
+            stepCount = 0;
         }
     }
 }
