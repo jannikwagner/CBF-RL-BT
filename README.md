@@ -16,3 +16,9 @@ mlagents-learn configs/conf2.yaml --env=builds/build10 --run-id=env5.26 --initia
 ```
 mlagents-learn configs/conf2.yaml --env=builds/build10 --run-id=env5.26 --resume
 ```
+
+### Tensorboard
+
+```
+tensorboard --logdir=results
+```

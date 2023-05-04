@@ -55,7 +55,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 87f58f73867a44f29807452383560da2, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MovePlayerUp
@@ -135,7 +135,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 8e1896ea0f66543c78ef0d1dff1a175d, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: PushTriggerToGoal
@@ -215,7 +215,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: ad1fe42356ef942d4bc2a3d897707b4c, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: PushTargetToButton
@@ -423,7 +423,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 2c4efcadf26af45e2b6452d8bb41695c, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MoveToTarget
@@ -503,7 +503,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 2c6baec31299e4a26b494d5f14232edd, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MoveToGoalTrigger
