@@ -7,22 +7,22 @@ namespace Env5
     public class MovePlayerUp : EnvBaseAgent
     {
         private IDistanceRewarder targetUpDistanceRewarder;
-        private IDistanceRewarder playerTargetDistanceRewarder;
+        // private IDistanceRewarder playerTargetDistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.width * 2f);
-            Vector3 targetPos = controller.env.target.localPosition;
-            sensor.AddObservation((targetPos - playerPos) / controller.env.width);
+            // Vector3 targetPos = controller.env.target.localPosition;
+            // sensor.AddObservation((targetPos - playerPos) / controller.env.width);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
 
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            targetUpDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistanceTargetUp);
+            targetUpDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerX1);
 
-            playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
+            // playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
         }
 
         public override void OnActionReceived(ActionBuffers actions)

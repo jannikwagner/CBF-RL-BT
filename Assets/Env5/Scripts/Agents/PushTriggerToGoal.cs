@@ -7,16 +7,20 @@ namespace Env5
     public class PushTriggerToGoal : EnvBaseAgent
     {
         private IDistanceRewarder triggerGoalDistanceRewarder;
-        private IDistanceRewarder playerTriggerDistanceRewarder;
+        private IDistanceRewarder playerTargetDistancePunisher;
+        // private IDistanceRewarder playerTriggerDistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.width * 2f);
-            Vector3 triggerPos = controller.env.goalTrigger.localPosition;
-            sensor.AddObservation((triggerPos - playerPos) / controller.env.width);
+            // Vector3 triggerPos = controller.env.goalTrigger.localPosition;
+            // sensor.AddObservation((triggerPos - playerPos) / controller.env.width);
             Vector3 goalPos = controller.env.goal.localPosition;
             sensor.AddObservation((goalPos - playerPos) / controller.env.width);
-            sensor.AddObservation((goalPos - triggerPos) / controller.env.width);
+            Vector3 targetPos = controller.env.target.localPosition;
+            Vector3 distanceToTargetObs = (targetPos - playerPos) / controller.env.width;
+            sensor.AddObservation(distanceToTargetObs);  // should not collide
+            // sensor.AddObservation((goalPos - triggerPos) / controller.env.width);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
 
@@ -25,8 +29,8 @@ namespace Env5
             base.OnEpisodeBegin();
             triggerGoalDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.goalTrigger.localPosition, controller.env.goal.localPosition));
 
-            playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
-
+            // playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
+            playerTargetDistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -46,6 +50,7 @@ namespace Env5
             AddReward(triggerGoalDistanceRewarder.Reward() * 1f);
 
             // AddReward(playerTriggerDistanceRewarder.Reward() * rFactor);
+            AddReward(-playerTargetDistancePunisher.Reward() * 1f);
         }
     }
 }

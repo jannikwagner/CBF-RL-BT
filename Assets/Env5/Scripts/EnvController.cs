@@ -81,6 +81,11 @@ namespace Env5
             var distance = target.localPosition.x - x1;
             return Mathf.Max(distance, 0);
         }
+        public float DistancePlayerX1()
+        {
+            var distance = player.localPosition.x - x1;
+            return Mathf.Max(distance, 0);
+        }
         public bool PlayerUp()
         {
             return DistancePlayerUp() == 0;
