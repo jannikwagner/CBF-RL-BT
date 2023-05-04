@@ -1,7 +1,10 @@
 
+using System;
+
 public interface IDistanceRewarder
 {
     float Reward();
+    public void Init();
 }
 
 public class DistanceRewarder : IDistanceRewarder
@@ -12,9 +15,15 @@ public class DistanceRewarder : IDistanceRewarder
     public DistanceRewarder(System.Func<float> getDistance)
     {
         this.getDistance = getDistance;
+        Init();
+    }
+
+    public void Init()
+    {
         startDistance = getDistance();
         lastDistance = startDistance;
     }
+
     public float Reward()
     {
         float distance = getDistance();
@@ -32,9 +41,15 @@ public class OnlyImprovingDistanceRewarder : IDistanceRewarder
     public OnlyImprovingDistanceRewarder(System.Func<float> getDistance)
     {
         this.getDistance = getDistance;
-        startDistance = getDistance();
-        bestDistance = startDistance;
+        Init();
     }
+
+    public void Init()
+    {
+        startDistance = this.getDistance();
+        bestDistance = this.startDistance;
+    }
+
     public float Reward()
     {
         float distance = getDistance();

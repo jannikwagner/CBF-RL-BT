@@ -9,6 +9,26 @@ namespace Env5
 {
     public class EnvBaseAgent : BaseAgent
     {
+        public override void CollectObservations(VectorSensor sensor)  // currently not used but overridden
+        {
+            Vector3 playerPos = controller.player.localPosition;
+            Vector3 playerPosObs = playerPos / controller.env.width * 2f;
+            sensor.AddObservation(playerPosObs);
+            sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
+            Vector3 targetPos = controller.env.target.localPosition;
+            Vector3 distanceToTargetObs = (targetPos - playerPos) / controller.env.width;
+            sensor.AddObservation(distanceToTargetObs);
+            Vector3 goalTriggerPos = controller.env.goalTrigger.localPosition;
+            Vector3 distanceToGoalTriggerObs = (goalTriggerPos - playerPos) / controller.env.width;
+            sensor.AddObservation(distanceToGoalTriggerObs);
+            Vector3 buttonPos = controller.env.button.localPosition;
+            Vector3 distanceToButtonObs = (buttonPos - playerPos) / controller.env.width;
+            sensor.AddObservation(distanceToButtonObs);
+            Vector3 goalPos = controller.env.goal.localPosition;
+            Vector3 distanceToGoalObs = (goalPos - playerPos) / controller.env.width;
+            sensor.AddObservation(distanceToGoalObs);
+        }
+
         public PlayerController controller;
         private IEnvActuator actuator;
         void Start()
