@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7645637431537792470}
   - component: {fileID: 3626383228367997308}
   m_Layer: 0
-  m_Name: PushTargetUp
+  m_Name: MovePlayerUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -57,8 +57,8 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 20c95c8076b9c4b4e9d53f4bd0f738f0, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
-  m_BehaviorName: PushTargetUp
+  m_BehaviorType: 1
+  m_BehaviorName: MovePlayerUp
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -137,7 +137,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 3198de5b94a2d4429b6319f332c3a910, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: PushTriggerToGoal
   TeamId: 0
   m_UseChildSensors: 1
@@ -217,7 +217,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: ad88413a2e3aa4b30ac185075d97d94c, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: PushTargetToButton
   TeamId: 0
   m_UseChildSensors: 1
@@ -269,7 +269,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4514409696925509296}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -14, y: 4.5, z: -2}
+  m_LocalPosition: {x: -15, y: 4.5, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -425,7 +425,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 38895ad607fd84dbc9fd174dd63e0472, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToTarget
   TeamId: 0
   m_UseChildSensors: 1
@@ -505,7 +505,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: f8e3034049d454aedbd8a009bfc37a61, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToGoalTrigger
   TeamId: 0
   m_UseChildSensors: 1
@@ -1210,7 +1210,7 @@ Transform:
   m_GameObject: {fileID: 7481095166044813525}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -12, y: 4.0001, z: -2}
-  m_LocalScale: {x: 2, y: 0.0002, z: 2}
+  m_LocalScale: {x: 4, y: 0.0002, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7481095166365429462}
@@ -1554,7 +1554,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveToTarget: {fileID: 760492578527463795}
   pushTargetToButton: {fileID: 125194164082413185}
-  pushTargetUp: {fileID: 3626383228367997308}
+  movePlayerUp: {fileID: 3626383228367997308}
   moveToGoalTrigger: {fileID: 1961971100187755110}
   pushTriggerToGoal: {fileID: 280573827063923440}
   controller: {fileID: 2350770349054637415}
@@ -1804,7 +1804,7 @@ Transform:
   m_GameObject: {fileID: 7481095166641309680}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 15, y: 4.0001, z: 0}
-  m_LocalScale: {x: 2, y: 0.0002, z: 2}
+  m_LocalScale: {x: 4, y: 0.0002, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7481095166365429462}

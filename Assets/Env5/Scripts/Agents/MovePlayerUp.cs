@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Env5
 {
-    public class PushTargetUp : EnvBaseAgent
+    public class MovePlayerUp : EnvBaseAgent
     {
         private IDistanceRewarder targetUpDistanceRewarder;
         private IDistanceRewarder playerTargetDistanceRewarder;

@@ -69,10 +69,10 @@ namespace Env5
                 StopControlGoalTrigger(true);
             }
         }
-        void OnCollisionStay(UnityEngine.Collision collision)
-        {
-            OnCollisionEnter(collision);
-        }
+        // void OnCollisionStay(UnityEngine.Collision collision)
+        // {
+        //     OnCollisionEnter(collision);
+        // }
 
         public void StopControl()
         {

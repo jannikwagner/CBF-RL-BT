@@ -12,7 +12,7 @@ namespace Env5
         public IAgentSwitcher agentSwitcher;
         public MoveToTarget moveToTarget;
         public PushTargetToButton pushTargetToButton;
-        public PushTargetUp pushTargetUp;
+        public MovePlayerUp movePlayerUp;
         public MoveToGoalTrigger moveToGoalTrigger;
         public PushTriggerToGoal pushTriggerToGoal;
         public PlayerController controller;
@@ -23,7 +23,7 @@ namespace Env5
 
         private void Awake()
         {
-            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, pushTargetUp, moveToGoalTrigger, pushTriggerToGoal };
+            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal };
 
             agentSwitcher = new AgentSwitcher();
             agentSwitcher.AddAgents(agents);
@@ -46,11 +46,11 @@ namespace Env5
                                     } ),
 
                                     new Selector("PushTargetUpSelector", new Node[]{
-                                        new PredicateCondition("TargetUp", controller.env.TargetUp),
-                                        new LearningActionAgentSwitcher("PushTargetUp", pushTargetUp, agentSwitcher, controller.env.TargetUp),
+                                        new PredicateCondition("TargetUp", controller.env.PlayerUp),
+                                        new LearningActionAgentSwitcher("PushTargetUp", movePlayerUp, agentSwitcher, controller.env.PlayerUp, new List<System.Func<bool>> {controller.IsControllingTarget}),
                                     } ),
 
-                                    new LearningActionAgentSwitcher("PushTargetToButton", pushTargetToButton, agentSwitcher, controller.env.ButtonPressed, new List<System.Func<bool>> {controller.env.TargetUp})
+                                    new LearningActionAgentSwitcher("PushTargetToButton", pushTargetToButton, agentSwitcher, controller.env.ButtonPressed, new List<System.Func<bool>> {controller.env.PlayerUp})
                                 }),
                             }),
 
@@ -59,7 +59,12 @@ namespace Env5
                                 new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher, controller.IsControllingGoalTrigger, new List<System.Func<bool>> {controller.env.ButtonPressed}),
                             }),
 
-                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, controller.env.GoalPressed, new List<System.Func<bool>> {controller.env.ButtonPressed})
+                            new Selector("MovePlayerUpSelector", new Node[]{
+                                new PredicateCondition("PlayerUp", controller.env.PlayerUp),
+                                new LearningActionAgentSwitcher("MovePlayerUp", movePlayerUp, agentSwitcher, controller.env.PlayerUp, new List<System.Func<bool>> {controller.env.ButtonPressed}),
+                            } ),
+
+                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, controller.env.GoalPressed, new List<System.Func<bool>> {controller.env.ButtonPressed, controller.env.PlayerUp})
                         }),
                     }),
 

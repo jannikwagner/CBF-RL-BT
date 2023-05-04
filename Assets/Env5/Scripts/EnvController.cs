@@ -23,7 +23,7 @@ namespace Env5
         float part4 = 0.25f;
         float playerScale = 1f;
         float buttonHeight = 0.0002f;
-        float buttonScale = 2f;
+        float buttonScale = 4f;
         float margin = 1f;
         float podiumBredth = 10f;
 
@@ -78,7 +78,17 @@ namespace Env5
 
         public float DistanceTargetUp()
         {
-            var distance = target.position.x - x1;
+            var distance = target.localPosition.x - x1;
+            return Mathf.Max(distance, 0);
+        }
+        public bool PlayerUp()
+        {
+            return DistancePlayerUp() == 0;
+        }
+
+        public float DistancePlayerUp()
+        {
+            var distance = elevatedGroundY + playerScale / 2f - player.localPosition.y;
             return Mathf.Max(distance, 0);
         }
 
@@ -104,7 +114,7 @@ namespace Env5
 
             player.localPosition = new Vector3(-18, playerY, -2);
             player.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            target.localPosition = new Vector3(-14, playerY, -2);
+            target.localPosition = new Vector3(-15, playerY, -2);
             target.localRotation = Quaternion.Euler(0, 0, 0);
             goalTrigger.localPosition = new Vector3(-17, playerY, 0);
 
