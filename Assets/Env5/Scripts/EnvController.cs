@@ -106,12 +106,13 @@ namespace Env5
             x4 = x3 + width * part4;
             height = elevatedGroundY - groundY;
 
-            float minX = x0 + margin + playerScale;
-            float maxX = x4 - margin - playerScale;
-            float maxXTarget = x3 - margin - playerScale;
-            float minZ = -width / 2 + margin + playerScale;
-            float maxZ = width / 2 - margin - playerScale;
-            float x1WithScale = x1 - playerScale;
+            float minX = x0 + margin + playerScale / 2;
+            float maxX = x4 - margin - playerScale / 2;
+            float maxXTarget = x3 - margin - playerScale / 2;
+            float z0 = -width / 2;
+            float z1 = width / 2;
+            float minZ = z0 + margin + playerScale / 2;
+            float maxZ = z1 - margin - playerScale / 2;
             float playerY = elevatedGroundY + playerScale / 2;
             float buttonY = elevatedGroundY + buttonHeight / 2;
             // float podiumZ1 = -podiumBredth / 2;
@@ -133,10 +134,12 @@ namespace Env5
             // float buttonX = Random.Range(minX, buttonMaxX);
             // float buttonZ = buttonX < buttonTiltStartX ? Random.Range(minZ, maxZ) : Random.Range(buttonSmallMinZ, buttonSmallMaxZ);
             // button.localPosition = new Vector3(buttonX, elevatedGroundYTarget, buttonZ);
-            button.localPosition = new Vector3(Random.Range(minX + 1, x1 - buttonScale), buttonY, Random.Range(minZ + 1, maxZ - 1));
+            button.localPosition = new Vector3(Random.Range(x0 + buttonScale / 2, x1 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
+            goal.localPosition = new Vector3(Random.Range(x3 + buttonScale / 2, x4 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
 
             player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
             target.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
+            goalTrigger.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
             // target.position = button.position;
             // target.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
 
