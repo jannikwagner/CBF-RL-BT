@@ -11,12 +11,12 @@ public class Utility
         return new float[] { vec.x, vec.y, vec.z };
     }
 
-    public static Vector3 ArrToVec3(float[] arr)
+    public static Vector3 ArrToVec3(float[] arr, int start = 0)
     {
-        return new Vector3(arr[0], arr[1], arr[2]);
+        return new Vector3(arr[0 + start], arr[1 + start], arr[2 + start]);
     }
 
-    public static float[] combineArrs(in float[][] vectors)
+    public static float[] Concat(in float[][] vectors)
     {
         var length = 0;
         foreach (var vector in vectors)
@@ -36,9 +36,9 @@ public class Utility
         }
         return result;
     }
-    public static float[] combineArrs(in float[] vector1, in float[] vector2)
+    public static float[] Concat(in float[] vector1, in float[] vector2)
     {
-        return combineArrs(new float[][] { vector1, vector2 });
+        return Concat(new float[][] { vector1, vector2 });
     }
 
     public static float Dot(in float[] vector1, in float[] vector2)

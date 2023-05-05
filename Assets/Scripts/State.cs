@@ -30,11 +30,11 @@ public class CombinedDynamics : IControlledDynamics
 
     public float[] currentState()
     {
-        return Utility.combineArrs(controlledState.currentState(), state.currentState());
+        return Utility.Concat(controlledState.currentState(), state.currentState());
     }
 
     public float[] ControlledDynamics(ActionBuffers action)
     {
-        return Utility.combineArrs(controlledState.ControlledDynamics(action), state.Dynamics());
+        return Utility.Concat(controlledState.ControlledDynamics(action), state.Dynamics());
     }
 }

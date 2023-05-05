@@ -147,12 +147,12 @@ public class Env4Agent : Agent
         {
             var movement = agent.actuatorComponent.GetMovement(action, agent.controller.speed);
             var batteryChange = agent.controller.getBatteryChange(movement);
-            return Utility.combineArrs(Utility.vec3ToArr(movement), new float[] { batteryChange });
+            return Utility.Concat(Utility.vec3ToArr(movement), new float[] { batteryChange });
         }
 
         public float[] currentState()
         {
-            return Utility.combineArrs(Utility.vec3ToArr(agent.controller.playerTransform.localPosition), new float[] { agent.controller.battery });
+            return Utility.Concat(Utility.vec3ToArr(agent.controller.playerTransform.localPosition), new float[] { agent.controller.battery });
         }
     }
 }

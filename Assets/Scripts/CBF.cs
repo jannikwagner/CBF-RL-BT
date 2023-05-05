@@ -172,3 +172,36 @@ public class SignedSquareCBF : ModulatedCBF
     ))
     { }
 }
+
+public class StaticBallCBF3D2ndOrder : ICBF
+{
+    public float radius;
+    public Vector3 center;
+    public StaticBallCBF3D2ndOrder(float radius, Vector3 center)
+    {
+        this.radius = radius;
+        this.center = center;
+    }
+    public float evaluate(float[] x)
+    {
+        var data = Data.FromArray(x);
+        return (Utility.ArrToVec3(x) - center).magnitude - radius;
+    }
+    public float[] gradient(float[] x)
+    {
+        return Utility.vec3ToArr((Utility.ArrToVec3(x) - center).normalized);
+    }
+    class Data
+    {
+        public Vector3 position;
+        public Vector3 velocity;
+        public static Data FromArray(float[] x)
+        {
+            return new Data { position = Utility.ArrToVec3(x), velocity = Utility.ArrToVec3(x, 3) };
+        }
+        public float[] ToArray()
+        {
+            return Utility.Concat(Utility.vec3ToArr(this.position), Utility.vec3ToArr(this.velocity));
+        }
+    }
+}
