@@ -1,7 +1,8 @@
+using Unity.MLAgents.Actuators;
 using UnityEngine;
 
 
-public class EnemyBehavior4 : MonoBehaviour, IDynamics
+public class EnemyBehavior4 : MonoBehaviour, IControlledDynamics
 {
     public float maxSpeed = 1f;
     public float minSpeed = 1f;
@@ -13,11 +14,6 @@ public class EnemyBehavior4 : MonoBehaviour, IDynamics
     public float[] currentState()
     {
         return Utility.vec3ToArr(transform.localPosition);
-    }
-
-    public float[] Dynamics()
-    {
-        return Utility.vec3ToArr(_dynamics());
     }
 
     void Update()
@@ -36,5 +32,10 @@ public class EnemyBehavior4 : MonoBehaviour, IDynamics
         float moveZ = Mathf.Clamp(distance.z, -1f, 1f);
         var movement = new Vector3(moveX, 0f, moveZ) * speed;
         return movement;
+    }
+
+    public float[] ControlledDynamics(ActionBuffers action)
+    {
+        return Utility.vec3ToArr(_dynamics());
     }
 }

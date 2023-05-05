@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents.Actuators;
 
-
-public interface IDynamics
+public abstract class State
 {
-    public float[] currentState();
-    public float[] Dynamics();
+    public abstract float[] array { get; }
+    public abstract State FromArray(float[] array);
+    public abstract string ToStr();
 }
 
 public interface IControlledDynamics
@@ -19,22 +19,22 @@ public interface IControlledDynamics
 
 public class CombinedDynamics : IControlledDynamics
 {
-    public IControlledDynamics controlledState;
-    public IDynamics state;
+    public IControlledDynamics controlledState1;
+    public IControlledDynamics controlledState2;
 
-    public CombinedDynamics(IControlledDynamics controlledState, IDynamics state)
+    public CombinedDynamics(IControlledDynamics controlledState1, IControlledDynamics controlledState2)
     {
-        this.controlledState = controlledState;
-        this.state = state;
+        this.controlledState1 = controlledState1;
+        this.controlledState2 = controlledState2;
     }
 
     public float[] currentState()
     {
-        return Utility.Concat(controlledState.currentState(), state.currentState());
+        return Utility.Concat(controlledState1.currentState(), controlledState2.currentState());
     }
 
     public float[] ControlledDynamics(ActionBuffers action)
     {
-        return Utility.Concat(controlledState.ControlledDynamics(action), state.Dynamics());
+        return Utility.Concat(controlledState1.ControlledDynamics(action), controlledState2.ControlledDynamics(action));
     }
 }
