@@ -18,7 +18,7 @@ namespace Env5
         {
             float x = Input.GetAxis("Horizontal");
             float z = Input.GetAxis("Vertical");
-            controller.ApplyForce(new Vector3(x, 0, z));
+            controller.ApplyAcc(new Vector3(x, 0, z));
         }
     }
 }

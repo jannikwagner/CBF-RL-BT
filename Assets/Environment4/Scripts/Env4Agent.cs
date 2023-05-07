@@ -116,7 +116,7 @@ public class Env4Agent : Agent
         }
     }
 
-    public class MovementDynamics : IControlledDynamics
+    public class MovementDynamics : IDynamicsProvider
     {
         private Env4Agent agent;
         public MovementDynamics(Env4Agent agent)
@@ -124,18 +124,18 @@ public class Env4Agent : Agent
             this.agent = agent;
         }
 
-        public float[] ControlledDynamics(ActionBuffers action)
+        public float[] dxdt(ActionBuffers action)
         {
             return Utility.vec3ToArr(agent.actuatorComponent.GetMovement(action, agent.controller.speed));
         }
 
-        public float[] currentState()
+        public float[] x()
         {
             return Utility.vec3ToArr(agent.controller.playerTransform.localPosition);
         }
     }
 
-    public class BatteryDynamics : IControlledDynamics
+    public class BatteryDynamics : IDynamicsProvider
     {
         private Env4Agent agent;
         public BatteryDynamics(Env4Agent agent)
@@ -143,14 +143,14 @@ public class Env4Agent : Agent
             this.agent = agent;
         }
 
-        public float[] ControlledDynamics(ActionBuffers action)
+        public float[] dxdt(ActionBuffers action)
         {
             var movement = agent.actuatorComponent.GetMovement(action, agent.controller.speed);
             var batteryChange = agent.controller.getBatteryChange(movement);
             return Utility.Concat(Utility.vec3ToArr(movement), new float[] { batteryChange });
         }
 
-        public float[] currentState()
+        public float[] x()
         {
             return Utility.Concat(Utility.vec3ToArr(agent.controller.playerTransform.localPosition), new float[] { agent.controller.battery });
         }

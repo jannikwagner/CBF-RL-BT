@@ -11,30 +11,44 @@ public abstract class State
     public abstract string ToStr();
 }
 
-public interface IControlledDynamics
+public class PosVelState
 {
-    public float[] currentState();
-    public float[] ControlledDynamics(ActionBuffers action);
+    public Vector3 position;
+    public Vector3 velocity;
+    public static PosVelState FromArray(float[] x)
+    {
+        return new PosVelState { position = Utility.ArrToVec3(x), velocity = Utility.ArrToVec3(x, 3) };
+    }
+    public float[] ToArray()
+    {
+        return Utility.Concat(this.position, this.velocity);
+    }
 }
 
-public class CombinedDynamics : IControlledDynamics
+public interface IDynamicsProvider
 {
-    public IControlledDynamics controlledState1;
-    public IControlledDynamics controlledState2;
+    public float[] x();
+    public float[] dxdt(ActionBuffers action);
+}
 
-    public CombinedDynamics(IControlledDynamics controlledState1, IControlledDynamics controlledState2)
+public class CombinedDynamics : IDynamicsProvider
+{
+    public IDynamicsProvider dynamics1;
+    public IDynamicsProvider dynamics2;
+
+    public CombinedDynamics(IDynamicsProvider dynamics1, IDynamicsProvider dynamics2)
     {
-        this.controlledState1 = controlledState1;
-        this.controlledState2 = controlledState2;
+        this.dynamics1 = dynamics1;
+        this.dynamics2 = dynamics2;
     }
 
-    public float[] currentState()
+    public float[] x()
     {
-        return Utility.Concat(controlledState1.currentState(), controlledState2.currentState());
+        return Utility.Concat(dynamics1.x(), dynamics2.x());
     }
 
-    public float[] ControlledDynamics(ActionBuffers action)
+    public float[] dxdt(ActionBuffers action)
     {
-        return Utility.Concat(controlledState1.ControlledDynamics(action), controlledState2.ControlledDynamics(action));
+        return Utility.Concat(dynamics1.dxdt(action), dynamics2.dxdt(action));
     }
 }

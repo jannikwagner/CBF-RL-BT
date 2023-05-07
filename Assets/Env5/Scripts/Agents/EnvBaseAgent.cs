@@ -35,15 +35,15 @@ namespace Env5
         {
             actuator = new EnvActuator25();
         }
-        public Vector3 GetForce(ActionBuffers actions)
+        public Vector3 GetAcc(ActionBuffers actions)
         {
-            return actuator.GetForce(actions);
+            return actuator.GetAcc(actions);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
         {
-            var force = GetForce(actions);
-            controller.ApplyForce(force);
+            var acc = GetAcc(actions);
+            controller.ApplyAcc(acc);
             base.OnActionReceived(actions);
         }
 
@@ -64,14 +64,14 @@ namespace Env5
 
     public interface IEnvActuator
     {
-        Vector3 GetForce(ActionBuffers actions);
+        Vector3 GetAcc(ActionBuffers actions);
         void Heuristic(in ActionBuffers actionsOut);
     }
 
     public class EnvActuator25 : IEnvActuator
     {
 
-        public Vector3 GetForce(ActionBuffers actions)
+        public Vector3 GetAcc(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
             var action = discreteActions[0];
@@ -96,7 +96,7 @@ namespace Env5
     public class EnvActuator9 : IEnvActuator
     {
 
-        public Vector3 GetForce(ActionBuffers actions)
+        public Vector3 GetAcc(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
             var action = discreteActions[0];
@@ -119,7 +119,7 @@ namespace Env5
     }
     public class EnvActuator5 : IEnvActuator
     {
-        public Vector3 GetForce(ActionBuffers actions)
+        public Vector3 GetAcc(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
             var action = discreteActions[0];
@@ -160,6 +160,25 @@ namespace Env5
                 discreateActionsOut[0] = i > 0 ? 3 : 4;
             }
             // Debug.Log(discreateActionsOut[0]);
+        }
+    }
+    public class PosVelDynamics : IDynamicsProvider
+    {
+        EnvBaseAgent agent;
+        public float[] dxdt(ActionBuffers action)
+        {
+            var velocity = agent.controller.rb.velocity;
+            var acc = agent.GetAcc(action);
+            var dxdt = new PosVelState { position = velocity, velocity = acc };
+            return dxdt.ToArray();
+        }
+
+        public float[] x()
+        {
+            var position = agent.controller.player.localPosition;
+            var velocity = agent.controller.rb.velocity;
+            var x = new PosVelState { position = position, velocity = velocity };
+            return x.ToArray();
         }
     }
 }

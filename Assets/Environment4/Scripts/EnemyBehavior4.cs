@@ -2,7 +2,7 @@ using Unity.MLAgents.Actuators;
 using UnityEngine;
 
 
-public class EnemyBehavior4 : MonoBehaviour, IControlledDynamics
+public class EnemyBehavior4 : MonoBehaviour, IDynamicsProvider
 {
     public float maxSpeed = 1f;
     public float minSpeed = 1f;
@@ -11,7 +11,7 @@ public class EnemyBehavior4 : MonoBehaviour, IControlledDynamics
 
     [SerializeField] private Transform playerTransform;
 
-    public float[] currentState()
+    public float[] x()
     {
         return Utility.vec3ToArr(transform.localPosition);
     }
@@ -34,7 +34,7 @@ public class EnemyBehavior4 : MonoBehaviour, IControlledDynamics
         return movement;
     }
 
-    public float[] ControlledDynamics(ActionBuffers action)
+    public float[] dxdt(ActionBuffers action)
     {
         return Utility.vec3ToArr(_dynamics());
     }

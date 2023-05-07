@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using System.Linq;
 
 public class Utility
 {
@@ -117,5 +118,50 @@ public class Utility
     {
         var mult = Mathf.Pow(10.0f, digits);
         return Mathf.Round(value * mult) / mult;
+    }
+
+    internal static float[] Concat(Vector3 vec1, Vector3 vec2)
+    {
+        return Concat(new Vector3[] { vec1, vec2 });
+    }
+
+    private static float[] Concat(Vector3[] vector3s)
+    {
+        return Concat(vector3s.Select(vec => vec3ToArr(vec)).ToArray());
+    }
+}
+
+// @see https://stackoverflow.com/questions/35461643/what-is-faster-in-finding-element-with-property-of-maximum-value
+public static class EnumerableExtensions
+{
+    public static TSource MaxBy<TSource>(this IEnumerable<TSource> source, Func<TSource, float> selector)
+    {
+        using (var iterator = source.GetEnumerator())
+        {
+            if (!iterator.MoveNext())
+                throw new InvalidOperationException();
+
+            var max = iterator.Current;
+            var maxValue = selector(max);
+            var comparer = Comparer<float>.Default;
+
+            while (iterator.MoveNext())
+            {
+                var current = iterator.Current;
+                var currentValue = selector(current);
+
+                if (comparer.Compare(currentValue, maxValue) > 0)
+                {
+                    max = current;
+                    maxValue = currentValue;
+                }
+            }
+
+            return max;
+        }
+    }
+    public static TSource MinBy<TSource>(this IEnumerable<TSource> source, Func<TSource, float> selector)
+    {
+        return source.MaxBy((element) => -selector(element));
     }
 }

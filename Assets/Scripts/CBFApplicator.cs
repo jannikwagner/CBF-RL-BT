@@ -4,11 +4,11 @@ using Unity.MLAgents.Actuators;
 
 public abstract class CBFApplicator
 {
-    protected IControlledDynamics controlledDynamics;
+    protected IDynamicsProvider controlledDynamics;
     public ICBF cbf;
     public bool debug;
 
-    public CBFApplicator(ICBF cbf, IControlledDynamics controlledDynamics, bool debug = false)
+    public CBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, bool debug = false)
     {
         this.cbf = cbf;
         this.controlledDynamics = controlledDynamics;
@@ -17,7 +17,7 @@ public abstract class CBFApplicator
 
     public bool isSafe()
     {
-        return isSafe(controlledDynamics.currentState());
+        return isSafe(controlledDynamics.x());
     }
 
     public bool isSafe(float[] x)
@@ -27,12 +27,12 @@ public abstract class CBFApplicator
 
     public float evluate()
     {
-        return cbf.evaluate(controlledDynamics.currentState());
+        return cbf.evaluate(controlledDynamics.x());
     }
 
     public float[] gradient()
     {
-        return cbf.gradient(controlledDynamics.currentState());
+        return cbf.gradient(controlledDynamics.x());
     }
 
     public abstract bool isActionValid(ActionBuffers action);
@@ -42,7 +42,7 @@ public class ContinuousCBFApplicator : CBFApplicator
 {
     Func<float, float> alpha = (x) => 1f;
 
-    public ContinuousCBFApplicator(ICBF cbf, IControlledDynamics controlledDynamics, Func<float, float> alpha = null, bool debug = false) : base(cbf, controlledDynamics, debug)
+    public ContinuousCBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, Func<float, float> alpha = null, bool debug = false) : base(cbf, controlledDynamics, debug)
     {
         if (alpha != null)
         {
@@ -52,9 +52,9 @@ public class ContinuousCBFApplicator : CBFApplicator
 
     public override bool isActionValid(ActionBuffers action)
     {
-        var x = controlledDynamics.currentState();
+        var x = controlledDynamics.x();
         var gradient = cbf.gradient(x);
-        var dynamics = controlledDynamics.ControlledDynamics(action);
+        var dynamics = controlledDynamics.dxdt(action);
         if (debug) Debug.Log("dynamics: " + Utility.arrToStr(dynamics));
         if (debug) Debug.Log("gradient: " + Utility.arrToStr(gradient));
         if (debug) Debug.Log("State: " + Utility.arrToStr(x));
@@ -68,7 +68,7 @@ public class DiscreteCBFApplicator : CBFApplicator
 {
     private float eta;
     private float deltaTime;
-    public DiscreteCBFApplicator(ICBF cbf, IControlledDynamics controlledDynamics, float eta, float deltaTime, bool debug = false) : base(cbf, controlledDynamics, debug)
+    public DiscreteCBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, float eta, float deltaTime, bool debug = false) : base(cbf, controlledDynamics, debug)
     /*
      * eta: How strongly the state should be pushed into the safe set
      * deltaTime: the time step
@@ -80,8 +80,8 @@ public class DiscreteCBFApplicator : CBFApplicator
 
     public override bool isActionValid(ActionBuffers action)
     {
-        var currentState = controlledDynamics.currentState();
-        var dynamics = controlledDynamics.ControlledDynamics(action);
+        var currentState = controlledDynamics.x();
+        var dynamics = controlledDynamics.dxdt(action);
         var nextState = Utility.Add(currentState, Utility.Mult(dynamics, deltaTime));
         var nextValue = cbf.evaluate(nextState);
         var currentValue = cbf.evaluate(currentState);

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
 
 public interface ICBF
 {
@@ -173,35 +175,85 @@ public class SignedSquareCBF : ModulatedCBF
     { }
 }
 
-public class StaticBallCBF3D2ndOrder : ICBF
+public class StaticWallCBF3D2ndOrder : ICBF
 {
-    public float radius;
-    public Vector3 center;
-    public StaticBallCBF3D2ndOrder(float radius, Vector3 center)
+    public Vector3 point;
+    public Vector3 normal;
+    public float minDistance;
+    public float maxAccel;
+    public StaticWallCBF3D2ndOrder(Vector3 point, Vector3 normal, float maxAccel, float minDistance = 0)
     {
-        this.radius = radius;
-        this.center = center;
+        this.point = point;
+        this.normal = normal;
+        this.minDistance = minDistance;
+        this.maxAccel = maxAccel;
     }
     public float evaluate(float[] x)
     {
-        var data = Data.FromArray(x);
-        return (Utility.ArrToVec3(x) - center).magnitude - radius;
+        var data = PosVelState.FromArray(x);
+        float p = Vector3.Dot(data.position - point, normal) - minDistance;
+        float v = Vector3.Dot(data.velocity, normal);
+
+        float h = p + Mathf.Sign(v) * v * v / (2f * maxAccel);
+        return h;
     }
     public float[] gradient(float[] x)
     {
-        return Utility.vec3ToArr((Utility.ArrToVec3(x) - center).normalized);
+        var data = PosVelState.FromArray(x);
+        float v = Vector3.Dot(data.velocity, normal);
+
+        float dhdp = 1f;
+        float dhdv = 2f * Mathf.Sign(v) * v / (2f * maxAccel);
+        float dpdx = normal.x;
+        float dpdy = normal.y;
+        float dpdz = normal.z;
+        float dvdx = normal.x;
+        float dvdy = normal.y;
+        float dvdz = normal.z;
+        return new float[] {
+            dhdp * dpdx,
+            dhdp * dpdy,
+            dhdp * dpdz,
+            dhdv * dvdx,
+            dhdv * dvdy,
+            dhdv * dvdz
+        };
     }
-    class Data
+}
+
+public class MinCBF : ICBF
+{
+    public List<ICBF> cbfs;
+    public MinCBF(List<ICBF> cbfs)
     {
-        public Vector3 position;
-        public Vector3 velocity;
-        public static Data FromArray(float[] x)
-        {
-            return new Data { position = Utility.ArrToVec3(x), velocity = Utility.ArrToVec3(x, 3) };
-        }
-        public float[] ToArray()
-        {
-            return Utility.Concat(Utility.vec3ToArr(this.position), Utility.vec3ToArr(this.velocity));
-        }
+        this.cbfs = cbfs;
+    }
+
+    public float evaluate(float[] x)
+    {
+        return cbfs.Min(cbf => cbf.evaluate(x));
+    }
+
+    public float[] gradient(float[] x)
+    {
+        return cbfs.MinBy<ICBF>(cbf => cbf.evaluate(x)).gradient(x);
+    }
+}
+public class MaxCBF : ICBF
+{
+    public List<ICBF> cbfs;
+    public MaxCBF(List<ICBF> cbfs)
+    {
+        this.cbfs = cbfs;
+    }
+
+    public float evaluate(float[] x)
+    {
+        return cbfs.Max(cbf => cbf.evaluate(x));
+    }
+
+    public float[] gradient(float[] x)
+    {
+        return cbfs.MaxBy<ICBF>(cbf => cbf.evaluate(x)).gradient(x);
     }
 }

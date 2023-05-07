@@ -15,7 +15,7 @@ namespace Env5
         // Start is called before the first frame update
         internal float maxSpeed = 10f;
 
-        public void ApplyForce(Vector3 force)
+        public void ApplyAcc(Vector3 force)
         {
             rb.AddForce(force * rb.mass * forceFactor);
 
