@@ -40,7 +40,7 @@ public abstract class CBFApplicator
 
 public class ContinuousCBFApplicator : CBFApplicator
 {
-    Func<float, float> alpha = (x) => 1f;
+    Func<float, float> alpha = (x) => x;
 
     public ContinuousCBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, Func<float, float> alpha = null, bool debug = false) : base(cbf, controlledDynamics, debug)
     {
