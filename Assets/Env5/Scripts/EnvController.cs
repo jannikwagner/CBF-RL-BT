@@ -16,6 +16,7 @@ namespace Env5
         private float groundY = 0f;
         private float elevatedGroundY = 4f;
         private float width = 40f;
+        private float bridgeWidth = 3f;
 
         float part1 = 0.25f;
         float part2 = 0.25f;
@@ -37,7 +38,7 @@ namespace Env5
         public float X1 => x1;
         public float Width => width;
         public float ElevatedGroundY => elevatedGroundY;
-
+        public float BridgeWidth => bridgeWidth;
 
         void Awake()
         {

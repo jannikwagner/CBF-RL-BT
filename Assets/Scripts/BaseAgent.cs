@@ -9,16 +9,16 @@ public abstract class BaseAgent : Agent
     private int actionCount;
     private int maxActions = 500;
     private int stepsPerDecision = 5;
-    private Func<bool> postCondition;
-    private List<Func<bool>> accs;
+    private Condition postCondition;
+    private List<Condition> accs;
     private List<CBFApplicator> cbfApplicators;
     private CBFDiscreteInvalidActionMasker masker;
 
     // public int ActionCount { get => actionCount; set => actionCount = value; }
     // public int MaxActions { get => maxActions; set => maxActions = value; }
     // public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
-    public Func<bool> PostCondition { get => postCondition; set => postCondition = value; }
-    public List<Func<bool>> ACCs { get => accs; set => accs = value; }
+    public Condition PostCondition { get => postCondition; set => postCondition = value; }
+    public List<Condition> ACCs { get => accs; set => accs = value; }
     public abstract int NumActions { get; }
     public List<CBFApplicator> CBFApplicators { get => cbfApplicators; set => cbfApplicators = value; }
 
@@ -50,18 +50,29 @@ public abstract class BaseAgent : Agent
 
     public void ApplyPostConditionReward()
     {
-        if (PostCondition != null && PostCondition())
+        if (PostCondition != null && PostCondition.Func())
         {
             AddReward(1f);
-            Debug.Log("PostCondition met");
+            Debug.Log("PostCondition " + PostCondition.Name + " met");
         }
     }
     public void ApplyACCReward()
     {
-        if (ACCs != null && !ACCs.TrueForAll(x => x()))
+        bool violated = false;
+        if (ACCs != null)
         {
-            AddReward(-1f);
-            Debug.Log("ACC violated");
+            foreach (var acc in ACCs)
+            {
+                if (!acc.Func())
+                {
+                    Debug.Log("ACC " + acc.Name + " violated");
+                    violated = true;
+                }
+            }
+            if (violated)
+            {
+                AddReward(-1f);
+            }
         }
     }
     public override void OnActionReceived(ActionBuffers actions)

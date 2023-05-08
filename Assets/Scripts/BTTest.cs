@@ -210,11 +210,11 @@ namespace BTTest
             return payload();
         }
     }
-    public class Condition : ExecutionNode
+    public class ConditionNode : ExecutionNode
     {
-        public Condition(String name) : base(name) { }
+        public ConditionNode(String name) : base(name) { }
     }
-    public class PredicateCondition : Condition
+    public class PredicateCondition : ConditionNode
     {
         private Func<bool> predicate;
         public PredicateCondition(String name, Func<bool> predicate) : base(name)
@@ -226,7 +226,7 @@ namespace BTTest
             return predicate() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
-    public class CBFCondition : Condition
+    public class CBFCondition : ConditionNode
     {
         private CBFApplicator cbfApplicator;
         public CBFCondition(String name, CBFApplicator cbfApplicator) : base(name)
@@ -241,12 +241,12 @@ namespace BTTest
     public class LearningActionAgentSwitcher : Action
     {
         public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher) : base(name) { this.agent = agent; this.switcher = switcher; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Func<bool> postCondition) : this(name, agent, switcher) { this.postCondition = postCondition; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Func<bool> postCondition, List<Func<bool>> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition) : this(name, agent, switcher) { this.postCondition = postCondition; }
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, List<Condition> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
         protected BaseAgent agent;
         protected IAgentSwitcher switcher;
-        private Func<bool> postCondition;
-        private List<Func<bool>> accs;
+        private Condition postCondition;
+        private List<Condition> accs;
 
         public override TaskStatus OnUpdate()
         {

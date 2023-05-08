@@ -33,9 +33,9 @@ namespace Env5
         {
             base.OnActionReceived(actions);
             // Debug.Log("MoveToTarget.OnActionReceived");
-            if (PostCondition != null && PostCondition())
+            if (PostCondition != null && PostCondition.Func())
             {
-                Debug.Log("GoalTrigger reached!");
+                Debug.Log("GoalTrigger reached! PC: " + PostCondition.Name);
 
                 float velocityPunishment = -0.1f * controller.rb.velocity.magnitude / controller.maxSpeed;
                 // Debug.Log("velocityPunishment: " + velocityPunishment);

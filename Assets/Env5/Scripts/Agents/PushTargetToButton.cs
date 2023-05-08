@@ -31,9 +31,9 @@ namespace Env5
         public override void OnActionReceived(ActionBuffers actions)
         {
             base.OnActionReceived(actions);
-            if (PostCondition != null && PostCondition())
+            if (PostCondition != null && PostCondition.Func())
             {
-                Debug.Log("Button pressed!");
+                Debug.Log("Button pressed! PC: " + PostCondition.Name);
                 AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
