@@ -13,9 +13,9 @@ namespace Env5
         public GameObject bridgeDown;
         public GameObject bridgeUp;
 
-        public float groundY = 0f;
-        public float elevatedGroundY = 4f;
-        public readonly float width = 40f;
+        private float groundY = 0f;
+        private float elevatedGroundY = 4f;
+        private float width = 40f;
 
         float part1 = 0.25f;
         float part2 = 0.25f;
@@ -33,6 +33,11 @@ namespace Env5
         float x3;
         float x4;
         float height;
+
+        public float X1 => x1;
+        public float Width => width;
+        public float ElevatedGroundY => elevatedGroundY;
+
 
         void Awake()
         {
@@ -99,18 +104,18 @@ namespace Env5
 
         public void Initialize()
         {
-            x0 = -width / 2;
-            x1 = x0 + width * part1;
-            x2 = x1 + width * part2;
-            x3 = x2 + width * part3;
-            x4 = x3 + width * part4;
+            x0 = -Width / 2;
+            x1 = x0 + Width * part1;
+            x2 = x1 + Width * part2;
+            x3 = x2 + Width * part3;
+            x4 = x3 + Width * part4;
             height = elevatedGroundY - groundY;
 
             float minX = x0 + margin + playerScale / 2;
             float maxX = x4 - margin - playerScale / 2;
             float maxXTarget = x3 - margin - playerScale / 2;
-            float z0 = -width / 2;
-            float z1 = width / 2;
+            float z0 = -Width / 2;
+            float z1 = Width / 2;
             float minZ = z0 + margin + playerScale / 2;
             float maxZ = z1 - margin - playerScale / 2;
             float playerY = elevatedGroundY + playerScale / 2;

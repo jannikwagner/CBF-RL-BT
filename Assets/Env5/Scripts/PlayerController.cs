@@ -11,13 +11,14 @@ namespace Env5
         public Rigidbody rb;
         public EnvController env;
         private float closenessDistance = 3.0f;
-        private float forceFactor = 10f;
-        // Start is called before the first frame update
+        private float accFactor = 10f;
         internal float maxSpeed = 10f;
 
-        public void ApplyAcc(Vector3 force)
+        public float AccFactor { get => accFactor; }
+
+        public void ApplyAcc(Vector3 acc)
         {
-            rb.AddForce(force * rb.mass * forceFactor);
+            rb.AddForce(acc * accFactor * rb.mass);
 
             if (rb.velocity.magnitude > maxSpeed)
             {

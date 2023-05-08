@@ -12,13 +12,13 @@ namespace Env5
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
-            sensor.AddObservation(playerPos / controller.env.width * 2f);
+            sensor.AddObservation(playerPos / controller.env.Width * 2f);
             // Vector3 triggerPos = controller.env.goalTrigger.localPosition;
             // sensor.AddObservation((triggerPos - playerPos) / controller.env.width);
             Vector3 goalPos = controller.env.goal.localPosition;
-            sensor.AddObservation((goalPos - playerPos) / controller.env.width);
+            sensor.AddObservation((goalPos - playerPos) / controller.env.Width);
             Vector3 targetPos = controller.env.target.localPosition;
-            Vector3 distanceToTargetObs = (targetPos - playerPos) / controller.env.width;
+            Vector3 distanceToTargetObs = (targetPos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToTargetObs);  // should not collide
             // sensor.AddObservation((goalPos - triggerPos) / controller.env.width);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);

@@ -11,11 +11,11 @@ namespace Env5
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
-            sensor.AddObservation(playerPos / controller.env.width * 2f);
+            sensor.AddObservation(playerPos / controller.env.Width * 2f);
             // Vector3 targetPos = controller.env.target.localPosition;
             // sensor.AddObservation((targetPos - playerPos) / controller.env.width);
             Vector3 buttonPos = controller.env.button.localPosition;
-            sensor.AddObservation((buttonPos - playerPos) / controller.env.width);
+            sensor.AddObservation((buttonPos - playerPos) / controller.env.Width);
             // sensor.AddObservation((buttonPos - targetPos) / controller.env.width);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }

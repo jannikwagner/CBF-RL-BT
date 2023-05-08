@@ -24,7 +24,7 @@ namespace Env5
         private void Awake()
         {
             var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal };
-
+            var upCBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), controller.AccFactor);
             agentSwitcher = new AgentSwitcher();
             agentSwitcher.AddAgents(agents);
 

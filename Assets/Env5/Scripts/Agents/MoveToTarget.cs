@@ -10,10 +10,10 @@ namespace Env5
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
-            Vector3 playerPosObs = playerPos / controller.env.width * 2f;
+            Vector3 playerPosObs = playerPos / controller.env.Width * 2f;
             sensor.AddObservation(playerPosObs);
             Vector3 targetPos = controller.env.target.localPosition;
-            Vector3 distanceObs = (targetPos - playerPos) / controller.env.width;
+            Vector3 distanceObs = (targetPos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceObs);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
