@@ -65,6 +65,7 @@ public abstract class BaseAgent : Agent
             {
                 if (!acc.Func())
                 {
+                    OnACCViolation();
                     Debug.Log("ACC " + acc.Name + " violated");
                     violated = true;
                 }
@@ -75,6 +76,9 @@ public abstract class BaseAgent : Agent
             }
         }
     }
+
+    protected abstract void OnACCViolation();
+
     public override void OnActionReceived(ActionBuffers actions)
     {
         actionCount++;

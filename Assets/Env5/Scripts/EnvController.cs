@@ -84,12 +84,12 @@ namespace Env5
 
         public float DistanceTargetUp()
         {
-            var distance = target.localPosition.x - x1;
+            var distance = target.localPosition.x - x1 - Utility.eps;
             return Mathf.Max(distance, 0);
         }
         public float DistancePlayerX1()
         {
-            var distance = player.localPosition.x - x1;
+            var distance = player.localPosition.x - x1 - Utility.eps;
             return Mathf.Max(distance, 0);
         }
         public bool PlayerUp()
@@ -99,7 +99,7 @@ namespace Env5
 
         public float DistancePlayerUp()
         {
-            var distance = elevatedGroundY + playerScale / 2f - player.localPosition.y;
+            var distance = elevatedGroundY + playerScale / 2f - player.localPosition.y - Utility.eps;
             return Mathf.Max(distance, 0);
         }
 
