@@ -6,15 +6,8 @@ using Unity.MLAgents.Actuators;
 
 public class CBFDiscreteInvalidActionMasker
 {
-    private ActionSpec actionSpec;
-    public CBFDiscreteInvalidActionMasker(ActionSpec actionSpec)
+    public void WriteDiscreteActionMask(IDiscreteActionMask actionMask, CBFApplicator[] cbfApplicators, int numActions)
     {
-        this.actionSpec = actionSpec;
-    }
-    public void WriteDiscreteActionMask(IDiscreteActionMask actionMask, CBFApplicator[] cbfApplicators)
-    {
-        var numActions = actionSpec.BranchSizes[0];
-
         bool[] actionMasked = new bool[numActions];
         foreach (var cbfApplicator in cbfApplicators)
         {

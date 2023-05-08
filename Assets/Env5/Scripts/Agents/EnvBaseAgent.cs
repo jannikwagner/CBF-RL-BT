@@ -31,6 +31,8 @@ namespace Env5
 
         public PlayerController controller;
         private IEnvActuator actuator;
+        public override int NumActions => actuator.NumActions;
+
         void Start()
         {
             actuator = new EnvActuator25();
@@ -64,13 +66,14 @@ namespace Env5
 
     public interface IEnvActuator
     {
+        int NumActions { get; }
         Vector3 GetAcc(ActionBuffers actions);
         void Heuristic(in ActionBuffers actionsOut);
     }
 
     public class EnvActuator25 : IEnvActuator
     {
-
+        public int NumActions => 25;
         public Vector3 GetAcc(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
@@ -78,8 +81,8 @@ namespace Env5
 
             var i = action % 5;
             var j = action / 5;
-            var force = new Vector3(i - 2, 0f, j - 2) / 2.0f;
-            return force;
+            var acc = new Vector3(i - 2, 0f, j - 2) / 2.0f;
+            return acc;
         }
 
         public void Heuristic(in ActionBuffers actionsOut)
@@ -95,6 +98,7 @@ namespace Env5
     }
     public class EnvActuator9 : IEnvActuator
     {
+        public int NumActions => 9;
 
         public Vector3 GetAcc(ActionBuffers actions)
         {
@@ -119,6 +123,8 @@ namespace Env5
     }
     public class EnvActuator5 : IEnvActuator
     {
+        public int NumActions => 5;
+
         public Vector3 GetAcc(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
@@ -165,6 +171,10 @@ namespace Env5
     public class PosVelDynamics : IDynamicsProvider
     {
         EnvBaseAgent agent;
+        public PosVelDynamics(EnvBaseAgent agent)
+        {
+            this.agent = agent;
+        }
         public float[] dxdt(ActionBuffers action)
         {
             var velocity = agent.controller.rb.velocity;

@@ -47,7 +47,7 @@ public class Env4ActuatorComponent : ActuatorComponent
         public Env4Actuator(Env4Agent agent)
         {
             this.agent = agent;
-            this.masker = new CBFDiscreteInvalidActionMasker(this.ActionSpec);
+            this.masker = new CBFDiscreteInvalidActionMasker();
         }
 
         public ActionSpec ActionSpec => m_ActionSpec;
@@ -75,7 +75,7 @@ public class Env4ActuatorComponent : ActuatorComponent
 
         public void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
         {
-            masker.WriteDiscreteActionMask(actionMask, agent.cbfApplicators);
+            masker.WriteDiscreteActionMask(actionMask, agent.cbfApplicators, this.ActionSpec.BranchSizes[0]);
         }
     }
 }

@@ -4,19 +4,23 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using UnityEngine;
 
-public class BaseAgent : Agent
+public abstract class BaseAgent : Agent
 {
     private int actionCount;
     private int maxActions = 500;
     private int stepsPerDecision = 5;
     private Func<bool> postCondition;
     private List<Func<bool>> accs;
+    private List<CBFApplicator> cbfApplicators;
+    private CBFDiscreteInvalidActionMasker masker;
 
     // public int ActionCount { get => actionCount; set => actionCount = value; }
     // public int MaxActions { get => maxActions; set => maxActions = value; }
     // public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
     public Func<bool> PostCondition { get => postCondition; set => postCondition = value; }
     public List<Func<bool>> ACCs { get => accs; set => accs = value; }
+    public abstract int NumActions { get; }
+    public List<CBFApplicator> CBFApplicators { get => cbfApplicators; set => cbfApplicators = value; }
 
     public virtual void ResetEnvLocal() { }
     public virtual void ResetEnvGlobal() { }
@@ -72,5 +76,18 @@ public class BaseAgent : Agent
             AddReward(-1f);
             Debug.Log(this + "EpisodeShouldEnd, negative reward");
         }
+    }
+
+    public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
+    {
+        if (cbfApplicators == null)
+        {
+            return;
+        }
+        if (masker == null)
+        {
+            masker = new CBFDiscreteInvalidActionMasker();
+        }
+        masker.WriteDiscreteActionMask(actionMask, cbfApplicators.ToArray(), NumActions);
     }
 }

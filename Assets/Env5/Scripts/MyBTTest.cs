@@ -25,6 +25,9 @@ namespace Env5
         {
             var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal };
             var upCBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), controller.AccFactor);
+            var posVelDynamics = new PosVelDynamics(pushTargetToButton);
+            var cbfApplicator = new ContinuousCBFApplicator(upCBF, posVelDynamics, debug: true);
+            pushTargetToButton.CBFApplicators = new List<CBFApplicator> { cbfApplicator };
             agentSwitcher = new AgentSwitcher();
             agentSwitcher.AddAgents(agents);
 
