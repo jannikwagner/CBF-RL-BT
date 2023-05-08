@@ -38,6 +38,11 @@ namespace Env5
             var upBridgeCBFApplicator = new ContinuousCBFApplicator(upBridgeCBF, upBridgeCBFPosVelDynamics, debug: debug);
             pushTriggerToGoal.CBFApplicators = new List<CBFApplicator> { upBridgeCBFApplicator };
 
+            var buttonPressedCBF = new StaticPointCBF3D2ndOrderApproximation(controller.env.button.localPosition, controller.AccFactor, controller.env.PlayerScale);
+            var buttonPressedCBFPosVelDynamics = new PosVelDynamics(moveToGoalTrigger);
+            var buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics, debug: debug);
+            moveToGoalTrigger.CBFApplicators = new List<CBFApplicator> { buttonPressedCBFApplicator };
+
             var isControllingTarget = new Condition("IsControllingTarget", controller.IsControllingTarget);
             var playerUp = new Condition("PlayerUp", controller.env.PlayerUp);
             var buttonPressed = new Condition("ButtonPressed", controller.env.ButtonPressed);

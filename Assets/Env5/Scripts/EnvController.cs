@@ -40,6 +40,8 @@ namespace Env5
         public float ElevatedGroundY => elevatedGroundY;
         public float BridgeWidth => bridgeWidth;
 
+        public float PlayerScale { get => playerScale; }
+
         void Awake()
         {
             Initialize();

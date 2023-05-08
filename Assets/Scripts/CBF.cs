@@ -174,6 +174,35 @@ public class SignedSquareCBF : ModulatedCBF
     ))
     { }
 }
+public class StaticPointCBF3D2ndOrderApproximation : ICBF
+{
+    public Vector3 point;
+    public float minDistance;
+    public float maxAccel;
+    public StaticPointCBF3D2ndOrderApproximation(Vector3 point, float maxAccel, float minDistance = 0)
+    {
+        this.point = point;
+        this.minDistance = minDistance;
+        this.maxAccel = maxAccel;
+    }
+    public float evaluate(float[] x)
+    {
+        var data = PosVelState.FromArray(x);
+        // the normal is changing! as a consequence, this is actually not a static wall
+        var normal = (data.position - point).normalized;
+        var wall = new StaticWallCBF3D2ndOrder(point, normal, maxAccel, minDistance);
+        return wall.evaluate(x);
+    }
+
+    public float[] gradient(float[] x)
+    {
+        var data = PosVelState.FromArray(x);
+        var normal = (data.position - point).normalized;
+        var wall = new StaticWallCBF3D2ndOrder(point, normal, maxAccel, minDistance);
+        return wall.gradient(x);
+    }
+}
+
 
 public class StaticWallCBF3D2ndOrder : ICBF
 {
@@ -194,16 +223,23 @@ public class StaticWallCBF3D2ndOrder : ICBF
         float p = Vector3.Dot(data.position - point, normal) - minDistance;
         float v = Vector3.Dot(data.velocity, normal);
 
-        float h = p + Mathf.Sign(v) * v * v / (2f * maxAccel);
+        float h = p + factor(v) * v * v / (2f * maxAccel);
         return h;
     }
+
+    private static float factor(float v)
+    {
+        return (v < 0) ? -1f : 0f;
+        // return Mathf.Sign(v);
+    }
+
     public float[] gradient(float[] x)
     {
         var data = PosVelState.FromArray(x);
         float v = Vector3.Dot(data.velocity, normal);
 
         float dhdp = 1f;
-        float dhdv = 2f * Mathf.Sign(v) * v / (2f * maxAccel);
+        float dhdv = 2f * factor(v) * v / (2f * maxAccel);
         float dpdx = normal.x;
         float dpdy = normal.y;
         float dpdz = normal.z;
