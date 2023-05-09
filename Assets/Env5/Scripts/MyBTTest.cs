@@ -21,11 +21,11 @@ namespace Env5
 
         public int MaxSteps { get => maxSteps; set => maxSteps = value; }
 
-        private void Awake()
+        private void Start()
         {
-            bool debug = false;
+            bool debug = true;
             var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal };
-            var upCBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), controller.AccFactor);
+            var upCBF = new StaticWallCBF3D2ndOrder(new Vector3(-10, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), controller.AccFactor, -0.5f);
             var upCBFPosVelDynamics = new PosVelDynamics(pushTargetToButton);
             var upCBFApplicator = new ContinuousCBFApplicator(upCBF, upCBFPosVelDynamics, debug: debug);
             pushTargetToButton.CBFApplicators = new List<CBFApplicator> { upCBFApplicator };

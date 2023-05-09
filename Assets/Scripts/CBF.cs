@@ -224,6 +224,8 @@ public class StaticWallCBF3D2ndOrder : ICBF
         float v = Vector3.Dot(data.velocity, normal);
 
         float h = p + factor(v) * v * v / (2f * maxAccel);
+
+        // Debug.Log("point" + point + ", normal:" + normal + ", pos: " + data.position + ", vel: " + data.velocity + ", p: " + p + ", v: " + v + ", h: " + h);
         return h;
     }
 

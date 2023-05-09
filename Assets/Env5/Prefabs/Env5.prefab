@@ -1644,8 +1644,6 @@ MonoBehaviour:
   goal: {fileID: 7481095166641309692}
   bridgeDown: {fileID: 7481095165390883636}
   bridgeUp: {fileID: 7481095165469514434}
-  groundY: 0
-  elevatedGroundY: 4
 --- !u!1 &7481095166394033187
 GameObject:
   m_ObjectHideFlags: 0

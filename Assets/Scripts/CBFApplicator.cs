@@ -54,13 +54,14 @@ public class ContinuousCBFApplicator : CBFApplicator
     {
         var x = controlledDynamics.x();
         var gradient = cbf.gradient(x);
-        var dynamics = controlledDynamics.dxdt(action);
-        if (debug) Debug.Log("dynamics: " + Utility.arrToStr(dynamics));
-        if (debug) Debug.Log("gradient: " + Utility.arrToStr(gradient));
-        if (debug) Debug.Log("State: " + Utility.arrToStr(x));
-        float left = Utility.Dot(dynamics, gradient);
+        var dxdt = controlledDynamics.dxdt(action);
+        bool debugLocal = debug && action.DiscreteActions[0] == 14;
+        if (debugLocal) Debug.Log("dxdt: " + Utility.arrToStr(dxdt));
+        if (debugLocal) Debug.Log("dhdx: " + Utility.arrToStr(gradient));
+        if (debugLocal) Debug.Log("x: " + Utility.arrToStr(x));
+        float left = Utility.Dot(dxdt, gradient);
         float right = -alpha.Invoke(cbf.evaluate(x));
-        if (debug) Debug.Log("left: " + left + ", right: " + right);
+        if (debugLocal) Debug.Log("left: " + left + ", right: " + right);
         return left >= right;
     }
 }

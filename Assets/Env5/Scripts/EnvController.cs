@@ -112,6 +112,7 @@ namespace Env5
             x2 = x1 + Width * part2;
             x3 = x2 + Width * part3;
             x4 = x3 + Width * part4;
+            // Debug.Log($"x0: {x0}, x1: {x1}, x2: {x2}, x3: {x3}, x4: {x4}");
             height = elevatedGroundY - groundY;
 
             float minX = x0 + margin + playerScale / 2;

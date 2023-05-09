@@ -73,7 +73,7 @@ public class Utility
         return result;
     }
 
-    public static String arrToStr(float[] arr)
+    public static String arrToStr<T>(T[] arr)
     {
         var str = "[";
         foreach (var element in arr)
