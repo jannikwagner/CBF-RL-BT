@@ -39,15 +39,15 @@ public class CBFDiscreteInvalidActionMasker
             }
             actionMasked = actionMaskedNew;
         }
-        List<int> maskedActions = new List<int>();
-        for (int i = 0; i < actionMasked.Count(); i++)
-        {
-            if (actionMasked[i])
-            {
-                maskedActions.Add(i);
-            }
-        }
-        Debug.Log("Masked actions: " + Utility.arrToStr(maskedActions));
+        // List<int> maskedActions = new List<int>();
+        // for (int i = 0; i < actionMasked.Count(); i++)
+        // {
+        //     if (actionMasked[i])
+        //     {
+        //         maskedActions.Add(i);
+        //     }
+        // }
+        // Debug.Log("Masked actions: " + Utility.arrToStr(maskedActions));
 
         return actionMasked;
     }
