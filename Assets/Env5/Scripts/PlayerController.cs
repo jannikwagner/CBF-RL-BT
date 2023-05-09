@@ -91,7 +91,7 @@ namespace Env5
                 env.target.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
                 // The physics engine would be one FixedUpdate behind if we don't do this. This would lead to the BT executing MoveToTarget for one FixedUpdate.
                 if (press)
-                    env.button.GetComponentInParent<CollisionDetector>().Pressed = true;
+                    env.button.GetComponentInParent<CollisionDetector>().ManuallyAdd(env.target.gameObject.tag);
             }
         }
 
@@ -111,7 +111,7 @@ namespace Env5
                 env.goalTrigger.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
                 // The physics engine would be one FixedUpdate behind if we don't do this. This would lead to the BT executing MoveToGoalTrigger for one FixedUpdate.
                 if (press)
-                    env.goal.GetComponentInParent<CollisionDetector>().Pressed = true;
+                    env.goal.GetComponentInParent<CollisionDetector>().ManuallyAdd(env.goalTrigger.gameObject.tag);
             }
         }
 
@@ -133,6 +133,11 @@ namespace Env5
             ControlOther controlOther = this.GetComponent<ControlOther>();
             controlOther.enabled = true;
             controlOther.other = env.target.GetComponent<Rigidbody>();
+        }
+        public bool TouchingBridgeDown()
+        {
+            var collisionDetector = GetComponent<CollisionDetector>();
+            return collisionDetector.Touching(env.bridgeDown);
         }
     }
 }

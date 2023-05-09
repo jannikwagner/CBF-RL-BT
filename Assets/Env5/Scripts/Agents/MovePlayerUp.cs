@@ -20,7 +20,7 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            targetUpDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerX1);
+            targetUpDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerBeforeX1);
 
             // playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
         }

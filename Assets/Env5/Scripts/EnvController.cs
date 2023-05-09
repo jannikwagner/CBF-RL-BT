@@ -71,13 +71,13 @@ namespace Env5
         public bool ButtonPressed()
         {
             // return Vector3.Distance(target.position, button.position) < buttonScale;
-            return button.gameObject.GetComponent<CollisionDetector>().Pressed;
+            return button.gameObject.GetComponent<CollisionDetector>().Touching(target.gameObject);
         }
 
         public bool GoalPressed()
         {
             // return Vector3.Distance(goalTrigger.position, goal.position) < buttonScale;
-            return goal.gameObject.GetComponent<CollisionDetector>().Pressed;
+            return goal.gameObject.GetComponent<CollisionDetector>().Touching(goalTrigger.gameObject);
         }
 
         public bool TargetUp()
@@ -90,10 +90,19 @@ namespace Env5
             var distance = target.localPosition.x - x1 - Utility.eps;
             return Mathf.Max(distance, 0);
         }
-        public float DistancePlayerX1()
+        public float DistancePlayerBeforeX1()
         {
             var distance = player.localPosition.x - x1 - Utility.eps;
             return Mathf.Max(distance, 0);
+        }
+        public float DistancePlayerPastX3()
+        {
+            var distance = x3 - player.localPosition.x - Utility.eps;
+            return Mathf.Max(distance, 0);
+        }
+        public bool PlayerPastX3()
+        {
+            return DistancePlayerPastX3() == 0;
         }
         public bool PlayerUp()
         {
@@ -161,8 +170,8 @@ namespace Env5
             var playerController = player.GetComponentInParent<PlayerController>();
             playerController.StopControl();
             // It is manually set to true in PlayerController.StopControl() when the player touches the goal or button for the BT to behave correctly.
-            button.GetComponentInParent<CollisionDetector>().Pressed = false;
-            goal.GetComponentInParent<CollisionDetector>().Pressed = false;
+            button.GetComponentInParent<CollisionDetector>().ManuallyRemove(target.gameObject.tag);
+            goal.GetComponentInParent<CollisionDetector>().ManuallyRemove(goalTrigger.gameObject.tag);
             Initialize();
         }
     }
