@@ -139,8 +139,8 @@ namespace BTTest
     }
     public class CompositeNode : Node
     {
-        private Node[] children;
-        public CompositeNode(String name, Node[] children) : base(name)
+        private IEnumerable<Node> children;
+        public CompositeNode(String name, IEnumerable<Node> children) : base(name)
         {
             this.children = children;
             foreach (Node child in children)
@@ -148,7 +148,7 @@ namespace BTTest
                 child.Parent = this;
             }
         }
-        public Node[] Children { get => children; }
+        public IEnumerable<Node> Children { get => children; }
         public override void OnReset()
         {
             foreach (var child in children)
@@ -160,7 +160,7 @@ namespace BTTest
     }
     public class Sequence : CompositeNode
     {
-        public Sequence(String name, Node[] children) : base(name, children) { }
+        public Sequence(String name, IEnumerable<Node> children) : base(name, children) { }
         public override TaskStatus OnUpdate()
         {
             foreach (Node child in Children)
@@ -176,7 +176,7 @@ namespace BTTest
     }
     public class Selector : CompositeNode
     {
-        public Selector(String name, Node[] children) : base(name, children) { }
+        public Selector(String name, IEnumerable<Node> children) : base(name, children) { }
         public override TaskStatus OnUpdate()
         {
             foreach (Node child in Children)
