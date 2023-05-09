@@ -23,24 +23,28 @@ namespace Env5
 
         private void Start()
         {
+            int steps = moveToTarget.ActionsPerDecision;
+            float deltaTime = Time.fixedDeltaTime * steps;
+            float eta = 1f;
+            System.Func<float, float> alpha = ((float x) => x / deltaTime);
+            float margin = Utility.eps;
             bool debug = true;
-            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal };
-            var upCBF = new StaticWallCBF3D2ndOrder(new Vector3(-10, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), controller.AccFactor, -0.5f);
-            var upCBFPosVelDynamics = new PosVelDynamics(pushTargetToButton);
-            var upCBFApplicator = new ContinuousCBFApplicator(upCBF, upCBFPosVelDynamics, debug: debug);
+            var upCBF = new StaticWallCBF3D2ndOrder(new Vector3(-10, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), controller.AccFactor, margin);
+            var upCBFPosVelDynamics = new PlayerPosVelDynamics(pushTargetToButton);
+            var upCBFApplicator = new ContinuousCBFApplicator(upCBF, upCBFPosVelDynamics, debug: debug, alpha: alpha);
             pushTargetToButton.CBFApplicators = new List<CBFApplicator> { upCBFApplicator };
 
-            var bridgeLeftCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), controller.AccFactor);
-            var bridgeRightCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, -controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), controller.AccFactor);
+            var bridgeLeftCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), controller.AccFactor, margin);
+            var bridgeRightCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, -controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), controller.AccFactor, margin);
             var bridgeCBF = new MinCBF(new List<ICBF> { bridgeLeftCBF, bridgeRightCBF });
             var upBridgeCBF = new MaxCBF(new List<ICBF> { upCBF, bridgeCBF });
-            var upBridgeCBFPosVelDynamics = new PosVelDynamics(pushTriggerToGoal);
-            var upBridgeCBFApplicator = new ContinuousCBFApplicator(upBridgeCBF, upBridgeCBFPosVelDynamics, debug: debug);
+            var upBridgeCBFPosVelDynamics = new PlayerPosVelDynamics(pushTriggerToGoal);
+            var upBridgeCBFApplicator = new ContinuousCBFApplicator(upBridgeCBF, upBridgeCBFPosVelDynamics, debug: debug, alpha: alpha);
             pushTriggerToGoal.CBFApplicators = new List<CBFApplicator> { upBridgeCBFApplicator };
 
-            var buttonPressedCBF = new StaticPointCBF3D2ndOrderApproximation(controller.env.button.localPosition, controller.AccFactor, controller.env.PlayerScale);
-            var buttonPressedCBFPosVelDynamics = new PosVelDynamics(moveToGoalTrigger);
-            var buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics, debug: debug);
+            var buttonPressedCBF = new StaticPointCBF3D2ndOrderApproximation(controller.AccFactor, controller.env.PlayerScale + margin);
+            var buttonPressedCBFPosVelDynamics = new PlayerTargetPosVelDynamics(moveToGoalTrigger);
+            var buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics, debug: debug, alpha: alpha);
             moveToGoalTrigger.CBFApplicators = new List<CBFApplicator> { buttonPressedCBFApplicator };
 
             var isControllingTarget = new Condition("IsControllingTarget", controller.IsControllingTarget);
@@ -49,7 +53,7 @@ namespace Env5
             var isControllingGoalTrigger = new Condition("IsControllingGoalTrigger", controller.IsControllingGoalTrigger);
             var goalPressed = new Condition("GoalPressed", controller.env.GoalPressed);
 
-
+            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal };
             agentSwitcher = new AgentSwitcher();
             agentSwitcher.AddAgents(agents);
 

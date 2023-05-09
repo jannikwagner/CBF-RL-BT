@@ -174,35 +174,6 @@ public class SignedSquareCBF : ModulatedCBF
     ))
     { }
 }
-public class StaticPointCBF3D2ndOrderApproximation : ICBF
-{
-    public Vector3 point;
-    public float minDistance;
-    public float maxAccel;
-    public StaticPointCBF3D2ndOrderApproximation(Vector3 point, float maxAccel, float minDistance = 0)
-    {
-        this.point = point;
-        this.minDistance = minDistance;
-        this.maxAccel = maxAccel;
-    }
-    public float evaluate(float[] x)
-    {
-        var data = PosVelState.FromArray(x);
-        // the normal is changing! as a consequence, this is actually not a static wall
-        var normal = (data.position - point).normalized;
-        var wall = new StaticWallCBF3D2ndOrder(point, normal, maxAccel, minDistance);
-        return wall.evaluate(x);
-    }
-
-    public float[] gradient(float[] x)
-    {
-        var data = PosVelState.FromArray(x);
-        var normal = (data.position - point).normalized;
-        var wall = new StaticWallCBF3D2ndOrder(point, normal, maxAccel, minDistance);
-        return wall.gradient(x);
-    }
-}
-
 
 public class StaticWallCBF3D2ndOrder : ICBF
 {
@@ -256,6 +227,33 @@ public class StaticWallCBF3D2ndOrder : ICBF
             dhdv * dvdy,
             dhdv * dvdz
         };
+    }
+}
+
+public class StaticPointCBF3D2ndOrderApproximation : ICBF
+{
+    public float minDistance;
+    public float maxAccel;
+    public StaticPointCBF3D2ndOrderApproximation(float maxAccel, float minDistance = 0)
+    {
+        this.minDistance = minDistance;
+        this.maxAccel = maxAccel;
+    }
+    public float evaluate(float[] x)
+    {
+        var data = PosVelState.FromArray(x);
+        // the normal is changing! as a consequence, this is actually not a static wall
+        var normal = (data.position).normalized;
+        var wall = new StaticWallCBF3D2ndOrder(Vector3.zero, normal, maxAccel, minDistance);
+        return wall.evaluate(x);
+    }
+
+    public float[] gradient(float[] x)
+    {
+        var data = PosVelState.FromArray(x);
+        var normal = (data.position).normalized;
+        var wall = new StaticWallCBF3D2ndOrder(Vector3.zero, normal, maxAccel, minDistance);
+        return wall.gradient(x);
     }
 }
 

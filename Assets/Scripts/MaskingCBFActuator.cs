@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents.Actuators;
+using System.Linq;
 
 public class CBFDiscreteInvalidActionMasker
 {
@@ -29,7 +30,15 @@ public class CBFDiscreteInvalidActionMasker
             }
             actionMasked = actionMaskedNew;
         }
-        Debug.Log("Masked actions: " + Utility.arrToStr(actionMasked));
+        List<int> maskedActions = new List<int>();
+        for (int i = 0; i < actionMasked.Count(); i++)
+        {
+            if (actionMasked[i])
+            {
+                maskedActions.Add(i);
+            }
+        }
+        Debug.Log("Masked actions: " + Utility.arrToStr(maskedActions));
         for (int i = 0; i < numActions; i++)
         {
             actionMask.SetActionEnabled(0, i, !actionMasked[i]);

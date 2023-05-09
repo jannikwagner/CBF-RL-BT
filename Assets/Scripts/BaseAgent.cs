@@ -7,8 +7,8 @@ using UnityEngine;
 public abstract class BaseAgent : Agent
 {
     private int actionCount;
-    private int maxActions = 500;
-    private int stepsPerDecision = 5;
+    private int maxActions = 5000;
+    private int actionsPerDecision = 10;
     private Condition postCondition;
     private List<Condition> accs;
     private List<CBFApplicator> cbfApplicators;
@@ -21,6 +21,7 @@ public abstract class BaseAgent : Agent
     public List<Condition> ACCs { get => accs; set => accs = value; }
     public abstract int NumActions { get; }
     public List<CBFApplicator> CBFApplicators { get => cbfApplicators; set => cbfApplicators = value; }
+    public int ActionsPerDecision { get => actionsPerDecision; set => actionsPerDecision = value; }
 
     public virtual void ResetEnvLocal() { }
     public virtual void ResetEnvGlobal() { }
@@ -33,7 +34,7 @@ public abstract class BaseAgent : Agent
 
     public void Act()
     {
-        if (actionCount % stepsPerDecision == 0)
+        if (actionCount % actionsPerDecision == 0)
         {
             RequestDecision();
         }

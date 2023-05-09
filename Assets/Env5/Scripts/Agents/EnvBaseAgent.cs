@@ -173,10 +173,10 @@ namespace Env5
             // Debug.Log(discreateActionsOut[0]);
         }
     }
-    public class PosVelDynamics : IDynamicsProvider
+    public class PlayerPosVelDynamics : IDynamicsProvider
     {
         EnvBaseAgent agent;
-        public PosVelDynamics(EnvBaseAgent agent)
+        public PlayerPosVelDynamics(EnvBaseAgent agent)
         {
             this.agent = agent;
         }
@@ -192,6 +192,30 @@ namespace Env5
         {
             var position = agent.controller.player.localPosition;
             var velocity = agent.controller.rb.velocity;
+            var x = new PosVelState { position = position, velocity = velocity };
+            return x.ToArray();
+        }
+    }
+    public class PlayerTargetPosVelDynamics : IDynamicsProvider
+    {
+        EnvBaseAgent agent;
+        public PlayerTargetPosVelDynamics(EnvBaseAgent agent)
+        {
+            this.agent = agent;
+        }
+        public float[] dxdt(ActionBuffers action)
+        {
+            var targetVelocity = agent.controller.env.target.GetComponentInParent<Rigidbody>().velocity;
+            var velocity = agent.controller.rb.velocity - targetVelocity;
+            var acc = agent.GetAcc(action) + 0.5f * targetVelocity;
+            var dxdt = new PosVelState { position = velocity, velocity = acc };
+            return dxdt.ToArray();
+        }
+
+        public float[] x()
+        {
+            var position = agent.controller.player.localPosition - agent.controller.env.target.localPosition;
+            var velocity = agent.controller.rb.velocity - agent.controller.env.target.GetComponentInParent<Rigidbody>().velocity;
             var x = new PosVelState { position = position, velocity = velocity };
             return x.ToArray();
         }

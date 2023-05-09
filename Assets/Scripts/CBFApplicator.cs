@@ -55,7 +55,8 @@ public class ContinuousCBFApplicator : CBFApplicator
         var x = controlledDynamics.x();
         var gradient = cbf.gradient(x);
         var dxdt = controlledDynamics.dxdt(action);
-        bool debugLocal = debug && action.DiscreteActions[0] == 14;
+        bool debugLocal = debug && (action.DiscreteActions[0] == 14 || action.DiscreteActions[0] == 10);
+        if (debugLocal) Debug.Log("action: " + action.DiscreteActions[0]);
         if (debugLocal) Debug.Log("dxdt: " + Utility.arrToStr(dxdt));
         if (debugLocal) Debug.Log("dhdx: " + Utility.arrToStr(gradient));
         if (debugLocal) Debug.Log("x: " + Utility.arrToStr(x));
