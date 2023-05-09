@@ -10,11 +10,14 @@ namespace Env5
         [SerializeField]
         private BT _tree;
         public IAgentSwitcher agentSwitcher;
+        public MoveOverBridge moveOverBridge;
+        public MovePlayerUp movePlayerUp;
+        public MoveToBridge moveToBridge;
         public MoveToTarget moveToTarget;
         public PushTargetToButton pushTargetToButton;
-        public MovePlayerUp movePlayerUp;
         public MoveToGoalTrigger moveToGoalTrigger;
         public PushTriggerToGoal pushTriggerToGoal;
+        public PushTriggerToGoalNew pushTriggerToGoalNew;
         public PlayerController controller;
         private int maxSteps = 10000;
         private int stepCount;
