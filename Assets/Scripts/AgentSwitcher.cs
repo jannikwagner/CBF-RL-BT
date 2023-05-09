@@ -99,6 +99,7 @@ public class AgentSwitcher : IAgentSwitcher
 
     public void Reset()
     {
+        DeactivateAgent();
         foreach (var item in agents)
         {
             item.gameObject.SetActive(false);

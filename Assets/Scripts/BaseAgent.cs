@@ -15,7 +15,7 @@ public abstract class BaseAgent : Agent
     protected CBFDiscreteInvalidActionMasker masker = new CBFDiscreteInvalidActionMasker();
 
     // public int ActionCount { get => actionCount; set => actionCount = value; }
-    // public int MaxActions { get => maxActions; set => maxActions = value; }
+    public int MaxActions { get => maxActions; }
     // public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
     public Condition PostCondition { get => postCondition; set => postCondition = value; }
     public IEnumerable<Condition> ACCs { get => accs; set => accs = value; }

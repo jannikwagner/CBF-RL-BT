@@ -57,7 +57,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 87f58f73867a44f29807452383560da2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MovePlayerUp
   TeamId: 0
   m_UseChildSensors: 1
@@ -137,7 +137,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 8e1896ea0f66543c78ef0d1dff1a175d, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: PushTriggerToGoal
   TeamId: 0
   m_UseChildSensors: 1
@@ -217,7 +217,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: ad1fe42356ef942d4bc2a3d897707b4c, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: PushTargetToButton
   TeamId: 0
   m_UseChildSensors: 1
@@ -425,7 +425,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 2c4efcadf26af45e2b6452d8bb41695c, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToTarget
   TeamId: 0
   m_UseChildSensors: 1
@@ -505,7 +505,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 2c6baec31299e4a26b494d5f14232edd, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToGoalTrigger
   TeamId: 0
   m_UseChildSensors: 1
@@ -1291,7 +1291,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfb2b4b89e5904d2f82ca61a409c16b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetTag: Target
 --- !u!1 &7481095166178352639
 GameObject:
   m_ObjectHideFlags: 0
@@ -1408,6 +1407,7 @@ GameObject:
   - component: {fileID: 5997831232032838397}
   - component: {fileID: 1685125455920507372}
   - component: {fileID: 3446715112260403477}
+  - component: {fileID: 4675581954513705800}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1584,6 +1584,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   other: {fileID: 239936688466277072}
+--- !u!114 &4675581954513705800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7481095166327812006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfb2b4b89e5904d2f82ca61a409c16b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7481095166365429461
 GameObject:
   m_ObjectHideFlags: 0
@@ -1883,7 +1895,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfb2b4b89e5904d2f82ca61a409c16b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetTag: GoalTrigger
 --- !u!1 &7481095166705782638
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,6 +7,7 @@ namespace Env5
     public class PushTriggerToGoal : EnvBaseAgent
     {
         private IDistanceRewarder triggerGoalDistanceRewarder;
+        private IDistanceRewarder X3DistanceRewarder;
         private IDistanceRewarder playerTargetDistancePunisher;
         // private IDistanceRewarder playerTriggerDistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
@@ -31,6 +32,7 @@ namespace Env5
 
             // playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
             playerTargetDistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
+            X3DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerPastX3);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -48,9 +50,15 @@ namespace Env5
             // }
 
             AddReward(triggerGoalDistanceRewarder.Reward() * 1f);
+            AddReward(X3DistanceRewarder.Reward() * 1f);
 
             // AddReward(playerTriggerDistanceRewarder.Reward() * rFactor);
             AddReward(-playerTargetDistancePunisher.Reward() * 1f);
+
+            if (controller.TouchingBridgeDown())
+            {
+                AddReward(1f / MaxActions);
+            }
         }
     }
 }
