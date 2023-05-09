@@ -59,7 +59,8 @@ namespace Env5
                 var chosenAction = discreateActionsOut[0];
                 if (!allowedActions.Contains(chosenAction))
                 {
-                    discreateActionsOut[0] = allowedActions[0];
+                    int i = Random.Range(0, allowedActions.Count);
+                    discreateActionsOut[0] = allowedActions[i];
                 }
             }
         }

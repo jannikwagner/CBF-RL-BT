@@ -7,7 +7,7 @@ using System.Linq;
 
 public class Utility
 {
-    public static float eps => 1e-5f;
+    public static float eps => 1e-3f;
     public static float[] vec3ToArr(Vector3 vec)
     {
         return new float[] { vec.x, vec.y, vec.z };

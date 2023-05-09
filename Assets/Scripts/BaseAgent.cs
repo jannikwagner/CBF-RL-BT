@@ -8,7 +8,7 @@ public abstract class BaseAgent : Agent
 {
     private int actionCount;
     private int maxActions = 5000;
-    private int actionsPerDecision = 1;
+    private int actionsPerDecision = 10;
     private Condition postCondition;
     private IEnumerable<Condition> accs;
     private IEnumerable<CBFApplicator> cbfApplicators;

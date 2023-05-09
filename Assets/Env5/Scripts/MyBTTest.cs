@@ -27,14 +27,20 @@ namespace Env5
             float deltaTime = Time.fixedDeltaTime * steps;
             float eta = 1f;
             System.Func<float, float> alpha = ((float x) => x / deltaTime);
-            float margin = Utility.eps + 0.1f;
+            float margin = Utility.eps + 0.2f;
             bool debug = true;
             float maxAccFactor = 1 / 1.5f;
             float maxAcc = controller.MaxAcc * maxAccFactor;
+
             var upLeftCBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), maxAcc, margin);
             var upCBFPosVelDynamics = new PlayerPosVelDynamics(pushTargetToButton);
             var upCBFApplicator = new ContinuousCBFApplicator(upLeftCBF, upCBFPosVelDynamics, debug: debug, alpha: alpha);
             pushTargetToButton.CBFApplicators = new List<CBFApplicator> { upCBFApplicator };
+
+            var buttonPressedCBF = new StaticPointCBF3D2ndOrderApproximation(maxAcc, controller.env.PlayerScale + margin);
+            var buttonPressedCBFPosVelDynamics = new PlayerTargetPosVelDynamics(moveToGoalTrigger);
+            var buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics, debug: debug, alpha: alpha);
+            moveToGoalTrigger.CBFApplicators = new List<CBFApplicator> { buttonPressedCBFApplicator };
 
             var bridgeLeftCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), maxAcc, margin);
             var bridgeRightCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, -controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), maxAcc, margin);
@@ -44,13 +50,11 @@ namespace Env5
             var upBridgeCBF = new MaxCBF(new List<ICBF> { upCBF, bridgeCBF });
             var upBridgeCBFPosVelDynamics = new PlayerPosVelDynamics(pushTriggerToGoal);
             var upBridgeCBFApplicator = new ContinuousCBFApplicator(upBridgeCBF, upBridgeCBFPosVelDynamics, debug: debug, alpha: alpha);
-            pushTriggerToGoal.CBFApplicators = new List<CBFApplicator> { upBridgeCBFApplicator };
+            var buttonPressedCBFPosVelDynamics2 = new PlayerTargetPosVelDynamics(pushTriggerToGoal);
+            var buttonPressedCBFApplicator2 = new ContinuousCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics2, debug: debug, alpha: alpha);
+            pushTriggerToGoal.CBFApplicators = new List<CBFApplicator> { buttonPressedCBFApplicator2, upBridgeCBFApplicator };
 
-            var buttonPressedCBF = new StaticPointCBF3D2ndOrderApproximation(maxAcc, controller.env.PlayerScale + margin);
-            var buttonPressedCBFPosVelDynamics = new PlayerTargetPosVelDynamics(moveToGoalTrigger);
-            var buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics, debug: debug, alpha: alpha);
-            moveToGoalTrigger.CBFApplicators = new List<CBFApplicator> { buttonPressedCBFApplicator };
-
+            // conditions
             var isControllingTarget = new Condition("IsControllingTarget", controller.IsControllingTarget);
             var playerUp = new Condition("PlayerUp", controller.env.PlayerUp);
             var buttonPressed = new Condition("ButtonPressed", controller.env.ButtonPressed);
