@@ -39,7 +39,7 @@ namespace Env5
         }
         public Vector3 GetAcc(ActionBuffers actions)
         {
-            return actuator.GetAcc(actions);
+            return actuator.GetAcc(actions) * controller.MaxAcc;
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -52,6 +52,16 @@ namespace Env5
         public override void Heuristic(in ActionBuffers actionsOut)
         {
             actuator.Heuristic(actionsOut);
+            if (CBFApplicators != null)
+            {
+                var allowedActions = CBFDiscreteInvalidActionMasker.AllowedActions(CBFApplicators, NumActions);
+                var discreateActionsOut = actionsOut.DiscreteActions;
+                var chosenAction = discreateActionsOut[0];
+                if (!allowedActions.Contains(chosenAction))
+                {
+                    discreateActionsOut[0] = allowedActions[0];
+                }
+            }
         }
 
         public override void ResetEnvLocal()

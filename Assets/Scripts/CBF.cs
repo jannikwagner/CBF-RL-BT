@@ -7,8 +7,8 @@ using System.Linq;
 
 public interface ICBF
 {
-    public float evaluate(float[] x);
-    public float[] gradient(float[] x);
+    public float h(float[] x);
+    public float[] dhdx(float[] x);
 }
 
 public class MovingBallCBF3D : ICBF
@@ -20,14 +20,14 @@ public class MovingBallCBF3D : ICBF
         this.radius = radius;
     }
 
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
         var position = new Vector3(x[0], x[1], x[2]);
         var center = new Vector3(x[3], x[4], x[5]);
         return (position - center).magnitude - radius;
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
         var position = new Vector3(x[0], x[1], x[2]);
         var center = new Vector3(x[3], x[4], x[5]);
@@ -47,12 +47,12 @@ public class StaticBallCBF3D : ICBF
         this.center = center;
     }
 
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
         return (Utility.ArrToVec3(x) - center).magnitude - radius;
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
         return Utility.vec3ToArr((Utility.ArrToVec3(x) - center).normalized);
     }
@@ -69,13 +69,13 @@ public class WallCBF3D : ICBF
         this.normal = normal;
     }
 
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
         // Debug.Log("x: " + Utility.ArrToVec3(x) + ", point: " + point.ToString() + ", normal: " + normal.ToString());
         return Vector3.Dot(Utility.ArrToVec3(x) - point, normal);
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
         return Utility.vec3ToArr(normal);
     }
@@ -94,14 +94,14 @@ public class StaticBatteryMarginCBF : ICBF
         this.batteryConsumption = batteryConsumption;
     }
 
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
         var position = new Vector3(x[0], x[1], x[2]);
         var battery = x[3];
         return battery - ((position - center).magnitude + margin) * batteryConsumption;
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
         var position = new Vector3(x[0], x[1], x[2]);
         var battery = x[3];
@@ -133,15 +133,15 @@ public class ModulatedCBF : ICBF
         this.alpha = alpha;
     }
 
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
-        return alpha.f(cbf.evaluate(x));
+        return alpha.f(cbf.h(x));
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
-        var cbfValue = cbf.evaluate(x);
-        var cbfGradient = cbf.gradient(x);
+        var cbfValue = cbf.h(x);
+        var cbfGradient = cbf.dhdx(x);
         var alphaDerivative = alpha.df(cbfValue);
 
         return Utility.Mult(cbfGradient, alphaDerivative);
@@ -188,7 +188,7 @@ public class StaticWallCBF3D2ndOrder : ICBF
         this.minDistance = minDistance;
         this.maxAccel = maxAccel;
     }
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
         var data = PosVelState.FromArray(x);
         float p = Vector3.Dot(data.position - point, normal) - minDistance;
@@ -203,10 +203,10 @@ public class StaticWallCBF3D2ndOrder : ICBF
     private static float factor(float v)
     {
         return (v < 0) ? -1f : 0f;
-        // return Mathf.Sign(v);
+        // return Mathf.Sign(v);  // this would render positions inside the wall where the velocity is high enough that one would move out of the wall safe
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
         var data = PosVelState.FromArray(x);
         float v = Vector3.Dot(data.velocity, normal);
@@ -239,21 +239,21 @@ public class StaticPointCBF3D2ndOrderApproximation : ICBF
         this.minDistance = minDistance;
         this.maxAccel = maxAccel;
     }
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
         var data = PosVelState.FromArray(x);
         // the normal is changing! as a consequence, this is actually not a static wall
         var normal = (data.position).normalized;
         var wall = new StaticWallCBF3D2ndOrder(Vector3.zero, normal, maxAccel, minDistance);
-        return wall.evaluate(x);
+        return wall.h(x);
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
         var data = PosVelState.FromArray(x);
         var normal = (data.position).normalized;
         var wall = new StaticWallCBF3D2ndOrder(Vector3.zero, normal, maxAccel, minDistance);
-        return wall.gradient(x);
+        return wall.dhdx(x);
     }
 }
 
@@ -265,14 +265,14 @@ public class MinCBF : ICBF
         this.cbfs = cbfs;
     }
 
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
-        return cbfs.Min(cbf => cbf.evaluate(x));
+        return cbfs.Min(cbf => cbf.h(x));
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
-        return cbfs.MinBy<ICBF>(cbf => cbf.evaluate(x)).gradient(x);
+        return cbfs.MinBy<ICBF>(cbf => cbf.h(x)).dhdx(x);
     }
 }
 public class MaxCBF : ICBF
@@ -283,13 +283,13 @@ public class MaxCBF : ICBF
         this.cbfs = cbfs;
     }
 
-    public float evaluate(float[] x)
+    public float h(float[] x)
     {
-        return cbfs.Max(cbf => cbf.evaluate(x));
+        return cbfs.Max(cbf => cbf.h(x));
     }
 
-    public float[] gradient(float[] x)
+    public float[] dhdx(float[] x)
     {
-        return cbfs.MaxBy<ICBF>(cbf => cbf.evaluate(x)).gradient(x);
+        return cbfs.MaxBy<ICBF>(cbf => cbf.h(x)).dhdx(x);
     }
 }

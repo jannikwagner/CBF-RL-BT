@@ -35,6 +35,7 @@ namespace Env5
         float x4;
         float height;
 
+        public float X3 => x3;
         public float X1 => x1;
         public float Width => width;
         public float ElevatedGroundY => elevatedGroundY;

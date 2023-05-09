@@ -7,7 +7,16 @@ using System.Linq;
 
 public class CBFDiscreteInvalidActionMasker
 {
-    public void WriteDiscreteActionMask(IDiscreteActionMask actionMask, CBFApplicator[] cbfApplicators, int numActions)
+    public void WriteDiscreteActionMask(IDiscreteActionMask actionMask, IEnumerable<CBFApplicator> cbfApplicators, int numActions)
+    {
+        bool[] actionMasked = TestActions(cbfApplicators, numActions);
+        for (int i = 0; i < numActions; i++)
+        {
+            actionMask.SetActionEnabled(0, i, !actionMasked[i]);
+        }
+    }
+
+    private static bool[] TestActions(IEnumerable<CBFApplicator> cbfApplicators, int numActions)
     {
         bool[] actionMasked = new bool[numActions];
         foreach (var cbfApplicator in cbfApplicators)
@@ -39,10 +48,21 @@ public class CBFDiscreteInvalidActionMasker
             }
         }
         Debug.Log("Masked actions: " + Utility.arrToStr(maskedActions));
-        for (int i = 0; i < numActions; i++)
+
+        return actionMasked;
+    }
+    public static List<int> AllowedActions(IEnumerable<CBFApplicator> cbfApplicators, int numActions)
+    {
+        bool[] actionMasked = TestActions(cbfApplicators, numActions);
+        List<int> allowedActions = new List<int>();
+        for (int i = 0; i < actionMasked.Count(); i++)
         {
-            actionMask.SetActionEnabled(0, i, !actionMasked[i]);
+            if (!actionMasked[i])
+            {
+                allowedActions.Add(i);
+            }
         }
+        return allowedActions;
     }
 }
 

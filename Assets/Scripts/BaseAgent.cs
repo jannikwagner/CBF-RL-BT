@@ -8,19 +8,19 @@ public abstract class BaseAgent : Agent
 {
     private int actionCount;
     private int maxActions = 5000;
-    private int actionsPerDecision = 10;
+    private int actionsPerDecision = 1;
     private Condition postCondition;
-    private List<Condition> accs;
-    private List<CBFApplicator> cbfApplicators;
-    private CBFDiscreteInvalidActionMasker masker;
+    private IEnumerable<Condition> accs;
+    private IEnumerable<CBFApplicator> cbfApplicators;
+    protected CBFDiscreteInvalidActionMasker masker = new CBFDiscreteInvalidActionMasker();
 
     // public int ActionCount { get => actionCount; set => actionCount = value; }
     // public int MaxActions { get => maxActions; set => maxActions = value; }
     // public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
     public Condition PostCondition { get => postCondition; set => postCondition = value; }
-    public List<Condition> ACCs { get => accs; set => accs = value; }
+    public IEnumerable<Condition> ACCs { get => accs; set => accs = value; }
     public abstract int NumActions { get; }
-    public List<CBFApplicator> CBFApplicators { get => cbfApplicators; set => cbfApplicators = value; }
+    public IEnumerable<CBFApplicator> CBFApplicators { get => cbfApplicators; set => cbfApplicators = value; }
     public int ActionsPerDecision { get => actionsPerDecision; set => actionsPerDecision = value; }
 
     public virtual void ResetEnvLocal() { }
@@ -104,6 +104,6 @@ public abstract class BaseAgent : Agent
         {
             masker = new CBFDiscreteInvalidActionMasker();
         }
-        masker.WriteDiscreteActionMask(actionMask, cbfApplicators.ToArray(), NumActions);
+        masker.WriteDiscreteActionMask(actionMask, cbfApplicators, NumActions);
     }
 }
