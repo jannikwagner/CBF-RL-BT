@@ -73,21 +73,21 @@ namespace Env5
             _tree = new BT(
                 new Sequence("Root", new Node[] {
                     new Selector("PushTriggerToGoalSelector", new Node[] {
-                        new PredicateCondition("TriggerAtGoal", controller.env.GoalPressed),
+                        new PredicateCondition("TriggerAtGoal", goalPressed),
                         new Sequence("PushTriggerToGoalSequence", new Node[]{
 
                             new Selector("PushTargetToButtonSelector", new Node[] {
-                                new PredicateCondition("TargetAtButton", controller.env.ButtonPressed),
+                                new PredicateCondition("TargetAtButton", buttonPressed),
                                 new Sequence("PushTargetToButtonSequence", new Node[]{
 
                                     new Selector("MoveSelector", new Node[]{
-                                        new PredicateCondition("CloseToTarget", controller.IsControllingTarget),
+                                        new PredicateCondition("IsControllingTarget", isControllingTarget),
                                         new LearningActionAgentSwitcher("MoveToTarget", moveToTarget, agentSwitcher, isControllingTarget),
                                     } ),
 
-                                    new Selector("PushTargetUpSelector", new Node[]{
-                                        new PredicateCondition("TargetUp", controller.env.PlayerUp),
-                                        new LearningActionAgentSwitcher("PushTargetUp", movePlayerUp, agentSwitcher, playerUp, new List<Condition> {isControllingTarget}),
+                                    new Selector("MovePlayerUpSelector", new Node[]{
+                                        new PredicateCondition("TargetUp", playerUp),
+                                        new LearningActionAgentSwitcher("MovePlayerUp", movePlayerUp, agentSwitcher, playerUp, new List<Condition> {isControllingTarget}),
                                     } ),
 
                                     new LearningActionAgentSwitcher("PushTargetToButton", pushTargetToButton, agentSwitcher, buttonPressed, new List<Condition> {playerUp})
@@ -95,12 +95,12 @@ namespace Env5
                             }),
 
                             new Selector("MoveToGoalTriggerSelector", new Node[]{
-                                new PredicateCondition("CloseToTrigger", controller.IsControllingGoalTrigger),
+                                new PredicateCondition("IsControllingGoalTrigger", isControllingGoalTrigger),
                                 new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher, isControllingGoalTrigger, new List<Condition> {buttonPressed}),
                             }),
 
                             new Selector("MovePlayerUpSelector", new Node[]{
-                                new PredicateCondition("PlayerUp", controller.env.PlayerUp),
+                                new PredicateCondition("PlayerUp", playerUp),
                                 new LearningActionAgentSwitcher("MovePlayerUp", movePlayerUp, agentSwitcher, playerUp, new List<Condition> {buttonPressed}),
                             } ),
 

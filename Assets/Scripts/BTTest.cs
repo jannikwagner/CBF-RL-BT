@@ -216,14 +216,14 @@ namespace BTTest
     }
     public class PredicateCondition : ConditionNode
     {
-        private Func<bool> predicate;
-        public PredicateCondition(String name, Func<bool> predicate) : base(name)
+        private Condition predicate;
+        public PredicateCondition(String name, Condition predicate) : base(name)
         {
             this.predicate = predicate;
         }
         public override TaskStatus OnUpdate()
         {
-            return predicate() ? TaskStatus.Success : TaskStatus.Failure;
+            return predicate.Func() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
     public class CBFCondition : ConditionNode
