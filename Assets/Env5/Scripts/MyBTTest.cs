@@ -47,31 +47,31 @@ namespace Env5
             var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, topEdgeBridgeCBF, bottomEdgeBridgeCBF });
 
             var pushTargetToButtonPosVelDynamics = new PlayerPosVelDynamics(pushTargetToButton);
-            var pushTargetToButton_leftOfX1CBFApplicator = new ContinuousCBFApplicator(leftOfX1CBF, pushTargetToButtonPosVelDynamics, deltaTime, debug: debugCBF, alpha: alpha);
+            var pushTargetToButton_leftOfX1CBFApplicator = new ContinuousCBFApplicator(leftOfX1CBF, pushTargetToButtonPosVelDynamics, deltaTime, debug: debugCBF);
             pushTargetToButton.CBFApplicators = new List<CBFApplicator> { pushTargetToButton_leftOfX1CBFApplicator };
 
             var moveToGoalTriggerPlayerTargetPosVelDynamics = new PlayerTargetPosVelDynamics(moveToGoalTrigger);
-            var moveToGoalTrigger_buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, moveToGoalTriggerPlayerTargetPosVelDynamics, deltaTime, debug: debugCBF, alpha: alpha);
+            var moveToGoalTrigger_buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, moveToGoalTriggerPlayerTargetPosVelDynamics, deltaTime, debug: debugCBF);
             moveToGoalTrigger.CBFApplicators = new List<CBFApplicator> { moveToGoalTrigger_buttonPressedCBFApplicator };
 
             var moveToBridgePosVelDynamics = new PlayerPosVelDynamics(moveToBridge);
             var moveToBridgePlayerTargetPosVelDynamics = new PlayerTargetPosVelDynamics(moveToBridge);
-            var moveToBridge_upBridgeCBFApplicator = new ContinuousCBFApplicator(upBridgeCBF, moveToBridgePosVelDynamics, deltaTime, debug: debugCBF, alpha: alpha);
-            var moveToBridge_buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, moveToBridgePlayerTargetPosVelDynamics, deltaTime, debug: debugCBF, alpha: alpha);
+            var moveToBridge_upBridgeCBFApplicator = new ContinuousCBFApplicator(upBridgeCBF, moveToBridgePosVelDynamics, deltaTime, debug: debugCBF);
+            var moveToBridge_buttonPressedCBFApplicator = new ContinuousCBFApplicator(buttonPressedCBF, moveToBridgePlayerTargetPosVelDynamics, deltaTime, debug: debugCBF);
             moveToBridge.CBFApplicators = new List<CBFApplicator> { moveToBridge_buttonPressedCBFApplicator, moveToBridge_upBridgeCBFApplicator };
 
             var moveOverBridgePosVelDynamics = new PlayerPosVelDynamics(moveOverBridge);
-            var moveOverBridge_bridgeOpenRightCBFApplicator = new ContinuousCBFApplicator(bridgeOpenRightCBF, moveOverBridgePosVelDynamics, deltaTime, debug: debugCBF, alpha: alpha);
+            var moveOverBridge_bridgeOpenRightCBFApplicator = new ContinuousCBFApplicator(bridgeOpenRightCBF, moveOverBridgePosVelDynamics, deltaTime, debug: debugCBF);
             moveOverBridge.CBFApplicators = new List<CBFApplicator> { moveOverBridge_bridgeOpenRightCBFApplicator };
 
             var pushTriggerToGoalNewPosVelDynamics = new PlayerPosVelDynamics(pushTriggerToGoalNew);
-            var pushTriggerToGoalNew_pastBridgeCBFApplicator = new ContinuousCBFApplicator(rightOfX3CBF, pushTriggerToGoalNewPosVelDynamics, deltaTime, debug: debugCBF, alpha: alpha);
+            var pushTriggerToGoalNew_pastBridgeCBFApplicator = new ContinuousCBFApplicator(rightOfX3CBF, pushTriggerToGoalNewPosVelDynamics, deltaTime, debug: debugCBF);
             pushTriggerToGoalNew.CBFApplicators = new List<CBFApplicator> { pushTriggerToGoalNew_pastBridgeCBFApplicator };
 
             // var upBridgeCBFPosVelDynamics = new PlayerPosVelDynamics(pushTriggerToGoal);
-            // var upBridgeCBFApplicator = new ContinuousCBFApplicator(upBridgeCBF, upBridgeCBFPosVelDynamics, debug: debugCBF, alpha: alpha);
+            // var upBridgeCBFApplicator = new ContinuousCBFApplicator(upBridgeCBF, upBridgeCBFPosVelDynamics, debug: debugCBF);
             // var buttonPressedCBFPosVelDynamics2 = new PlayerTargetPosVelDynamics(pushTriggerToGoal);
-            // var buttonPressedCBFApplicator2 = new ContinuousCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics2, debug: debugCBF, alpha: alpha);
+            // var buttonPressedCBFApplicator2 = new ContinuousCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics2, debug: debugCBF);
             // pushTriggerToGoal.CBFApplicators = new List<CBFApplicator> { buttonPressedCBFApplicator2, upBridgeCBFApplicator };
 
             // conditions
