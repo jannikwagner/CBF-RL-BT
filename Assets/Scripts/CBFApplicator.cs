@@ -79,7 +79,7 @@ public class ContinuousCBFApplicator : CBFApplicator
 public class DiscreteCBFApplicator : CBFApplicator
 {
     private float eta;
-    public DiscreteCBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, float deltaTime, float eta = 0, bool debug = false) : base(cbf, controlledDynamics, deltaTime, debug)
+    public DiscreteCBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, float deltaTime, float eta = 1, bool debug = false) : base(cbf, controlledDynamics, deltaTime, debug)
     /*
      * eta: How strongly the state should be pushed into the safe set
      * deltaTime: the time step
