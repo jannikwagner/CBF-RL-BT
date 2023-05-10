@@ -47,8 +47,8 @@ namespace Env5
             //     AddReward(rFactor / maxActions);
             // }
 
-            AddReward(triggerGoalDistanceRewarder.Reward() * 1f);
-            AddReward(X3DistanceRewarder.Reward() * 1f);
+            AddReward(triggerGoalDistanceRewarder.Reward() * 0.5f);
+            AddReward(X3DistanceRewarder.Reward() * 0.5f);
 
             // AddReward(playerTriggerDistanceRewarder.Reward() * rFactor);
 

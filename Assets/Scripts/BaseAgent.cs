@@ -29,7 +29,7 @@ public abstract class BaseAgent : Agent
     {
         base.OnEpisodeBegin();
         actionCount = 0;
-        Debug.Log(this + "OnEpisodeBegin");
+        Debug.Log(this + ": OnEpisodeBegin");
     }
 
     public void Act()
@@ -54,7 +54,7 @@ public abstract class BaseAgent : Agent
         if (PostCondition != null && PostCondition.Func())
         {
             AddReward(1f);
-            Debug.Log("PostCondition " + PostCondition.Name + " met");
+            Debug.Log(this + ": PostCondition " + PostCondition.Name + " met");
         }
     }
     public void ApplyACCReward()
@@ -67,7 +67,7 @@ public abstract class BaseAgent : Agent
                 if (!acc.Func())
                 {
                     OnACCViolation();
-                    Debug.Log("ACC " + acc.Name + " violated");
+                    Debug.Log(this + ": ACC " + acc.Name + " violated");
                     violated = true;
                 }
             }

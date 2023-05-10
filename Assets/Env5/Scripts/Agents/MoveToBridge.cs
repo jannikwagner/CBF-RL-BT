@@ -38,7 +38,7 @@ namespace Env5
             base.OnActionReceived(actions);
             if (PostCondition != null && PostCondition.Func())
             {
-                Debug.Log("Goal pressed! PC: " + PostCondition.Name);
+                Debug.Log("Moved to bridge! PC: " + PostCondition.Name);
                 AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
             // Debug.Log("PushTargetToButton.OnActionReceived");
@@ -50,7 +50,7 @@ namespace Env5
             AddReward(playerBridgeDistanceRewarder.Reward() * 1f);
 
             // AddReward(playerTriggerDistanceRewarder.Reward() * rFactor);
-            AddReward(-playerTargetDistancePunisher.Reward() * 1f);
+            // AddReward(-playerTargetDistancePunisher.Reward() * 1f);
         }
     }
 }

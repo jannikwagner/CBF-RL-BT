@@ -63,8 +63,10 @@ namespace Env5
             var buttonPressed = new Condition("ButtonPressed", controller.env.ButtonPressed);
             var isControllingGoalTrigger = new Condition("IsControllingGoalTrigger", controller.IsControllingGoalTrigger);
             var goalPressed = new Condition("GoalPressed", controller.env.GoalPressed);
+            var onBridge = new Condition("OnBridge", controller.TouchingBridgeDown);
+            var playerPastX3 = new Condition("PlayerPastX3", controller.env.PlayerPastX3);
 
-            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal };
+            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal, moveToBridge, moveOverBridge, pushTriggerToGoalNew };
             agentSwitcher = new AgentSwitcher();
             agentSwitcher.AddAgents(agents);
 
@@ -102,9 +104,23 @@ namespace Env5
                             new Selector("MovePlayerUpSelector", new Node[]{
                                 new PredicateCondition("PlayerUp", playerUp),
                                 new LearningActionAgentSwitcher("MovePlayerUp", movePlayerUp, agentSwitcher, playerUp, new List<Condition> {buttonPressed}),
-                            } ),
+                            }),
 
-                            new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, goalPressed, new List<Condition> {buttonPressed, playerUp})
+                            new Selector("MoveOverBridgeSelector", new Node[]{
+                                new PredicateCondition("PastBridge", playerPastX3),
+                                new Sequence("MoveOverBridgeSequence", new Node[]{
+
+                                    new Selector("MoveToBridgeSelector", new Node[]{
+                                        new PredicateCondition("OnBridge", onBridge),
+                                        new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {buttonPressed, playerUp})
+                                    }),
+
+                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {buttonPressed, playerUp, onBridge})
+                                })
+                            }),
+
+                            new LearningActionAgentSwitcher("PushTriggerToGoalNew", pushTriggerToGoalNew, agentSwitcher, goalPressed, new List<Condition> {buttonPressed, playerUp, playerPastX3})
+                            // new LearningActionAgentSwitcher("PushTriggerToGoal", pushTriggerToGoal, agentSwitcher, goalPressed, new List<Condition> {buttonPressed, playerUp})
                         }),
                     }),
 

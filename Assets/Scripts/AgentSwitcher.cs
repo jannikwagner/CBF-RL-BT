@@ -68,7 +68,7 @@ public class AgentSwitcher : IAgentSwitcher
 
     private void DeactivateAgent()
     {
-        Debug.Log("DeactivateAgent" + currentAgent + ", reward: " + currentAgent.GetCumulativeReward());
+        Debug.Log("DeactivateAgent: " + currentAgent + ", reward: " + currentAgent.GetCumulativeReward());
         currentAgent.gameObject.SetActive(false);
     }
     private void ActivateAgent(BaseAgent agent)
@@ -99,6 +99,7 @@ public class AgentSwitcher : IAgentSwitcher
 
     public void Reset()
     {
+        // currentAgent.SetReward(0f); // don't!
         DeactivateAgent();
         foreach (var item in agents)
         {
