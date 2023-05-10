@@ -6,6 +6,7 @@ using UnityEngine;
 
 public abstract class BaseAgent : Agent
 {
+    public bool useCBF = true;
     private int actionCount;
     private int maxActions = 5000;
     private int actionsPerDecision = 10;
@@ -96,7 +97,7 @@ public abstract class BaseAgent : Agent
 
     public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
     {
-        if (cbfApplicators == null)
+        if (!useCBF || cbfApplicators == null)
         {
             return;
         }
