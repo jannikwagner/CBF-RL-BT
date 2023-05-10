@@ -23,15 +23,15 @@ public class Env4Agent : Agent
         int steps = decisionRequester.DecisionPeriod;
         float deltaTime = Time.fixedDeltaTime * steps;
         float eta = 1f;
-        Func<float, float> alpha = ((float x) => x / deltaTime);
+        Func<float, float> alpha = ((float x) => x);
 
         var movementDynamics = new MovementDynamics(this);
         var batteryDynamics = new BatteryDynamics(this);
-        var enemyCBFApplicator = new DiscreteCBFApplicator((new MovingBallCBF3D(1.5f)), new CombinedDynamics(movementDynamics, controller.enemy), 0.9f, deltaTime);
-        var wall1CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(controller.fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f))), movementDynamics, eta, deltaTime);
-        var wall2CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(-controller.fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f))), movementDynamics, eta, deltaTime);
-        var wall3CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(0f, 0f, controller.fieldWidth), new Vector3(0f, 0f, -1f))), movementDynamics, eta, deltaTime);
-        var wall4CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(0f, 0f, -controller.fieldWidth), new Vector3(0f, 0f, 1f))), movementDynamics, eta, deltaTime);
+        var enemyCBFApplicator = new DiscreteCBFApplicator((new MovingBallCBF3D(1.5f)), new CombinedDynamics(movementDynamics, controller.enemy), deltaTime, 0.9f);
+        var wall1CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(controller.fieldWidth, 0f, 0f), new Vector3(-1f, 0f, 0f))), movementDynamics, deltaTime, eta);
+        var wall2CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(-controller.fieldWidth, 0f, 0f), new Vector3(1f, 0f, 0f))), movementDynamics, deltaTime, eta);
+        var wall3CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(0f, 0f, controller.fieldWidth), new Vector3(0f, 0f, -1f))), movementDynamics, deltaTime, eta);
+        var wall4CBFApplicator = new DiscreteCBFApplicator(new SignedSquareCBF(new WallCBF3D(new Vector3(0f, 0f, -controller.fieldWidth), new Vector3(0f, 0f, 1f))), movementDynamics, deltaTime, eta);
         // var enemyCBFApplicatorWide = new DiscreteCBFApplicator(new MovingBallCBF3D(3f), new CombinedDynamics(movementDynamics, enemy), eta, deltaTime);
         // var batteryCBFApplicator = new DiscreteCBFApplicator(new StaticBatteryMarginCBF(controller.batteryTransform.localPosition, 1.5f, batteryConsumption), batteryDynamics, eta, deltaTime);
         cbfApplicators = new CBFApplicator[] { enemyCBFApplicator, wall1CBFApplicator, wall2CBFApplicator, wall3CBFApplicator, wall4CBFApplicator, };

@@ -113,38 +113,38 @@ public class StaticBatteryMarginCBF : ICBF
 public class FuncWithDerivative
 {
     public Func<float, float> f;
-    public Func<float, float> df;
+    public Func<float, float> dfdx;
 
     public FuncWithDerivative(Func<float, float> f, Func<float, float> df)
     {
         this.f = f;
-        this.df = df;
+        this.dfdx = df;
     }
 }
 
 public class ModulatedCBF : ICBF
 {
     public ICBF cbf;
-    public FuncWithDerivative alpha;
+    public FuncWithDerivative f;
 
-    public ModulatedCBF(ICBF cbf, FuncWithDerivative alpha)
+    public ModulatedCBF(ICBF cbf, FuncWithDerivative f)
     {
         this.cbf = cbf;
-        this.alpha = alpha;
+        this.f = f;
     }
 
     public float h(float[] x)
     {
-        return alpha.f(cbf.h(x));
+        return f.f(cbf.h(x));
     }
 
     public float[] dhdx(float[] x)
     {
-        var cbfValue = cbf.h(x);
-        var cbfGradient = cbf.dhdx(x);
-        var alphaDerivative = alpha.df(cbfValue);
+        var h = cbf.h(x);
+        var dhdx = cbf.dhdx(x);
+        var dfdh = f.dfdx(h);
 
-        return Utility.Mult(cbfGradient, alphaDerivative);
+        return Utility.Mult(dhdx, dfdh);
     }
 }
 
