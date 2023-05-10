@@ -19,6 +19,7 @@ namespace Env5
         public PushTriggerToGoal pushTriggerToGoal;
         public PushTriggerToGoalNew pushTriggerToGoalNew;
         public PlayerController controller;
+        private bool useCBF = true;
         private int maxSteps = 10000;
         private int stepCount;
 
@@ -84,6 +85,10 @@ namespace Env5
             var playerPastX3 = new Condition("PlayerPastX3", controller.env.PlayerPastX3);
 
             var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal, moveToBridge, moveOverBridge, pushTriggerToGoalNew };
+            foreach (var agent in agents)
+            {
+                agent.useCBF = useCBF;
+            }
             agentSwitcher = new AgentSwitcher();
             agentSwitcher.AddAgents(agents);
 
