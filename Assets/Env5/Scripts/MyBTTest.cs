@@ -28,7 +28,7 @@ namespace Env5
         private void Start()
         {
             int steps = moveToTarget.ActionsPerDecision;
-            float deltaTime = Time.fixedDeltaTime * steps;
+            float deltaTime = Time.fixedDeltaTime * (steps);
             float eta = 1f;
             System.Func<float, float> alpha = ((float x) => x);
             float margin = Utility.eps + 0.2f;

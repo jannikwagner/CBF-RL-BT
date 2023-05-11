@@ -9,7 +9,7 @@ public abstract class BaseAgent : Agent
     public bool useCBF = true;
     private int actionCount;
     private int maxActions = 5000;
-    private int actionsPerDecision = 10;
+    private int actionsPerDecision = 5;
     private Condition postCondition;
     private IEnumerable<Condition> accs;
     private IEnumerable<CBFApplicator> cbfApplicators;

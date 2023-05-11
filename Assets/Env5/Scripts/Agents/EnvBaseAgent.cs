@@ -195,6 +195,10 @@ namespace Env5
         {
             var velocity = agent.controller.rb.velocity;
             var acc = agent.GetAcc(action);
+            // apply acc before velocity! needed to be safe because of discretization of continuous system
+            // note: applying all steps accels at once is safer than actually necessary, but also simpler.
+            float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
+            velocity = velocity + acc * deltaTime;
             var dxdt = new PosVelState { position = velocity, velocity = acc };
             return dxdt.ToArray();
         }
@@ -219,6 +223,8 @@ namespace Env5
             var targetVelocity = agent.controller.env.target.GetComponentInParent<Rigidbody>().velocity;
             var velocity = agent.controller.rb.velocity - targetVelocity;
             var acc = agent.GetAcc(action) + 0.5f * targetVelocity;
+            float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
+            velocity = velocity + acc * deltaTime;
             var dxdt = new PosVelState { position = velocity, velocity = acc };
             return dxdt.ToArray();
         }

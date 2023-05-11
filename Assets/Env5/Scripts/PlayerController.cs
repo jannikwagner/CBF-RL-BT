@@ -18,7 +18,7 @@ namespace Env5
 
         public void ApplyAcc(Vector3 acc)
         {
-            rb.AddForce(acc * rb.mass);
+            rb.AddForce(acc, ForceMode.Acceleration);
 
             if (rb.velocity.magnitude > maxSpeed)
             {
