@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Env5;
 using Unity.MLAgents;
 using UnityEngine;
 
@@ -9,11 +8,16 @@ using UnityEngine;
   * If an agent is in a `SimpleMultiAgentGroup` and its `gameObject` is deactivated, it will be removed from the group.
 */
 
-public interface IAgentSwitcher
+public interface IAgentProvider
+{
+    BaseAgent GetAgent();
+}
+
+public interface IAgentSwitcher : IAgentProvider
 {
     void Act(BaseAgent agent);
     void AddAgent(BaseAgent agent);
-    void AddAgents(EnvBaseAgent[] agents);
+    void AddAgents(BaseAgent[] agents);
     void Reset();
 }
 
@@ -109,12 +113,17 @@ public class AgentSwitcher : IAgentSwitcher
         currentAgent = null;
     }
 
-    public void AddAgents(EnvBaseAgent[] agents)
+    public void AddAgents(BaseAgent[] agents)
     {
         foreach (var agent in agents)
         {
             this.AddAgent(agent);
         }
+    }
+
+    public BaseAgent GetAgent()
+    {
+        return currentAgent;
     }
 }
 
@@ -148,7 +157,7 @@ public class AgentSwitcherWithAgentGroup : IAgentSwitcher
         // Debug.Log(agents.Count);
         // Debug.Log(m_AgentGroup.GetRegisteredAgents().Count);
     }
-    public void AddAgents(EnvBaseAgent[] agents)
+    public void AddAgents(BaseAgent[] agents)
     {
         foreach (var agent in agents)
         {
@@ -214,5 +223,9 @@ public class AgentSwitcherWithAgentGroup : IAgentSwitcher
             agent.gameObject.SetActive(false);
             statusMap[agent] = AgentSwitcherStatus.GlobalReset;
         }
+    }
+    public BaseAgent GetAgent()
+    {
+        return currentAgent;
     }
 }

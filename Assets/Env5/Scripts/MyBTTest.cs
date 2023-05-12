@@ -84,7 +84,7 @@ namespace Env5
             var onBridge = new Condition("OnBridge", controller.TouchingBridgeDown);
             var playerPastX3 = new Condition("PlayerPastX3", controller.env.PlayerPastX3);
 
-            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, pushTriggerToGoal, moveToBridge, moveOverBridge, pushTriggerToGoalNew };
+            var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, moveToBridge, moveOverBridge, pushTriggerToGoalNew };
             foreach (var agent in agents)
             {
                 agent.useCBF = useCBF;
