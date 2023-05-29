@@ -184,6 +184,38 @@ namespace Env5
             // Debug.Log(discreateActionsOut[0]);
         }
     }
+    public class EnvCircularActuator : IEnvActuator
+    {
+        public int directions;
+        public int strengths;
+        public int NumActions => directions * strengths + 1;
+
+        public Vector3 GetAcc(ActionBuffers actions)
+        {
+            var discreteActions = actions.DiscreteActions;
+            var action = discreteActions[0];
+
+            if (action == 0)
+            {
+                return new Vector3(0f, 0f, 0f);
+            }
+            else
+            {
+                var i = (action - 1) % directions;
+                var j = (action - 1) / directions;
+                var force = new Vector3(i - directions / 2, 0f, j - strengths / 2);
+                return force;
+            }
+        }
+
+        public void Heuristic(in ActionBuffers actionsOut)
+        {
+            var discreateActionsOut = actionsOut.DiscreteActions;
+
+            var i = (int)Input.GetAxisRaw("Horizontal");
+            var j = (int)Input.GetAxisRaw("Vertical");
+        }
+    }
     public class PlayerPosVelDynamics : IDynamicsProvider
     {
         EnvBaseAgent agent;
