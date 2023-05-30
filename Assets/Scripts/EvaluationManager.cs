@@ -11,21 +11,32 @@ public interface IEpisodeCounter
 }
 public interface ILogDataProvider : IStepCounter, IEpisodeCounter, IAgentProvider { }
 
-public class Event
+public abstract class Event
 {
     public int episode;
     public int step;
-    public BaseAgent agent;
+    public string agent;
+    public abstract EventType type { get; }
     // void FromJSON(string json);
     // string ToJSON();
 }
 
-public class PostConditionReachedEvent : Event { public Condition postCondition; }
+public enum EventType
+{
+    PostConditionReached,
+    ACCViolated,
+    LocalReset,
+    GlobalReset,
+    GlobalSuccess,
+    // PreConditionViolated,
+}
+
+public class PostConditionReachedEvent : Event { public string postCondition; public override EventType type => EventType.PostConditionReached; }
+public class ACCViolatedEvent : Event { public string acc; public override EventType type => EventType.ACCViolated; }
+public class LocalResetEvent : Event { public override EventType type => EventType.LocalReset; }
+public class GlobalResetEvent : Event { public override EventType type => EventType.GlobalReset; }
+public class GlobalSuccessEvent : Event { public override EventType type => EventType.GlobalSuccess; }
 // public class PreConditionViolatedEvent : Event { public Condition precondition; }
-public class ACCViolatedEvent : Event { public Condition acc; }
-public class LocalResetEvent : Event { }
-public class GlobalResetEvent : Event { }
-public class GlobalSuccessEvent : Event { }
 
 public interface IEvaluationManager
 {
@@ -51,7 +62,7 @@ public class EvaluationManager : IEvaluationManager
     {
         _event.episode = logDataProvider.Episode;
         _event.step = logDataProvider.Step;
-        _event.agent = logDataProvider.Agent;
+        _event.agent = logDataProvider.Agent.name;
         string jsonString = JsonUtility.ToJson(_event);
         Debug.Log(jsonString);
         events.Add(_event);

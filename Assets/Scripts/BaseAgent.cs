@@ -57,7 +57,7 @@ public abstract class BaseAgent : Agent
         {
             AddReward(1f);
             Debug.Log(this + ": PostCondition " + PostCondition.Name + " met");
-            evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition });
+            evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition.Name });
         }
     }
     public void CheckACCs()
@@ -72,7 +72,7 @@ public abstract class BaseAgent : Agent
                     OnACCViolation();
                     violated = true;
                     Debug.Log(this + ": ACC " + acc.Name + " violated");
-                    evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc });
+                    evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name });
                 }
             }
             if (violated)
