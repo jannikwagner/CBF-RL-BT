@@ -6,6 +6,7 @@ using UnityEngine;
 
 public abstract class BaseAgent : Agent
 {
+    public IEvaluationManager evaluationManager;
     public bool useCBF = true;
     private int actionCount;
     private int maxActions = 5000;
@@ -50,15 +51,16 @@ public abstract class BaseAgent : Agent
         return actionCount == maxActions;
     }
 
-    public void ApplyPostConditionReward()
+    public void CheckPostCondition()
     {
         if (PostCondition != null && PostCondition.Func())
         {
             AddReward(1f);
             Debug.Log(this + ": PostCondition " + PostCondition.Name + " met");
+            evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition });
         }
     }
-    public void ApplyACCReward()
+    public void CheckACCs()
     {
         bool violated = false;
         if (ACCs != null)
@@ -68,8 +70,9 @@ public abstract class BaseAgent : Agent
                 if (!acc.Func())
                 {
                     OnACCViolation();
-                    Debug.Log(this + ": ACC " + acc.Name + " violated");
                     violated = true;
+                    Debug.Log(this + ": ACC " + acc.Name + " violated");
+                    evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc });
                 }
             }
             if (violated)
@@ -86,12 +89,13 @@ public abstract class BaseAgent : Agent
         actionCount++;
         base.OnActionReceived(actions);
         AddReward(-1f / maxActions);
-        ApplyPostConditionReward();
-        ApplyACCReward();
+        CheckPostCondition();
+        CheckACCs();
         if (EpisodeShouldEnd())
         {
             AddReward(-1f);
             Debug.Log(this + "EpisodeShouldEnd, negative reward");
+            evaluationManager.AddEvent(new LocalResetEvent());
         }
     }
 

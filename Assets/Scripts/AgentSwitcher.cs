@@ -10,7 +10,7 @@ using UnityEngine;
 
 public interface IAgentProvider
 {
-    BaseAgent GetAgent();
+    BaseAgent Agent { get; }
 }
 
 public interface IAgentSwitcher : IAgentProvider
@@ -33,6 +33,8 @@ public class AgentSwitcher : IAgentSwitcher
     public List<BaseAgent> agents;
     protected BaseAgent currentAgent;
     protected AgentSwitcherStatus status;
+
+    public BaseAgent Agent => currentAgent;
 
     public AgentSwitcher()
     {
@@ -62,7 +64,7 @@ public class AgentSwitcher : IAgentSwitcher
         if (currentAgent.EpisodeShouldEnd())
         {
             Debug.Log("LocalReset");
-            // currentAgent.EpisodeInterrupted();  // not sure if this should be done TODO
+            // currentAgent.EpisodeInterrupted();  // not sure if this should be done TODO // should not be done
             DeactivateAgent();
             currentAgent.ResetEnvLocal();
             currentAgent = null;
@@ -120,11 +122,6 @@ public class AgentSwitcher : IAgentSwitcher
             this.AddAgent(agent);
         }
     }
-
-    public BaseAgent GetAgent()
-    {
-        return currentAgent;
-    }
 }
 
 
@@ -137,6 +134,9 @@ public class AgentSwitcherWithAgentGroup : IAgentSwitcher
     protected SimpleMultiAgentGroup m_AgentGroup;
     protected BaseAgent currentAgent;
     protected Dictionary<BaseAgent, AgentSwitcherStatus> statusMap;
+
+    public BaseAgent Agent => currentAgent;
+
 
     public AgentSwitcherWithAgentGroup()
     {
@@ -223,9 +223,5 @@ public class AgentSwitcherWithAgentGroup : IAgentSwitcher
             agent.gameObject.SetActive(false);
             statusMap[agent] = AgentSwitcherStatus.GlobalReset;
         }
-    }
-    public BaseAgent GetAgent()
-    {
-        return currentAgent;
     }
 }

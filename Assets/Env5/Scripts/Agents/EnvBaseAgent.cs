@@ -159,7 +159,6 @@ namespace Env5
                 case 0:
                 default:
                     return new Vector3(0f, 0f, 0f);
-
             }
         }
 
