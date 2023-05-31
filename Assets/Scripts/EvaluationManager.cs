@@ -9,13 +9,18 @@ public interface IEpisodeCounter
 {
     int Episode { get; }
 }
-public interface ILogDataProvider : IStepCounter, IEpisodeCounter, IAgentProvider { }
+public interface IActionProvider
+{
+    BTTest.Action Action { get; }
+}
+public interface ILogDataProvider : IStepCounter, IEpisodeCounter, IAgentProvider, IActionProvider { }
 
 public abstract class Event
 {
     public int episode;
     public int step;
     public string agent;
+    public string action;
     public abstract EventType type { get; }
     // void FromJSON(string json);
     // string ToJSON();
@@ -63,8 +68,10 @@ public class EvaluationManager : IEvaluationManager
         _event.episode = logDataProvider.Episode;
         _event.step = logDataProvider.Step;
         _event.agent = logDataProvider.Agent.name;
+        _event.action = logDataProvider.Action.Name;
         string jsonString = JsonUtility.ToJson(_event);
         Debug.Log(jsonString);
+        Debug.Log(JsonUtility.ToJson(events));
         events.Add(_event);
     }
 }

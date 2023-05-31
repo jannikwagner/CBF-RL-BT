@@ -30,6 +30,7 @@ namespace Env5
         public int Step => stepCount;
         public int Episode => runCount;
         public BaseAgent Agent => agentSwitcher.Agent;
+        public Action Action => _tree.CurrentAction;
 
         private void Start()
         {

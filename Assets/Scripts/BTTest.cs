@@ -15,6 +15,7 @@ namespace BTTest
         private HashSet<Node> previousExecutionSet;
         private HashSet<Node> currentRunningSet;
         private HashSet<Node> previousRunningSet;
+        private Action currentAction;
         private long step;
         private Node Root { get => root; set { this.root = value; SetReferenceRec(value); } }
         public HashSet<Node> CurrentExecutionSet { get => currentExecutionSet; set => currentExecutionSet = value; }
@@ -22,6 +23,7 @@ namespace BTTest
         public HashSet<Node> CurrentRunningSet { get => currentRunningSet; set => currentRunningSet = value; }
         public HashSet<Node> PreviousRunningSet { get => previousRunningSet; set => previousRunningSet = value; }
         public long Step { get => step; }
+        public Action CurrentAction { get => currentAction; set => currentAction = value; }
 
         private void Init()
         {
@@ -29,6 +31,7 @@ namespace BTTest
             previousExecutionSet = null;
             currentRunningSet = null;
             previousRunningSet = null;
+            currentAction = null;
             step = 0;
         }
 
@@ -197,6 +200,15 @@ namespace BTTest
     public class Action : ExecutionNode
     {
         public Action(String name) : base(name) { }
+        public override TaskStatus Tick()
+        {
+            TaskStatus status = base.Tick();
+            if (status == TaskStatus.Running)
+            {
+                this.Bt.CurrentAction = this;
+            }
+            return status;
+        }
     }
     public class Do : Action
     {
