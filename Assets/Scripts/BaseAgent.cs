@@ -62,7 +62,7 @@ public abstract class BaseAgent : Agent
     }
     public void CheckACCs()
     {
-        bool violated = false;
+        bool punished = false;
         if (ACCs != null)
         {
             foreach (var acc in ACCs)
@@ -70,14 +70,14 @@ public abstract class BaseAgent : Agent
                 if (!acc.Func())
                 {
                     OnACCViolation();
-                    violated = true;
+                    if (!punished)
+                    {
+                        AddReward(-1f);
+                    }
+                    punished = true;
                     Debug.Log(this + ": ACC " + acc.Name + " violated");
                     evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name });
                 }
-            }
-            if (violated)
-            {
-                AddReward(-1f);
             }
         }
     }

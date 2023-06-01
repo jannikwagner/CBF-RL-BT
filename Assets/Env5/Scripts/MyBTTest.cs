@@ -24,6 +24,7 @@ namespace Env5
         private int stepCount;
         private int runCount;
         private IEvaluationManager evaluationManager;
+        List<Condition> conditions;
 
         public int MaxSteps { get => maxSteps; set => maxSteps = value; }
 
@@ -34,9 +35,9 @@ namespace Env5
 
         private void Start()
         {
-            evaluationManager = new EvaluationManager(logDataProvider: this);
 
             var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, moveToBridge, moveOverBridge, pushTriggerToGoalNew };
+            evaluationManager = new EvaluationManager(logDataProvider: this, agents: agents, conditions: conditions);
             foreach (var agent in agents)
             {
                 agent.useCBF = useCBF;
@@ -50,11 +51,11 @@ namespace Env5
 
             InitCBFs();
             InitTree();
+
         }
 
         private void InitTree()
         {
-
             // conditions
             var isControllingTarget = new Condition("IsControllingTarget", controller.IsControllingTarget);
             var playerUp = new Condition("PlayerUp", controller.env.PlayerUp);
@@ -63,6 +64,7 @@ namespace Env5
             var goalPressed = new Condition("GoalPressed", controller.env.GoalPressed);
             var onBridge = new Condition("OnBridge", controller.TouchingBridgeDown);
             var playerPastX3 = new Condition("PlayerPastX3", controller.env.PlayerPastX3);
+            conditions = new List<Condition> { isControllingTarget, playerUp, buttonPressed, isControllingGoalTrigger, goalPressed, onBridge, playerPastX3 };
 
             _tree = new BT(
                 new Sequence("Root", new Node[] {
