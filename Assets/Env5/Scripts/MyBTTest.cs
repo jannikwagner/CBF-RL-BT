@@ -35,9 +35,8 @@ namespace Env5
 
         private void Start()
         {
-
             var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, moveToBridge, moveOverBridge, pushTriggerToGoalNew };
-            evaluationManager = new EvaluationManager(logDataProvider: this, agents: agents, conditions: conditions);
+            evaluationManager = new EvaluationManager();
             foreach (var agent in agents)
             {
                 agent.useCBF = useCBF;
@@ -51,7 +50,9 @@ namespace Env5
 
             InitCBFs();
             InitTree();
-
+            var actions = _tree.FindNodes<LearningActionAgentSwitcher>();
+            var action = actions[0];
+            evaluationManager.Init(this, conditions, agents, actions);
         }
 
         private void InitTree()
@@ -95,9 +96,9 @@ namespace Env5
                                 new LearningActionAgentSwitcher("MoveToTrigger", moveToGoalTrigger, agentSwitcher, isControllingGoalTrigger, new List<Condition> {buttonPressed}),
                             }),
 
-                            new Selector("MovePlayerUpSelector", new Node[]{
+                            new Selector("MovePlayerUpSelector2", new Node[]{
                                 new PredicateCondition("PlayerUp", playerUp),
-                                new LearningActionAgentSwitcher("MovePlayerUp", movePlayerUp, agentSwitcher, playerUp, new List<Condition> {buttonPressed}),
+                                new LearningActionAgentSwitcher("MovePlayerUp2", movePlayerUp, agentSwitcher, playerUp, new List<Condition> {buttonPressed}),
                             }),
 
                             new Selector("MoveOverBridgeSelector", new Node[]{

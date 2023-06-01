@@ -82,6 +82,28 @@ namespace BTTest
             this.Root.OnReset();
             Init();
         }
+
+        public List<T> FindNodes<T>(Func<T, bool> predicate = null) where T : Node
+        {
+            var nodes = new List<T>();
+            FindNodesRec(Root, predicate, nodes);
+            return nodes;
+        }
+
+        private void FindNodesRec<T>(Node root, Func<T, bool> predicate, List<T> nodes) where T : Node
+        {
+            if ((root is T) && (predicate == null || predicate(root as T)))
+            {
+                nodes.Add(root as T);
+            }
+            if (root is CompositeNode)
+            {
+                foreach (Node child in (root as CompositeNode).Children)
+                {
+                    FindNodesRec(child, predicate, nodes);
+                }
+            }
+        }
     }
 
     public class Node
@@ -257,8 +279,8 @@ namespace BTTest
         public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, List<Condition> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
         protected BaseAgent agent;
         protected IAgentSwitcher switcher;
-        private Condition postCondition;
-        private List<Condition> accs;
+        public Condition postCondition;
+        public List<Condition> accs;
 
         public override TaskStatus OnUpdate()
         {
