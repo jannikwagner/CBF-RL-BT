@@ -37,15 +37,15 @@ namespace Env5
         {
             actuator = new EnvActuator25();
         }
-        public Vector3 GetAcc(ActionBuffers actions)
+        public Vector3 GetAcceleration(ActionBuffers actions)
         {
-            return actuator.GetAcc(actions) * controller.MaxAcc;
+            return actuator.GetAcceleration(actions) * controller.MaxAcc;
         }
 
         public override void OnActionReceived(ActionBuffers actions)
         {
-            var acc = GetAcc(actions);
-            controller.ApplyAcc(acc);
+            var acceleration = GetAcceleration(actions);
+            controller.ApplyAcceleration(acceleration);
             base.OnActionReceived(actions);
         }
 
@@ -83,22 +83,22 @@ namespace Env5
     public interface IEnvActuator
     {
         int NumActions { get; }
-        Vector3 GetAcc(ActionBuffers actions);
+        Vector3 GetAcceleration(ActionBuffers actions);
         void Heuristic(in ActionBuffers actionsOut);
     }
 
     public class EnvActuator25 : IEnvActuator
     {
         public int NumActions => 25;
-        public Vector3 GetAcc(ActionBuffers actions)
+        public Vector3 GetAcceleration(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
             var action = discreteActions[0];
 
             var i = action % 5;
             var j = action / 5;
-            var acc = new Vector3(i - 2, 0f, j - 2) / 2.0f;
-            return acc;
+            var acceleration = new Vector3(i - 2, 0f, j - 2) / 2.0f;
+            return acceleration;
         }
 
         public void Heuristic(in ActionBuffers actionsOut)
@@ -116,7 +116,7 @@ namespace Env5
     {
         public int NumActions => 9;
 
-        public Vector3 GetAcc(ActionBuffers actions)
+        public Vector3 GetAcceleration(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
             var action = discreteActions[0];
@@ -141,7 +141,7 @@ namespace Env5
     {
         public int NumActions => 5;
 
-        public Vector3 GetAcc(ActionBuffers actions)
+        public Vector3 GetAcceleration(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
             var action = discreteActions[0];
@@ -189,7 +189,7 @@ namespace Env5
         public int strengths;
         public int NumActions => directions * strengths + 1;
 
-        public Vector3 GetAcc(ActionBuffers actions)
+        public Vector3 GetAcceleration(ActionBuffers actions)
         {
             var discreteActions = actions.DiscreteActions;
             var action = discreteActions[0];
@@ -225,12 +225,12 @@ namespace Env5
         public float[] dxdt(ActionBuffers action)
         {
             var velocity = agent.controller.rb.velocity;
-            var acc = agent.GetAcc(action);
-            // apply acc before velocity! needed to be safe because of discretization of continuous system
+            var acceleration = agent.GetAcceleration(action);
+            // apply acceleration before velocity! needed to be safe because of discretization of continuous system
             // note: applying all steps accels at once is safer than actually necessary, but also simpler.
             float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
-            velocity = velocity + acc * deltaTime;
-            var dxdt = new PosVelState { position = velocity, velocity = acc };
+            velocity = velocity + acceleration * deltaTime;
+            var dxdt = new PosVelState { position = velocity, velocity = acceleration };
             return dxdt.ToArray();
         }
 
@@ -253,10 +253,10 @@ namespace Env5
         {
             var targetVelocity = agent.controller.env.target.GetComponentInParent<Rigidbody>().velocity;
             var velocity = agent.controller.rb.velocity - targetVelocity;
-            var acc = agent.GetAcc(action) + 0.5f * targetVelocity;
+            var acceleration = agent.GetAcceleration(action) + 0.5f * targetVelocity;
             float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
-            velocity = velocity + acc * deltaTime;
-            var dxdt = new PosVelState { position = velocity, velocity = acc };
+            velocity = velocity + acceleration * deltaTime;
+            var dxdt = new PosVelState { position = velocity, velocity = acceleration };
             return dxdt.ToArray();
         }
 

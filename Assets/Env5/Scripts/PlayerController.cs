@@ -16,9 +16,9 @@ namespace Env5
 
         public float MaxAcc { get => maxAcc; }
 
-        public void ApplyAcc(Vector3 acc)
+        public void ApplyAcceleration(Vector3 acceleration)
         {
-            rb.AddForce(acc, ForceMode.Acceleration);
+            rb.AddForce(acceleration, ForceMode.Acceleration);
 
             if (rb.velocity.magnitude > maxSpeed)
             {

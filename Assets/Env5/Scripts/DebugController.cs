@@ -18,7 +18,7 @@ namespace Env5
         {
             float x = Input.GetAxis("Horizontal");
             float z = Input.GetAxis("Vertical");
-            controller.ApplyAcc(new Vector3(x, 0, z));
+            controller.ApplyAcceleration(new Vector3(x, 0, z));
         }
     }
 }
