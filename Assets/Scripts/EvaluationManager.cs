@@ -68,7 +68,7 @@ public class EvaluationManager : IEvaluationManager
     private IEnumerable<Condition> conditions;
     private IEnumerable<BaseAgent> agents;
     private IEnumerable<LearningActionAgentSwitcher> actions;
-    private int currentRun;
+    private List<RunStatistics> runStatistics = new List<RunStatistics>();
 
     public List<Event> Events { get => events; }
     public ILogDataProvider LogDataProvider { get => logDataProvider; set => logDataProvider = value; }
@@ -77,7 +77,6 @@ public class EvaluationManager : IEvaluationManager
     {
         events = new List<Event>();
         currentRunEvents = new List<Event>();
-        currentRun = -1;
     }
 
     public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions)
@@ -91,15 +90,14 @@ public class EvaluationManager : IEvaluationManager
     public void AddEvent(Event _event)
     {
         AugmentEvent(_event);
-        if (currentRun != _event.run)
-        {
-            currentRun = _event.run;
-            this.EvaluateCurrentEpisode();
-            currentRunEvents.Clear();
-        }
         Debug.Log(JsonUtility.ToJson(_event));
         events.Add(_event);
         currentRunEvents.Add(_event);
+        if (_event is GlobalTerminationEvent)
+        {
+            this.EvaluateCurrentEpisode();
+            currentRunEvents.Clear();
+        }
     }
 
     private void EvaluateCurrentEpisode()
@@ -107,6 +105,7 @@ public class EvaluationManager : IEvaluationManager
         var runEvaluator = new RunEvaluator(actions);
 
         var runStatistics = runEvaluator.EvaluateRun(currentRunEvents);
+        this.runStatistics.Add(runStatistics);
         Debug.Log(JsonUtility.ToJson(runStatistics));
     }
 
@@ -196,6 +195,7 @@ public class RunEvaluator
                 episodeStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
                 episodeStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
 
+                // this action has previously violated an acc
                 if (accViolationStepTemp.ContainsKey((actionTerminationEvent.action)))
                 {
                     var acc = accViolationStepTemp[actionTerminationEvent.action].Item1;
