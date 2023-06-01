@@ -19,11 +19,8 @@ public interface ILogDataProvider : IStepCounter, IEpisodeCounter, IAgentProvide
 
 public abstract class Event
 {
-    public int btEpisode;
-    public int step;
-    public string agent;
-    public string action;
-    public float reward;
+    public int run;
+    public int globalStep;
     // void FromJSON(string json);
     // string ToJSON();
 }
@@ -38,11 +35,22 @@ public enum EventType
     // PreConditionViolated,
 }
 
-public class PostConditionReachedEvent : Event { public string postCondition; public EventType type = EventType.PostConditionReached; }
-public class ACCViolatedEvent : Event { public string acc; public EventType type = EventType.ACCViolated; }
-public class LocalResetEvent : Event { public EventType type = EventType.LocalReset; }
-public class GlobalResetEvent : Event { public EventType type = EventType.GlobalReset; }
-public class GlobalSuccessEvent : Event { public EventType type = EventType.GlobalSuccess; }
+public abstract class ActionEvent : Event
+{
+    public string agent;
+    public string action;
+    public float reward;
+    public int localStep;
+}
+public abstract class ActionTerminationEvent : ActionEvent { }
+public abstract class GlobalEvent : Event { }
+public abstract class GlobalTerminationEvent : GlobalEvent { }
+
+public class PostConditionReachedEvent : ActionTerminationEvent { public string postCondition; public EventType type = EventType.PostConditionReached; }
+public class ACCViolatedEvent : ActionTerminationEvent { public string acc; public EventType type = EventType.ACCViolated; }
+public class LocalResetEvent : ActionTerminationEvent { public EventType type = EventType.LocalReset; }
+public class GlobalResetEvent : GlobalTerminationEvent { public EventType type = EventType.GlobalReset; }
+public class GlobalSuccessEvent : GlobalTerminationEvent { public EventType type = EventType.GlobalSuccess; }
 // public class PreConditionViolatedEvent : Event { public Condition precondition; }
 
 public interface IEvaluationManager
@@ -83,9 +91,9 @@ public class EvaluationManager : IEvaluationManager
     public void AddEvent(Event _event)
     {
         AugmentEvent(_event);
-        if (currentRun != _event.btEpisode)
+        if (currentRun != _event.run)
         {
-            currentRun = _event.btEpisode;
+            currentRun = _event.run;
             this.EvaluateCurrentEpisode();
             currentRunEvents.Clear();
         }
@@ -104,11 +112,19 @@ public class EvaluationManager : IEvaluationManager
 
     private void AugmentEvent(Event _event)
     {
-        _event.btEpisode = logDataProvider.Episode;
-        _event.step = logDataProvider.Step;
-        _event.agent = logDataProvider.Agent.name;
-        _event.action = logDataProvider.Action.Name;
-        _event.reward = logDataProvider.Agent.GetCumulativeReward();
+        _event.run = logDataProvider.Episode;
+        _event.globalStep = logDataProvider.Step;
+        if (_event is ActionEvent)
+        {
+            AugmentActionEvent(_event as ActionEvent);
+        }
+    }
+
+    private void AugmentActionEvent(ActionEvent actionEvent)
+    {
+        actionEvent.agent = logDataProvider.Agent.name;
+        actionEvent.action = logDataProvider.Action.Name;
+        actionEvent.reward = logDataProvider.Agent.GetCumulativeReward();
     }
 }
 
@@ -152,6 +168,7 @@ public class ActionStatistics
         }
     }
 }
+
 public class ACCViolatedStatistics
 {
     public string accName;
@@ -170,30 +187,59 @@ public class RunEvaluator
     public RunStatistics EvaluateRun(List<Event> runEvents)
     {
         var episodeStatistics = new RunStatistics(actions);
+        var accViolationStepTemp = new Dictionary<string, Tuple<string, int>>();
         foreach (Event _event in runEvents)
         {
-            switch (_event)
+            if (_event is ActionTerminationEvent)
             {
-                case PostConditionReachedEvent postConditionReachedEvent:
+                var actionTerminationEvent = _event as ActionTerminationEvent;
+                episodeStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
+                episodeStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
+
+                if (accViolationStepTemp.ContainsKey((actionTerminationEvent.action)))
+                {
+                    var acc = accViolationStepTemp[actionTerminationEvent.action].Item1;
+                    var step = accViolationStepTemp[actionTerminationEvent.action].Item2;
+                    accViolationStepTemp.Remove(actionTerminationEvent.action);
+                    episodeStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[acc].recovered.Add(true);
+                    episodeStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[acc].stepsToRecover.Add(actionTerminationEvent.globalStep - actionTerminationEvent.localStep - step);
+                }
+
+                if (_event is PostConditionReachedEvent)
+                {
+                    episodeStatistics.actionStatistics[actionTerminationEvent.action].postConditionReachedCount++;
                     episodeStatistics.postConditionReachedCount++;
-                    episodeStatistics.actionStatistics[_event.action].postConditionReachedCount++;
-                    break;
-                case ACCViolatedEvent accViolatedEvent:
+                }
+
+                else if (_event is ACCViolatedEvent)
+                {
+                    episodeStatistics.actionStatistics[actionTerminationEvent.action].accViolatedCount++;
                     episodeStatistics.accViolatedCount++;
-                    episodeStatistics.actionStatistics[_event.action].accViolatedCount++;
-                    break;
-                case LocalResetEvent localResetEvent:
+                    var accViolatedEvent = _event as ACCViolatedEvent;
+                    episodeStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[accViolatedEvent.acc].count++;
+                    accViolationStepTemp.Add(actionTerminationEvent.action, Tuple.Create(accViolatedEvent.acc, accViolatedEvent.globalStep));
+                }
+
+                else if (_event is LocalResetEvent)
+                {
+                    episodeStatistics.actionStatistics[actionTerminationEvent.action].localResetCount++;
                     episodeStatistics.localResetCount++;
-                    episodeStatistics.actionStatistics[_event.action].localResetCount++;
-                    break;
-                case GlobalResetEvent globalResetEvent:
-                    episodeStatistics.globalSuccess = false;
-                    episodeStatistics.steps = globalResetEvent.step;
-                    break;
-                case GlobalSuccessEvent globalSuccessEvent:
-                    episodeStatistics.globalSuccess = true;
-                    episodeStatistics.steps = globalSuccessEvent.step;
-                    break;
+                }
+            }
+            else if (_event is GlobalTerminationEvent)
+            {
+                var globalTerminationEvent = _event as GlobalTerminationEvent;
+                episodeStatistics.globalSuccess = globalTerminationEvent is GlobalSuccessEvent;
+                episodeStatistics.steps = globalTerminationEvent.globalStep;
+
+                foreach (var action in accViolationStepTemp.Keys)
+                {
+                    var acc = accViolationStepTemp[action].Item1;
+                    var step = accViolationStepTemp[action].Item2;
+                    episodeStatistics.actionStatistics[action].accViolatedStatistics[acc].recovered.Add(false);
+                    episodeStatistics.actionStatistics[action].accViolatedStatistics[acc].stepsToRecover.Add(globalTerminationEvent.globalStep - step);
+                    accViolationStepTemp.Remove(action);
+                }
             }
         }
         return episodeStatistics;

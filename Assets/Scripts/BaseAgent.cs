@@ -57,7 +57,7 @@ public abstract class BaseAgent : Agent
         {
             AddReward(1f);
             Debug.Log(this + ": PostCondition " + PostCondition.Name + " met");
-            evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition.Name });
+            evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition.Name, localStep = actionCount });
         }
     }
     public void CheckACCs()
@@ -76,7 +76,7 @@ public abstract class BaseAgent : Agent
                     }
                     punished = true;
                     Debug.Log(this + ": ACC " + acc.Name + " violated");
-                    evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name });
+                    evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name, localStep = actionCount });
                 }
             }
         }
@@ -95,7 +95,7 @@ public abstract class BaseAgent : Agent
         {
             AddReward(-1f);
             Debug.Log(this + "EpisodeShouldEnd, negative reward");
-            evaluationManager.AddEvent(new LocalResetEvent());
+            evaluationManager.AddEvent(new LocalResetEvent { localStep = actionCount });
         }
     }
 
