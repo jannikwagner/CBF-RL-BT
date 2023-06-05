@@ -135,6 +135,7 @@ public class RunStatistics
     public int accViolatedCount = 0;
     public int localResetCount = 0;
     public Dictionary<string, ActionStatistics> actionStatistics = new Dictionary<string, ActionStatistics>();
+
     public RunStatistics(IEnumerable<BTTest.LearningActionAgentSwitcher> actions)
     {
         foreach (BTTest.LearningActionAgentSwitcher action in actions)
@@ -179,69 +180,77 @@ public class ACCViolatedStatistics
 public class RunEvaluator
 {
     private IEnumerable<LearningActionAgentSwitcher> actions;
+
     public RunEvaluator(IEnumerable<LearningActionAgentSwitcher> actions)
     {
         this.actions = actions;
     }
+
     public RunStatistics EvaluateRun(List<Event> runEvents)
     {
-        var episodeStatistics = new RunStatistics(actions);
+        var runStatistics = new RunStatistics(actions);
         var accViolationStepTemp = new Dictionary<string, Tuple<string, int>>();
+
         foreach (Event _event in runEvents)
         {
             if (_event is ActionTerminationEvent)
             {
                 var actionTerminationEvent = _event as ActionTerminationEvent;
-                episodeStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
-                episodeStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
+                runStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
+                runStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
+                runStatistics.actionStatistics[actionTerminationEvent.action].episodes += 1;
 
                 // this action has previously violated an acc
                 if (accViolationStepTemp.ContainsKey((actionTerminationEvent.action)))
                 {
                     var acc = accViolationStepTemp[actionTerminationEvent.action].Item1;
-                    var step = accViolationStepTemp[actionTerminationEvent.action].Item2;
+                    var violationGlobalStep = accViolationStepTemp[actionTerminationEvent.action].Item2;
                     accViolationStepTemp.Remove(actionTerminationEvent.action);
-                    episodeStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[acc].recovered.Add(true);
-                    episodeStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[acc].stepsToRecover.Add(actionTerminationEvent.globalStep - actionTerminationEvent.localStep - step);
+                    runStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[acc].recovered.Add(true);
+                    runStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[acc].stepsToRecover.Add(actionTerminationEvent.globalStep - actionTerminationEvent.localStep - violationGlobalStep);
                 }
 
                 if (_event is PostConditionReachedEvent)
                 {
-                    episodeStatistics.actionStatistics[actionTerminationEvent.action].postConditionReachedCount++;
-                    episodeStatistics.postConditionReachedCount++;
+                    runStatistics.postConditionReachedCount++;
+                    runStatistics.actionStatistics[actionTerminationEvent.action].postConditionReachedCount++;
                 }
 
                 else if (_event is ACCViolatedEvent)
                 {
-                    episodeStatistics.actionStatistics[actionTerminationEvent.action].accViolatedCount++;
-                    episodeStatistics.accViolatedCount++;
+                    runStatistics.accViolatedCount++;
+                    runStatistics.actionStatistics[actionTerminationEvent.action].accViolatedCount++;
+
                     var accViolatedEvent = _event as ACCViolatedEvent;
-                    episodeStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[accViolatedEvent.acc].count++;
+                    runStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[accViolatedEvent.acc].count++;
+                    // prepare evaluating recovery
                     accViolationStepTemp.Add(actionTerminationEvent.action, Tuple.Create(accViolatedEvent.acc, accViolatedEvent.globalStep));
                 }
 
                 else if (_event is LocalResetEvent)
                 {
-                    episodeStatistics.actionStatistics[actionTerminationEvent.action].localResetCount++;
-                    episodeStatistics.localResetCount++;
+                    runStatistics.localResetCount++;
+                    runStatistics.actionStatistics[actionTerminationEvent.action].localResetCount++;
                 }
             }
+
             else if (_event is GlobalTerminationEvent)
             {
                 var globalTerminationEvent = _event as GlobalTerminationEvent;
-                episodeStatistics.globalSuccess = globalTerminationEvent is GlobalSuccessEvent;
-                episodeStatistics.steps = globalTerminationEvent.globalStep;
+                runStatistics.globalSuccess = globalTerminationEvent is GlobalSuccessEvent;
+                runStatistics.steps = globalTerminationEvent.globalStep;
 
                 foreach (var action in accViolationStepTemp.Keys)
                 {
                     var acc = accViolationStepTemp[action].Item1;
                     var step = accViolationStepTemp[action].Item2;
-                    episodeStatistics.actionStatistics[action].accViolatedStatistics[acc].recovered.Add(false);
-                    episodeStatistics.actionStatistics[action].accViolatedStatistics[acc].stepsToRecover.Add(globalTerminationEvent.globalStep - step);
+                    runStatistics.actionStatistics[action].accViolatedStatistics[acc].recovered.Add(false);
+                    runStatistics.actionStatistics[action].accViolatedStatistics[acc].stepsToRecover.Add(globalTerminationEvent.globalStep - step);
                     accViolationStepTemp.Remove(action);
                 }
             }
         }
-        return episodeStatistics;
+
+        return runStatistics;
     }
 }

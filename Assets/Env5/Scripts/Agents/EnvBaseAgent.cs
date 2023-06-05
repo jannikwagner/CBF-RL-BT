@@ -244,6 +244,7 @@ namespace Env5
     }
     public class PlayerTargetPosVelDynamics : IDynamicsProvider
     {
+        // relative position and velocity of player to target
         EnvBaseAgent agent;
         public PlayerTargetPosVelDynamics(EnvBaseAgent agent)
         {
