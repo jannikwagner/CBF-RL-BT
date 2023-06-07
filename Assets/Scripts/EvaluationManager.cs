@@ -35,6 +35,13 @@ public enum EventType
     // PreConditionViolated,
 }
 
+public enum ActionTerminationCause
+{
+    PostConditionReached,
+    ACCViolated,
+    LocalReset,
+}
+
 public abstract class ActionEvent : Event
 {
     public string agent;
@@ -42,6 +49,7 @@ public abstract class ActionEvent : Event
     public float reward;
     public int localStep;
 }
+
 public abstract class ActionTerminationEvent : ActionEvent { }
 public abstract class GlobalEvent : Event { }
 public abstract class GlobalTerminationEvent : GlobalEvent { }
@@ -55,7 +63,7 @@ public class GlobalSuccessEvent : GlobalTerminationEvent { public EventType type
 
 public interface IEvaluationManager
 {
-    void AddEvent(Event ev);
+    void AddEvent(Event _event);
     public List<Event> Events { get; }
     public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions);
 }
@@ -148,9 +156,8 @@ public class RunStatistics
 public class ActionStatistics
 {
     public string actionName;
-    public int episodes = 0;
-    public List<int> steps = new List<int>();
-    public List<float> rewards = new List<float>();
+    public int episodeCount = 0;
+    public List<EpisodeStatistics> episodes = new List<EpisodeStatistics>();
     public int postConditionReachedCount = 0;
     public int accViolatedCount = 0;
     public int localResetCount = 0;
@@ -167,6 +174,16 @@ public class ActionStatistics
             }
         }
     }
+}
+
+public class EpisodeStatistics
+{
+    public int steps = 0;
+    public float reward = 0;
+    public ActionTerminationCause cause;
+    public string accName;
+    public int accStepsToRecovery;
+    public bool accRecovered;
 }
 
 public class ACCViolatedStatistics
@@ -196,41 +213,49 @@ public class RunEvaluator
             if (_event is ActionTerminationEvent)
             {
                 var actionTerminationEvent = _event as ActionTerminationEvent;
-                runStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
-                runStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
-                runStatistics.actionStatistics[actionTerminationEvent.action].episodes += 1;
+                var episodeStatistics = new EpisodeStatistics { steps = actionTerminationEvent.localStep, reward = actionTerminationEvent.reward };
+                // runStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
+                // runStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
+                string action = actionTerminationEvent.action;
+                runStatistics.actionStatistics[action].episodes.Add(episodeStatistics);
+                runStatistics.actionStatistics[action].episodeCount += 1;
 
                 // this action has previously violated an acc
-                if (accViolationStepTemp.ContainsKey((actionTerminationEvent.action)))
+                if (accViolationStepTemp.ContainsKey(action))
                 {
-                    var acc = accViolationStepTemp[actionTerminationEvent.action].Item1;
-                    var violationGlobalStep = accViolationStepTemp[actionTerminationEvent.action].Item2;
-                    accViolationStepTemp.Remove(actionTerminationEvent.action);
-                    runStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[acc].recovered.Add(true);
-                    runStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[acc].stepsToRecover.Add(actionTerminationEvent.globalStep - actionTerminationEvent.localStep - violationGlobalStep);
+                    var acc = accViolationStepTemp[action].Item1;
+                    var violationGlobalStep = accViolationStepTemp[action].Item2;
+                    bool successfullyRecovered = true;
+                    int stepsToRecover = actionTerminationEvent.globalStep - actionTerminationEvent.localStep - violationGlobalStep;
+                    accViolationStepTemp.Remove(action);
+
+                    trackACCRecovery(runStatistics, action, acc, stepsToRecover, successfullyRecovered);
                 }
 
                 if (_event is PostConditionReachedEvent)
                 {
                     runStatistics.postConditionReachedCount++;
-                    runStatistics.actionStatistics[actionTerminationEvent.action].postConditionReachedCount++;
+                    runStatistics.actionStatistics[action].postConditionReachedCount++;
+                    episodeStatistics.cause = ActionTerminationCause.PostConditionReached;
                 }
 
                 else if (_event is ACCViolatedEvent)
                 {
                     runStatistics.accViolatedCount++;
-                    runStatistics.actionStatistics[actionTerminationEvent.action].accViolatedCount++;
+                    runStatistics.actionStatistics[action].accViolatedCount++;
+                    episodeStatistics.cause = ActionTerminationCause.ACCViolated;
 
                     var accViolatedEvent = _event as ACCViolatedEvent;
-                    runStatistics.actionStatistics[actionTerminationEvent.action].accViolatedStatistics[accViolatedEvent.acc].count++;
+                    runStatistics.actionStatistics[action].accViolatedStatistics[accViolatedEvent.acc].count++;
                     // prepare evaluating recovery
-                    accViolationStepTemp.Add(actionTerminationEvent.action, Tuple.Create(accViolatedEvent.acc, accViolatedEvent.globalStep));
+                    accViolationStepTemp.Add(action, Tuple.Create(accViolatedEvent.acc, accViolatedEvent.globalStep));
                 }
 
                 else if (_event is LocalResetEvent)
                 {
                     runStatistics.localResetCount++;
-                    runStatistics.actionStatistics[actionTerminationEvent.action].localResetCount++;
+                    runStatistics.actionStatistics[action].localResetCount++;
+                    episodeStatistics.cause = ActionTerminationCause.LocalReset;
                 }
             }
 
@@ -243,14 +268,29 @@ public class RunEvaluator
                 foreach (var action in accViolationStepTemp.Keys)
                 {
                     var acc = accViolationStepTemp[action].Item1;
-                    var step = accViolationStepTemp[action].Item2;
-                    runStatistics.actionStatistics[action].accViolatedStatistics[acc].recovered.Add(false);
-                    runStatistics.actionStatistics[action].accViolatedStatistics[acc].stepsToRecover.Add(globalTerminationEvent.globalStep - step);
+                    int violationGlobalStep = accViolationStepTemp[action].Item2;
+                    var stepsToRecover = globalTerminationEvent.globalStep - violationGlobalStep;
+                    bool successfullyRecovered = false;
                     accViolationStepTemp.Remove(action);
+
+                    trackACCRecovery(runStatistics, action, acc, stepsToRecover, successfullyRecovered);
                 }
             }
         }
 
         return runStatistics;
+    }
+
+    private static void trackACCRecovery(RunStatistics runStatistics, string action, string acc, int stepsToRecover, bool successfullyRecovered)
+    {
+        ACCViolatedStatistics aCCViolatedStatistics = runStatistics.actionStatistics[action].accViolatedStatistics[acc];
+        aCCViolatedStatistics.recovered.Add(successfullyRecovered);
+        aCCViolatedStatistics.stepsToRecover.Add(stepsToRecover);
+
+        List<EpisodeStatistics> episodes = runStatistics.actionStatistics[action].episodes;
+        var previousEpisodeStatistics = episodes[episodes.Count - 2];
+        previousEpisodeStatistics.accName = acc;
+        previousEpisodeStatistics.accStepsToRecovery = stepsToRecover;
+        previousEpisodeStatistics.accRecovered = successfullyRecovered;
     }
 }
