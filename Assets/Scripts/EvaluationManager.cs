@@ -76,7 +76,7 @@ public class EvaluationManager : IEvaluationManager
     private IEnumerable<Condition> conditions;
     private IEnumerable<BaseAgent> agents;
     private IEnumerable<LearningActionAgentSwitcher> actions;
-    private List<RunStatistics> runStatistics = new List<RunStatistics>();
+    private List<RunStatistic> runStatistics = new List<RunStatistic>();
 
     public List<Event> Events { get => events; }
     public ILogDataProvider LogDataProvider { get => logDataProvider; set => logDataProvider = value; }
@@ -112,9 +112,10 @@ public class EvaluationManager : IEvaluationManager
     {
         var runEvaluator = new RunEvaluator(actions);
 
-        var runStatistics = runEvaluator.EvaluateRun(currentRunEvents);
-        this.runStatistics.Add(runStatistics);
-        Debug.Log(JsonUtility.ToJson(runStatistics));
+        var runStatistic = runEvaluator.EvaluateRun(currentRunEvents);
+        this.runStatistics.Add(runStatistic);
+        Debug.Log(JsonUtility.ToJson(runStatistic));
+        Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(this.runStatistics));
     }
 
     private void AugmentEvent(Event _event)
@@ -135,48 +136,48 @@ public class EvaluationManager : IEvaluationManager
     }
 }
 
-public class RunStatistics
+public class RunStatistic
 {
     public bool globalSuccess = false;
     public int steps = -1;
     public int postConditionReachedCount = 0;
     public int accViolatedCount = 0;
     public int localResetCount = 0;
-    public Dictionary<string, ActionStatistics> actionStatistics = new Dictionary<string, ActionStatistics>();
+    public Dictionary<string, ActionStatistic> actionStatistics = new Dictionary<string, ActionStatistic>();
 
-    public RunStatistics(IEnumerable<BTTest.LearningActionAgentSwitcher> actions)
+    public RunStatistic(IEnumerable<BTTest.LearningActionAgentSwitcher> actions)
     {
         foreach (BTTest.LearningActionAgentSwitcher action in actions)
         {
-            actionStatistics.Add(action.Name, new ActionStatistics(action));
+            actionStatistics.Add(action.Name, new ActionStatistic(action));
         }
     }
 }
 
-public class ActionStatistics
+public class ActionStatistic
 {
     public string actionName;
     public int episodeCount = 0;
-    public List<EpisodeStatistics> episodes = new List<EpisodeStatistics>();
+    public List<EpisodeStatistic> episodes = new List<EpisodeStatistic>();
     public int postConditionReachedCount = 0;
     public int accViolatedCount = 0;
     public int localResetCount = 0;
-    public Dictionary<string, ACCViolatedStatistics> accViolatedStatistics = new Dictionary<string, ACCViolatedStatistics>();
+    public Dictionary<string, ACCViolatedStatistic> accViolatedStatistics = new Dictionary<string, ACCViolatedStatistic>();
 
-    public ActionStatistics(LearningActionAgentSwitcher action)
+    public ActionStatistic(LearningActionAgentSwitcher action)
     {
         actionName = action.Name;
         if (action.accs != null)
         {
             foreach (var acc in action.accs)
             {
-                accViolatedStatistics.Add(acc.Name, new ACCViolatedStatistics { accName = acc.Name });
+                accViolatedStatistics.Add(acc.Name, new ACCViolatedStatistic { accName = acc.Name });
             }
         }
     }
 }
 
-public class EpisodeStatistics
+public class EpisodeStatistic
 {
     public int steps = 0;
     public float reward = 0;
@@ -186,7 +187,7 @@ public class EpisodeStatistics
     public bool accRecovered;
 }
 
-public class ACCViolatedStatistics
+public class ACCViolatedStatistic
 {
     public string accName;
     public int count = 0;
@@ -203,9 +204,9 @@ public class RunEvaluator
         this.actions = actions;
     }
 
-    public RunStatistics EvaluateRun(List<Event> runEvents)
+    public RunStatistic EvaluateRun(List<Event> runEvents)
     {
-        var runStatistics = new RunStatistics(actions);
+        var runStatistics = new RunStatistic(actions);
         var accViolationStepTemp = new Dictionary<string, Tuple<string, int>>();
 
         foreach (Event _event in runEvents)
@@ -213,7 +214,7 @@ public class RunEvaluator
             if (_event is ActionTerminationEvent)
             {
                 var actionTerminationEvent = _event as ActionTerminationEvent;
-                var episodeStatistics = new EpisodeStatistics { steps = actionTerminationEvent.localStep, reward = actionTerminationEvent.reward };
+                var episodeStatistics = new EpisodeStatistic { steps = actionTerminationEvent.localStep, reward = actionTerminationEvent.reward };
                 // runStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
                 // runStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
                 string action = actionTerminationEvent.action;
@@ -281,13 +282,13 @@ public class RunEvaluator
         return runStatistics;
     }
 
-    private static void trackACCRecovery(RunStatistics runStatistics, string action, string acc, int stepsToRecover, bool successfullyRecovered)
+    private static void trackACCRecovery(RunStatistic runStatistics, string action, string acc, int stepsToRecover, bool successfullyRecovered)
     {
-        ACCViolatedStatistics aCCViolatedStatistics = runStatistics.actionStatistics[action].accViolatedStatistics[acc];
+        ACCViolatedStatistic aCCViolatedStatistics = runStatistics.actionStatistics[action].accViolatedStatistics[acc];
         aCCViolatedStatistics.recovered.Add(successfullyRecovered);
         aCCViolatedStatistics.stepsToRecover.Add(stepsToRecover);
 
-        List<EpisodeStatistics> episodes = runStatistics.actionStatistics[action].episodes;
+        List<EpisodeStatistic> episodes = runStatistics.actionStatistics[action].episodes;
         var previousEpisodeStatistics = episodes[episodes.Count - 2];
         previousEpisodeStatistics.accName = acc;
         previousEpisodeStatistics.accStepsToRecovery = stepsToRecover;

@@ -8,6 +8,12 @@ source ~/python-envs/ma/bin/activate
 cd ~/dev/unity/RLTest
 ```
 
+### Dependencies
+
+- Netwonsoft.Json (https://www.nuget.org/packages/Newtonsoft.Json)
+
+Install nuget packages: https://www.youtube.com/watch?v=rRILew38aWY
+
 ### Training
 
 
