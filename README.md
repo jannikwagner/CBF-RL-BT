@@ -1,5 +1,7 @@
 ### Python Environment
 
+(Specific to my computer, should not be in ReadMe)
+
 ```
 conda deactivate
 source ~/python-envs/ma/bin/activate
