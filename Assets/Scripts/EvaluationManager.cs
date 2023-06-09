@@ -182,9 +182,14 @@ public class EpisodeStatistic
     public int steps = 0;
     public float reward = 0;
     public ActionTerminationCause cause;
+    public ACCViolatedInfo accInfo = null;
+}
+
+public class ACCViolatedInfo
+{
     public string accName;
-    public int accStepsToRecovery;
-    public bool accRecovered;
+    public int stepsToRecover;
+    public bool recovered;
 }
 
 public class ACCViolatedStatistic
@@ -290,8 +295,6 @@ public class RunEvaluator
 
         List<EpisodeStatistic> episodes = runStatistics.actionStatistics[action].episodes;
         var previousEpisodeStatistics = episodes[episodes.Count - 2];
-        previousEpisodeStatistics.accName = acc;
-        previousEpisodeStatistics.accStepsToRecovery = stepsToRecover;
-        previousEpisodeStatistics.accRecovered = successfullyRecovered;
+        previousEpisodeStatistics.accInfo = new ACCViolatedInfo { accName = acc, stepsToRecover = stepsToRecover, recovered = successfullyRecovered };
     }
 }
