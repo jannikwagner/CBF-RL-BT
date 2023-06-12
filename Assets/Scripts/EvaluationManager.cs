@@ -19,8 +19,8 @@ public interface ILogDataProvider : IStepCounter, IEpisodeCounter, IAgentProvide
 
 public abstract class Event
 {
-    public int run;
-    public int globalStep;
+    public int compositeEpisode;
+    public int btStep;
     // void FromJSON(string json);
     // string ToJSON();
 }
@@ -65,18 +65,19 @@ public interface IEvaluationManager
 {
     void AddEvent(Event _event);
     public List<Event> Events { get; }
-    public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions);
+    public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions, string runId);
 }
 
 public class EvaluationManager : IEvaluationManager
 {
     private ILogDataProvider logDataProvider;
     private List<Event> events;
-    private List<Event> currentRunEvents;
+    private List<Event> currentCompositeEpisodeEvents;
     private IEnumerable<Condition> conditions;
     private IEnumerable<BaseAgent> agents;
     private IEnumerable<LearningActionAgentSwitcher> actions;
-    private List<RunStatistic> runStatistics = new List<RunStatistic>();
+    private List<CompositeEpisodeStatistic> statistics = new List<CompositeEpisodeStatistic>();
+    private string runId;
 
     public List<Event> Events { get => events; }
     public ILogDataProvider LogDataProvider { get => logDataProvider; set => logDataProvider = value; }
@@ -84,15 +85,16 @@ public class EvaluationManager : IEvaluationManager
     public EvaluationManager()
     {
         events = new List<Event>();
-        currentRunEvents = new List<Event>();
+        currentCompositeEpisodeEvents = new List<Event>();
     }
 
-    public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions)
+    public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions, string runId)
     {
         this.logDataProvider = logDataProvider;
         this.conditions = conditions;
         this.agents = agents;
         this.actions = actions;
+        this.runId = runId;
     }
 
     public void AddEvent(Event _event)
@@ -100,28 +102,28 @@ public class EvaluationManager : IEvaluationManager
         AugmentEvent(_event);
         Debug.Log(JsonUtility.ToJson(_event));
         events.Add(_event);
-        currentRunEvents.Add(_event);
+        currentCompositeEpisodeEvents.Add(_event);
         if (_event is GlobalTerminationEvent)
         {
             this.EvaluateCurrentEpisode();
-            currentRunEvents.Clear();
+            currentCompositeEpisodeEvents.Clear();
         }
     }
 
     private void EvaluateCurrentEpisode()
     {
-        var runEvaluator = new RunEvaluator(actions);
+        var compositeEpisodeEvaluator = new CompositeEpisodeEvaluator(actions);
 
-        var runStatistic = runEvaluator.EvaluateRun(currentRunEvents);
-        this.runStatistics.Add(runStatistic);
-        Debug.Log(JsonUtility.ToJson(runStatistic));
-        Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(this.runStatistics));
+        var statistic = compositeEpisodeEvaluator.EvaluateCompositeEpisode(currentCompositeEpisodeEvents);
+        this.statistics.Add(statistic);
+        Debug.Log(JsonUtility.ToJson(statistic));
+        Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(this.statistics));
     }
 
     private void AugmentEvent(Event _event)
     {
-        _event.run = logDataProvider.Episode;
-        _event.globalStep = logDataProvider.Step;
+        _event.compositeEpisode = logDataProvider.Episode;
+        _event.btStep = logDataProvider.Step;
         if (_event is ActionEvent)
         {
             AugmentActionEvent(_event as ActionEvent);
@@ -136,7 +138,7 @@ public class EvaluationManager : IEvaluationManager
     }
 }
 
-public class RunStatistic
+public class CompositeEpisodeStatistic
 {
     public bool globalSuccess = false;
     public int steps = -1;
@@ -145,7 +147,7 @@ public class RunStatistic
     public int localResetCount = 0;
     public Dictionary<string, ActionStatistic> actionStatistics = new Dictionary<string, ActionStatistic>();
 
-    public RunStatistic(IEnumerable<BTTest.LearningActionAgentSwitcher> actions)
+    public CompositeEpisodeStatistic(IEnumerable<BTTest.LearningActionAgentSwitcher> actions)
     {
         foreach (BTTest.LearningActionAgentSwitcher action in actions)
         {
@@ -200,67 +202,67 @@ public class ACCViolatedStatistic
     public List<bool> recovered = new List<bool>();
 }
 
-public class RunEvaluator
+public class CompositeEpisodeEvaluator
 {
     private IEnumerable<LearningActionAgentSwitcher> actions;
 
-    public RunEvaluator(IEnumerable<LearningActionAgentSwitcher> actions)
+    public CompositeEpisodeEvaluator(IEnumerable<LearningActionAgentSwitcher> actions)
     {
         this.actions = actions;
     }
 
-    public RunStatistic EvaluateRun(List<Event> runEvents)
+    public CompositeEpisodeStatistic EvaluateCompositeEpisode(List<Event> compositeEpisodeEvents)
     {
-        var runStatistics = new RunStatistic(actions);
+        var compositeEpisodeStatistics = new CompositeEpisodeStatistic(actions);
         var accViolationStepTemp = new Dictionary<string, Tuple<string, int>>();
 
-        foreach (Event _event in runEvents)
+        foreach (Event _event in compositeEpisodeEvents)
         {
             if (_event is ActionTerminationEvent)
             {
                 var actionTerminationEvent = _event as ActionTerminationEvent;
                 var episodeStatistics = new EpisodeStatistic { steps = actionTerminationEvent.localStep, reward = actionTerminationEvent.reward };
-                // runStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
-                // runStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
+                // compositeEpisodeStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
+                // compositeEpisodeStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
                 string action = actionTerminationEvent.action;
-                runStatistics.actionStatistics[action].episodes.Add(episodeStatistics);
-                runStatistics.actionStatistics[action].episodeCount += 1;
+                compositeEpisodeStatistics.actionStatistics[action].episodes.Add(episodeStatistics);
+                compositeEpisodeStatistics.actionStatistics[action].episodeCount += 1;
 
                 // this action has previously violated an acc
                 if (accViolationStepTemp.ContainsKey(action))
                 {
                     var acc = accViolationStepTemp[action].Item1;
-                    var violationGlobalStep = accViolationStepTemp[action].Item2;
+                    var violationBTStep = accViolationStepTemp[action].Item2;
                     bool successfullyRecovered = true;
-                    int stepsToRecover = actionTerminationEvent.globalStep - actionTerminationEvent.localStep - violationGlobalStep;
+                    int stepsToRecover = actionTerminationEvent.btStep - actionTerminationEvent.localStep - violationBTStep;
                     accViolationStepTemp.Remove(action);
 
-                    trackACCRecovery(runStatistics, action, acc, stepsToRecover, successfullyRecovered);
+                    trackACCRecovery(compositeEpisodeStatistics, action, acc, stepsToRecover, successfullyRecovered);
                 }
 
                 if (_event is PostConditionReachedEvent)
                 {
-                    runStatistics.postConditionReachedCount++;
-                    runStatistics.actionStatistics[action].postConditionReachedCount++;
+                    compositeEpisodeStatistics.postConditionReachedCount++;
+                    compositeEpisodeStatistics.actionStatistics[action].postConditionReachedCount++;
                     episodeStatistics.cause = ActionTerminationCause.PostConditionReached;
                 }
 
                 else if (_event is ACCViolatedEvent)
                 {
-                    runStatistics.accViolatedCount++;
-                    runStatistics.actionStatistics[action].accViolatedCount++;
+                    compositeEpisodeStatistics.accViolatedCount++;
+                    compositeEpisodeStatistics.actionStatistics[action].accViolatedCount++;
                     episodeStatistics.cause = ActionTerminationCause.ACCViolated;
 
                     var accViolatedEvent = _event as ACCViolatedEvent;
-                    runStatistics.actionStatistics[action].accViolatedStatistics[accViolatedEvent.acc].count++;
+                    compositeEpisodeStatistics.actionStatistics[action].accViolatedStatistics[accViolatedEvent.acc].count++;
                     // prepare evaluating recovery
-                    accViolationStepTemp.Add(action, Tuple.Create(accViolatedEvent.acc, accViolatedEvent.globalStep));
+                    accViolationStepTemp.Add(action, Tuple.Create(accViolatedEvent.acc, accViolatedEvent.btStep));
                 }
 
                 else if (_event is LocalResetEvent)
                 {
-                    runStatistics.localResetCount++;
-                    runStatistics.actionStatistics[action].localResetCount++;
+                    compositeEpisodeStatistics.localResetCount++;
+                    compositeEpisodeStatistics.actionStatistics[action].localResetCount++;
                     episodeStatistics.cause = ActionTerminationCause.LocalReset;
                 }
             }
@@ -268,32 +270,32 @@ public class RunEvaluator
             else if (_event is GlobalTerminationEvent)
             {
                 var globalTerminationEvent = _event as GlobalTerminationEvent;
-                runStatistics.globalSuccess = globalTerminationEvent is GlobalSuccessEvent;
-                runStatistics.steps = globalTerminationEvent.globalStep;
+                compositeEpisodeStatistics.globalSuccess = globalTerminationEvent is GlobalSuccessEvent;
+                compositeEpisodeStatistics.steps = globalTerminationEvent.btStep;
 
                 foreach (var action in accViolationStepTemp.Keys)
                 {
                     var acc = accViolationStepTemp[action].Item1;
-                    int violationGlobalStep = accViolationStepTemp[action].Item2;
-                    var stepsToRecover = globalTerminationEvent.globalStep - violationGlobalStep;
+                    int violationBTStep = accViolationStepTemp[action].Item2;
+                    var stepsToRecover = globalTerminationEvent.btStep - violationBTStep;
                     bool successfullyRecovered = false;
                     accViolationStepTemp.Remove(action);
 
-                    trackACCRecovery(runStatistics, action, acc, stepsToRecover, successfullyRecovered);
+                    trackACCRecovery(compositeEpisodeStatistics, action, acc, stepsToRecover, successfullyRecovered);
                 }
             }
         }
 
-        return runStatistics;
+        return compositeEpisodeStatistics;
     }
 
-    private static void trackACCRecovery(RunStatistic runStatistics, string action, string acc, int stepsToRecover, bool successfullyRecovered)
+    private static void trackACCRecovery(CompositeEpisodeStatistic compositeEpisodeStatistics, string action, string acc, int stepsToRecover, bool successfullyRecovered)
     {
-        ACCViolatedStatistic aCCViolatedStatistics = runStatistics.actionStatistics[action].accViolatedStatistics[acc];
+        ACCViolatedStatistic aCCViolatedStatistics = compositeEpisodeStatistics.actionStatistics[action].accViolatedStatistics[acc];
         aCCViolatedStatistics.recovered.Add(successfullyRecovered);
         aCCViolatedStatistics.stepsToRecover.Add(stepsToRecover);
 
-        List<EpisodeStatistic> episodes = runStatistics.actionStatistics[action].episodes;
+        List<EpisodeStatistic> episodes = compositeEpisodeStatistics.actionStatistics[action].episodes;
         var previousEpisodeStatistics = episodes[episodes.Count - 2];
         previousEpisodeStatistics.accInfo = new ACCViolatedInfo { accName = acc, stepsToRecover = stepsToRecover, recovered = successfullyRecovered };
     }

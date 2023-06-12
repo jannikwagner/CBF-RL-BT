@@ -51,8 +51,10 @@ namespace Env5
             InitCBFs();
             InitTree();
             var actions = _tree.FindNodes<LearningActionAgentSwitcher>();
-            var action = actions[0];
-            evaluationManager.Init(this, conditions, agents, actions);
+
+            var runId = "testRunId";
+
+            evaluationManager.Init(this, conditions, agents, actions, runId);
         }
 
         private void InitTree()
