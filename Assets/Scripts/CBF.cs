@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-
 public interface ICBF
 {
     public float h(float[] x);
