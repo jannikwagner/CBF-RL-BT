@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using BTTest;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public interface IStepCounter
@@ -21,8 +23,6 @@ public abstract class Event
 {
     public int compositeEpisode;
     public int btStep;
-    // void FromJSON(string json);
-    // string ToJSON();
 }
 
 public enum EventType
@@ -59,7 +59,7 @@ public class ACCViolatedEvent : ActionTerminationEvent { public string acc; publ
 public class LocalResetEvent : ActionTerminationEvent { public EventType type = EventType.LocalReset; }
 public class GlobalResetEvent : GlobalTerminationEvent { public EventType type = EventType.GlobalReset; }
 public class GlobalSuccessEvent : GlobalTerminationEvent { public EventType type = EventType.GlobalSuccess; }
-// public class PreConditionViolatedEvent : Event { public Condition precondition; }
+// public class PreConditionViolatedEvent : Event { public string preCondition; }
 
 public interface IEvaluationManager
 {
@@ -78,6 +78,8 @@ public class EvaluationManager : IEvaluationManager
     private IEnumerable<LearningActionAgentSwitcher> actions;
     private List<CompositeEpisodeStatistic> statistics = new List<CompositeEpisodeStatistic>();
     private string runId;
+    private string folderPath;
+    private IStorageManager storageManager;
 
     public List<Event> Events { get => events; }
     public ILogDataProvider LogDataProvider { get => logDataProvider; set => logDataProvider = value; }
@@ -95,6 +97,8 @@ public class EvaluationManager : IEvaluationManager
         this.agents = agents;
         this.actions = actions;
         this.runId = runId;
+        folderPath = $@"evaluation/stats/{runId}";
+        storageManager = new StorageManager(folderPath);
     }
 
     public void AddEvent(Event _event)
@@ -116,8 +120,7 @@ public class EvaluationManager : IEvaluationManager
 
         var statistic = compositeEpisodeEvaluator.EvaluateCompositeEpisode(currentCompositeEpisodeEvents);
         this.statistics.Add(statistic);
-        Debug.Log(JsonUtility.ToJson(statistic));
-        Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(this.statistics));
+        this.storageManager.AddStatistic(statistic);
     }
 
     private void AugmentEvent(Event _event)
@@ -140,6 +143,7 @@ public class EvaluationManager : IEvaluationManager
 
 public class CompositeEpisodeStatistic
 {
+    public int compositeEpisodeNumber = -1;
     public bool globalSuccess = false;
     public int steps = -1;
     public int postConditionReachedCount = 0;
@@ -214,6 +218,7 @@ public class CompositeEpisodeEvaluator
     public CompositeEpisodeStatistic EvaluateCompositeEpisode(List<Event> compositeEpisodeEvents)
     {
         var compositeEpisodeStatistics = new CompositeEpisodeStatistic(actions);
+        compositeEpisodeStatistics.compositeEpisodeNumber = compositeEpisodeEvents[0].compositeEpisode;
         var accViolationStepTemp = new Dictionary<string, Tuple<string, int>>();
 
         foreach (Event _event in compositeEpisodeEvents)
@@ -298,5 +303,83 @@ public class CompositeEpisodeEvaluator
         List<EpisodeStatistic> episodes = compositeEpisodeStatistics.actionStatistics[action].episodes;
         var previousEpisodeStatistics = episodes[episodes.Count - 2];
         previousEpisodeStatistics.accInfo = new ACCViolatedInfo { accName = acc, stepsToRecover = stepsToRecover, recovered = successfullyRecovered };
+    }
+}
+
+public interface IStorageManager
+{
+    void AddStatistic(CompositeEpisodeStatistic statistic);
+    void StoreStatistics();
+}
+
+public class StorageManager : IStorageManager
+{
+    private string folderPath;
+    private int checkpointInterval;
+    private List<CompositeEpisodeStatistic> statistics = new List<CompositeEpisodeStatistic>();
+
+    public StorageManager(string folderPath, int checkpointInterval = 1)
+    {
+        this.folderPath = folderPath;
+        this.checkpointInterval = checkpointInterval;
+
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+    }
+
+    public void AddStatistic(CompositeEpisodeStatistic statistic)
+    {
+        statistics.Add(statistic);
+
+        if (statistics.Count % checkpointInterval == 0)
+        {
+            StoreStatistics();
+        }
+    }
+
+    public void StoreStatistics()
+    {
+        var filePath = folderPath + "/statistics.json";
+        using (StreamWriter file = File.CreateText(filePath))
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Serialize(file, statistics);
+        }
+    }
+}
+
+public class SmallFilesStorageManager : IStorageManager
+{
+
+    private string folderPath;
+    private List<CompositeEpisodeStatistic> compositeEpisodeStatistics = new List<CompositeEpisodeStatistic>();
+
+    public SmallFilesStorageManager(string folderPath)
+    {
+        this.folderPath = folderPath;
+
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+    }
+
+    public void AddStatistic(CompositeEpisodeStatistic statistic)
+    {
+        // write to file
+        string statisticJson = Newtonsoft.Json.JsonConvert.SerializeObject(statistic);
+
+        var filePath = folderPath + "/compositeEpisode" + statistic.compositeEpisodeNumber + ".json";
+        using (StreamWriter file = File.CreateText(filePath))
+        {
+            file.Write(statisticJson);
+        }
+    }
+
+    public void StoreStatistics()
+    {
+        // do nothing
     }
 }

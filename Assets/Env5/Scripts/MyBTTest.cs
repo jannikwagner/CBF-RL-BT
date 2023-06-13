@@ -22,14 +22,14 @@ namespace Env5
         private bool useCBF = true;
         private int maxSteps = 10000;
         private int stepCount;
-        private int runCount;
+        private int compositeEpisodeCount;
         private IEvaluationManager evaluationManager;
         List<Condition> conditions;
 
         public int MaxSteps { get => maxSteps; set => maxSteps = value; }
 
         public int Step => stepCount;
-        public int Episode => runCount;
+        public int Episode => compositeEpisodeCount;
         public BaseAgent Agent => agentSwitcher.Agent;
         public Action Action => _tree.CurrentAction;
 
@@ -46,7 +46,7 @@ namespace Env5
             agentSwitcher.AddAgents(agents);
 
             stepCount = 0;
-            runCount = 0;
+            compositeEpisodeCount = 0;
 
             InitCBFs();
             InitTree();
@@ -334,7 +334,7 @@ namespace Env5
             agentSwitcher.Reset();
             controller.env.Reset();
             stepCount = 0;
-            runCount++;
+            compositeEpisodeCount++;
         }
     }
 }

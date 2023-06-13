@@ -14,6 +14,8 @@ cd ~/dev/unity/RLTest
 
 Install nuget packages: https://www.youtube.com/watch?v=rRILew38aWY
 
+Possibly an alternative way to install Netwonsoft.Json: https://github.com/jilleJr/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM
+
 ### Training
 
 
