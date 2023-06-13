@@ -82,6 +82,7 @@ Logs/
 /summaries
 # Output Artifacts
 /results
+/evaluation
 # Output Builds
 /Builds
 
