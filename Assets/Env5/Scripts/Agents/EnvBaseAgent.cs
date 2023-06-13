@@ -46,6 +46,9 @@ namespace Env5
         {
             var acceleration = GetAcceleration(actions);
             controller.ApplyAcceleration(acceleration);
+            // important to call base.OnActionReceived last,
+            // ACCs and postconditions are checked there and reward is added
+            // TODO: investigate whether this works in build environment
             base.OnActionReceived(actions);
         }
 
