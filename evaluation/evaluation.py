@@ -50,6 +50,7 @@ for i in range(len(data)):
             augmented_episodes.append(episode)
 
 eps_df = pd.DataFrame(augmented_episodes)
+eps_df.sort_values(by=["compositeEpisodeNumber", "localEpisodeNumber"], inplace=True)
 
 print(eps_df)
 print(eps_df.columns)
