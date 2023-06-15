@@ -14,7 +14,7 @@ public interface ILogDataProvider : IStepCounter, IEpisodeCounter, IAgentProvide
 
 public abstract class Event
 {
-    public int compositeEpisode;
+    public int compositeEpisodeNumber;
     public int btStep;
 }
 

@@ -66,7 +66,7 @@ public class EvaluationManager : IEvaluationManager
 
     private void AugmentEvent(Event _event)
     {
-        _event.compositeEpisode = logDataProvider.Episode;
+        _event.compositeEpisodeNumber = logDataProvider.Episode;
         _event.btStep = logDataProvider.Step;
         if (_event is ActionEvent)
         {

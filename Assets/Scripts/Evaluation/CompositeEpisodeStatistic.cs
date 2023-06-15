@@ -45,8 +45,9 @@ public class ActionStatistic
 
 public class EpisodeStatistic
 {
-    public int steps = 0;
+    public int steps = -1;
     public float reward = 0;
+    public int localEpisodeNumber = -1;
     public ActionTerminationCause terminationCause;
     public ACCViolatedInfo accInfo = null;
 }
@@ -80,7 +81,7 @@ public class EpisodeRecord
     public int compositeEpisodeNumber = -1;
     public int localEpisodeNumber = -1;
     public string actionName = null;
-    public int steps = 0;
+    public int localSteps = 0;
     public float reward = 0;
     public ActionTerminationCause terminationCause;
     public string accName = null;
