@@ -67,6 +67,11 @@ public class CompositeEpisodeEvaluator
                     compositeEpisodeStatistics.actionStatistics[action].localResetCount++;
                     episodeStatistics.cause = ActionTerminationCause.LocalReset;
                 }
+
+                else if (_event is ActionGlobalResetEvent)
+                {
+                    episodeStatistics.cause = ActionTerminationCause.GlobalReset;
+                }
             }
 
             else if (_event is GlobalTerminationEvent)

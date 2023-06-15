@@ -65,3 +65,11 @@ public class ACCViolatedStatistic
     public List<int> stepsToRecover = new List<int>();
     public List<bool> recovered = new List<bool>();
 }
+
+public enum ActionTerminationCause
+{
+    PostConditionReached,
+    ACCViolated,
+    LocalReset,
+    GlobalReset,
+}

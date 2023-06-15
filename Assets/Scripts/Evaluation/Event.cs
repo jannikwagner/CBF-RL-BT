@@ -1,4 +1,3 @@
-
 public interface IStepCounter
 {
     int Step { get; }
@@ -24,16 +23,10 @@ public enum EventType
     PostConditionReached,
     ACCViolated,
     LocalReset,
+    ActionGlobalReset,
     GlobalReset,
     GlobalSuccess,
     // PreConditionViolated,
-}
-
-public enum ActionTerminationCause
-{
-    PostConditionReached,
-    ACCViolated,
-    LocalReset,
 }
 
 public abstract class ActionEvent : Event
@@ -51,6 +44,7 @@ public abstract class GlobalTerminationEvent : GlobalEvent { }
 public class PostConditionReachedEvent : ActionTerminationEvent { public string postCondition; public EventType type = EventType.PostConditionReached; }
 public class ACCViolatedEvent : ActionTerminationEvent { public string acc; public EventType type = EventType.ACCViolated; }
 public class LocalResetEvent : ActionTerminationEvent { public EventType type = EventType.LocalReset; }
+public class ActionGlobalResetEvent : ActionTerminationEvent { public EventType type = EventType.ActionGlobalReset; }
 public class GlobalResetEvent : GlobalTerminationEvent { public EventType type = EventType.GlobalReset; }
 public class GlobalSuccessEvent : GlobalTerminationEvent { public EventType type = EventType.GlobalSuccess; }
 // public class PreConditionViolatedEvent : Event { public string preCondition; }

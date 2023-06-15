@@ -323,6 +323,7 @@ namespace Env5
             if (++stepCount % MaxSteps == 0)
             {
                 Debug.Log("Global Reset!");
+                evaluationManager.AddEvent(new ActionGlobalResetEvent { localStep = this.Agent.ActionCount });
                 evaluationManager.AddEvent(new GlobalResetEvent { });
                 NextEpisode();
             }
