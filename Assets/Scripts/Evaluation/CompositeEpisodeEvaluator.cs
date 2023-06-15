@@ -20,7 +20,7 @@ public class CompositeEpisodeEvaluator
         // alternative representation
         var episodes = new List<EpisodeRecord>();
 
-        var accViolationStepTemp = new Dictionary<string, Tuple<string, int, EpisodeRecord>>();
+        var accViolationStepTemp = new Dictionary<string, Tuple<string, int, EpisodeStatistic, EpisodeRecord>>();
         int localEpisodeNumber = 0;
 
         foreach (Event _event in events)
@@ -49,13 +49,14 @@ public class CompositeEpisodeEvaluator
                 {
                     var acc = accViolationStepTemp[action].Item1;
                     var violationBTStep = accViolationStepTemp[action].Item2;
-                    var episodeWithViolation = accViolationStepTemp[action].Item3;
+                    var episodeStatisticWithViolation = accViolationStepTemp[action].Item3;
+                    var episodeWithViolation = accViolationStepTemp[action].Item4;
 
                     bool successfullyRecovered = true;
                     int stepsToRecover = actionTerminationEvent.btStep - actionTerminationEvent.localStep - violationBTStep;
                     accViolationStepTemp.Remove(action);
 
-                    trackACCRecovery(compositeEpisodeStatistics, action, acc, stepsToRecover, successfullyRecovered, episodeWithViolation);
+                    trackACCRecovery(compositeEpisodeStatistics, action, acc, stepsToRecover, successfullyRecovered, episodeStatisticWithViolation, episodeWithViolation);
                 }
 
                 if (_event is PostConditionReachedEvent)
@@ -71,7 +72,7 @@ public class CompositeEpisodeEvaluator
                 {
                     var accViolatedEvent = _event as ACCViolatedEvent;
                     // prepare evaluating recovery
-                    accViolationStepTemp.Add(action, Tuple.Create(accViolatedEvent.acc, accViolatedEvent.btStep, episode));
+                    accViolationStepTemp.Add(action, Tuple.Create(accViolatedEvent.acc, accViolatedEvent.btStep, episodeStatistics, episode));
 
                     compositeEpisodeStatistics.accViolatedCount++;
                     compositeEpisodeStatistics.actionStatistics[action].accViolatedCount++;
@@ -80,8 +81,6 @@ public class CompositeEpisodeEvaluator
 
                     episode.terminationCause = ActionTerminationCause.ACCViolated;
                     episode.accName = accViolatedEvent.acc;
-                    // TODO: track recovery for 2nd representation
-
                 }
 
                 else if (_event is LocalResetEvent)
@@ -118,12 +117,13 @@ public class CompositeEpisodeEvaluator
                 {
                     var acc = accViolationStepTemp[action].Item1;
                     int violationBTStep = accViolationStepTemp[action].Item2;
-                    var episodeWithViolation = accViolationStepTemp[action].Item3;
+                    var episodeStatisticWithViolation = accViolationStepTemp[action].Item3;
+                    var episodeWithViolation = accViolationStepTemp[action].Item4;
 
                     var stepsToRecover = globalTerminationEvent.btStep - violationBTStep;
                     bool successfullyRecovered = false;
 
-                    trackACCRecovery(compositeEpisodeStatistics, action, acc, stepsToRecover, successfullyRecovered, episodeWithViolation);
+                    trackACCRecovery(compositeEpisodeStatistics, action, acc, stepsToRecover, successfullyRecovered, episodeStatisticWithViolation, episodeWithViolation);
                 }
                 accViolationStepTemp.Clear();
             }
@@ -132,7 +132,7 @@ public class CompositeEpisodeEvaluator
         return compositeEpisodeStatistics;
     }
 
-    private static void trackACCRecovery(CompositeEpisodeStatistic compositeEpisodeStatistics, string action, string acc, int stepsToRecover, bool successfullyRecovered, EpisodeRecord episode)
+    private static void trackACCRecovery(CompositeEpisodeStatistic compositeEpisodeStatistics, string action, string acc, int stepsToRecover, bool successfullyRecovered, EpisodeStatistic episodeStatistic, EpisodeRecord episode)
     {
         ACCViolatedStatistic aCCViolatedStatistics = compositeEpisodeStatistics.actionStatistics[action].accViolatedStatistics[acc];
         aCCViolatedStatistics.recovered.Add(successfullyRecovered);
@@ -141,9 +141,7 @@ public class CompositeEpisodeEvaluator
         List<EpisodeStatistic> episodes = compositeEpisodeStatistics.actionStatistics[action].episodes;
         // if successfully recovered, the second last (because the episode where it is recovered is last),
         // if not, the last, because we did not have the action again, otherwise it would have recovered
-        int past = successfullyRecovered ? 1 : 0;
-        var previousEpisodeStatistics = episodes[episodes.Count - past - 1];
-        previousEpisodeStatistics.accInfo = new ACCViolatedInfo { accName = acc, accStepsToRecover = stepsToRecover, accRecovered = successfullyRecovered };
+        episodeStatistic.accInfo = new ACCViolatedInfo { accName = acc, accStepsToRecover = stepsToRecover, accRecovered = successfullyRecovered };
 
         episode.accName = acc;  // not necessary, already set before
         episode.accStepsToRecover = stepsToRecover;

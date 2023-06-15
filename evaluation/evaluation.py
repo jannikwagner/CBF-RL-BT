@@ -39,7 +39,7 @@ for i in range(len(data)):
             episode["action"] = action
             episode["compositeEpisodeNumber"] = i
 
-            if episode["accInfo"]:
+            if episode["terminationCause"] == 1:  # ACC violated. Should be equivalent to episode["accInfo"] is not None
                 for key, value in episode["accInfo"].items():
                     episode[key] = value
             del episode["accInfo"]
@@ -59,4 +59,7 @@ actions = eps_df.action.unique()
 print(actions)
 accs = eps_df.query("terminationCause == 1").groupby("action").accName.unique()
 print(accs)
-print(len(eps_df))
+print(eps_df.compositeEpisodeNumber.max())
+float("NaN")
+nan = float("NaN")
+print(eps_df.query("terminationCause == 1")[eps_df.query("terminationCause == 1").accName.isnull()])
