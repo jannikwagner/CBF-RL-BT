@@ -6,16 +6,23 @@ runId = "testRunId"
 
 filePath = f"evaluation/stats/{runId}/statistics.json"
 
+action_termination_cause = [
+    "PostConditionReached",
+    "ACCViolated",
+    "LocalReset",
+    "GlobalReset",
+]
+
 # print(os.listdir())
 
 with open(filePath, "r") as f:
     data = json.load(f)
     # print(data)
 
-df = pd.DataFrame(data)
+comp_ep_df = pd.DataFrame(data)
 
-steps = df.steps
-global_success = df.globalSuccess
+gloabl_steps = comp_ep_df.steps
+global_success = comp_ep_df.globalSuccess
 
 # could instead also be done in unity
 augmented_episodes = []
@@ -31,10 +38,20 @@ for i in range(len(data)):
             episode = episodes[j]
             episode["action"] = action
             episode["compositeEpisodeNumber"] = i
-            episode["localEpisodeNumber"] = localEpisodeNumber
-            localEpisodeNumber += 1
+
+            if episode["accInfo"]:
+                for key, value in episode["accInfo"].items():
+                    episode["acc."+key] = value
+            del episode["accInfo"]
+
+            episode["globalSuccess"] = global_success[i]
+            episode["globalSteps"] = gloabl_steps[i]
+
+            # episode["localEpisodeNumber"] = localEpisodeNumber
+            # localEpisodeNumber += 1  # this is wrong because the episodes are sorted by action
+
             augmented_episodes.append(episode)
 
-df = pd.DataFrame(augmented_episodes)
+eps_df = pd.DataFrame(augmented_episodes)
 
-print(df)
+print(eps_df)

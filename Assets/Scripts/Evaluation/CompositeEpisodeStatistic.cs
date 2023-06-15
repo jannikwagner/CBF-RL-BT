@@ -47,13 +47,13 @@ public class EpisodeStatistic
 {
     public int steps = 0;
     public float reward = 0;
-    public ActionTerminationCause cause;
+    public ActionTerminationCause terminationCause;
     public ACCViolatedInfo accInfo = null;
 }
 
 public class ACCViolatedInfo
 {
-    public string accName;
+    public string name;
     public int stepsToRecover;
     public bool recovered;
 }
@@ -72,4 +72,20 @@ public enum ActionTerminationCause
     ACCViolated,
     LocalReset,
     GlobalReset,
+}
+
+// different approach
+public class EpisodeRecord
+{
+    public int compositeEpisodeNumber = -1;
+    public int localEpisodeNumber = -1;
+    public string actionName = null;
+    public int steps = 0;
+    public float reward = 0;
+    public ActionTerminationCause terminationCause;
+    public string accName = null;
+    public int accStepsToRecover = -1;
+    public bool accRecovered = false;
+    public bool globalSuccess = false;
+    public int globalSteps = -1;
 }

@@ -24,8 +24,6 @@ public class CompositeEpisodeEvaluator
             {
                 var actionTerminationEvent = _event as ActionTerminationEvent;
                 var episodeStatistics = new EpisodeStatistic { steps = actionTerminationEvent.localStep, reward = actionTerminationEvent.reward };
-                // compositeEpisodeStatistics.actionStatistics[actionTerminationEvent.action].steps.Add(actionTerminationEvent.localStep);
-                // compositeEpisodeStatistics.actionStatistics[actionTerminationEvent.action].rewards.Add(actionTerminationEvent.reward);
                 string action = actionTerminationEvent.action;
                 compositeEpisodeStatistics.actionStatistics[action].episodes.Add(episodeStatistics);
                 compositeEpisodeStatistics.actionStatistics[action].episodeCount += 1;
@@ -46,14 +44,14 @@ public class CompositeEpisodeEvaluator
                 {
                     compositeEpisodeStatistics.postConditionReachedCount++;
                     compositeEpisodeStatistics.actionStatistics[action].postConditionReachedCount++;
-                    episodeStatistics.cause = ActionTerminationCause.PostConditionReached;
+                    episodeStatistics.terminationCause = ActionTerminationCause.PostConditionReached;
                 }
 
                 else if (_event is ACCViolatedEvent)
                 {
                     compositeEpisodeStatistics.accViolatedCount++;
                     compositeEpisodeStatistics.actionStatistics[action].accViolatedCount++;
-                    episodeStatistics.cause = ActionTerminationCause.ACCViolated;
+                    episodeStatistics.terminationCause = ActionTerminationCause.ACCViolated;
 
                     var accViolatedEvent = _event as ACCViolatedEvent;
                     compositeEpisodeStatistics.actionStatistics[action].accViolatedStatistics[accViolatedEvent.acc].count++;
@@ -65,12 +63,12 @@ public class CompositeEpisodeEvaluator
                 {
                     compositeEpisodeStatistics.localResetCount++;
                     compositeEpisodeStatistics.actionStatistics[action].localResetCount++;
-                    episodeStatistics.cause = ActionTerminationCause.LocalReset;
+                    episodeStatistics.terminationCause = ActionTerminationCause.LocalReset;
                 }
 
                 else if (_event is ActionGlobalResetEvent)
                 {
-                    episodeStatistics.cause = ActionTerminationCause.GlobalReset;
+                    episodeStatistics.terminationCause = ActionTerminationCause.GlobalReset;
                 }
             }
 
@@ -104,6 +102,6 @@ public class CompositeEpisodeEvaluator
 
         List<EpisodeStatistic> episodes = compositeEpisodeStatistics.actionStatistics[action].episodes;
         var previousEpisodeStatistics = episodes[episodes.Count - 2];
-        previousEpisodeStatistics.accInfo = new ACCViolatedInfo { accName = acc, stepsToRecover = stepsToRecover, recovered = successfullyRecovered };
+        previousEpisodeStatistics.accInfo = new ACCViolatedInfo { name = acc, stepsToRecover = stepsToRecover, recovered = successfullyRecovered };
     }
 }
