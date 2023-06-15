@@ -139,7 +139,10 @@ public class CompositeEpisodeEvaluator
         aCCViolatedStatistics.stepsToRecover.Add(stepsToRecover);
 
         List<EpisodeStatistic> episodes = compositeEpisodeStatistics.actionStatistics[action].episodes;
-        var previousEpisodeStatistics = episodes[episodes.Count - 2];  // necessarily the previous episode of that action
+        // if successfully recovered, the second last (because the episode where it is recovered is last),
+        // if not, the last, because we did not have the action again, otherwise it would have recovered
+        int past = successfullyRecovered ? 1 : 0;
+        var previousEpisodeStatistics = episodes[episodes.Count - past - 1];
         previousEpisodeStatistics.accInfo = new ACCViolatedInfo { accName = acc, accStepsToRecover = stepsToRecover, accRecovered = successfullyRecovered };
 
         episode.accName = acc;  // not necessary, already set before
