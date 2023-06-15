@@ -55,7 +55,7 @@ namespace Env5
         public override void Heuristic(in ActionBuffers actionsOut)
         {
             actuator.Heuristic(actionsOut);
-            if (CBFApplicators != null)
+            if (useCBF && CBFApplicators != null)
             {
                 var allowedActions = CBFDiscreteInvalidActionMasker.AllowedActions(CBFApplicators, NumActions);
                 var discreateActionsOut = actionsOut.DiscreteActions;

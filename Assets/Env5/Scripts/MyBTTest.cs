@@ -19,7 +19,7 @@ namespace Env5
         public PushTriggerToGoal pushTriggerToGoal;
         public PushTriggerToGoalNew pushTriggerToGoalNew;
         public PlayerController controller;
-        private bool useCBF = true;
+        private bool useCBF = false;
         private int maxSteps = 10000;
         private int stepCount;
         private int compositeEpisodeCount;

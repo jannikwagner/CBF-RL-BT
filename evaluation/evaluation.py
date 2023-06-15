@@ -54,3 +54,9 @@ eps_df.sort_values(by=["compositeEpisodeNumber", "localEpisodeNumber"], inplace=
 
 print(eps_df)
 print(eps_df.columns)
+
+actions = eps_df.action.unique()
+print(actions)
+accs = eps_df.query("terminationCause == 1").groupby("action").accName.unique()
+print(accs)
+print(len(eps_df))

@@ -22,6 +22,7 @@ Possibly an alternative way to install Netwonsoft.Json: https://github.com/jille
 ```
 mlagents-learn configs/conf2.yaml --env=builds/build10 --run-id=env5.26 --initialize-from=env5.25
 ```
+
 #### Resume
 ```
 mlagents-learn configs/conf2.yaml --env=builds/build10 --run-id=env5.26 --resume

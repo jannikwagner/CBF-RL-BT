@@ -122,10 +122,10 @@ public class CompositeEpisodeEvaluator
 
                     var stepsToRecover = globalTerminationEvent.btStep - violationBTStep;
                     bool successfullyRecovered = false;
-                    accViolationStepTemp.Remove(action);
 
                     trackACCRecovery(compositeEpisodeStatistics, action, acc, stepsToRecover, successfullyRecovered, episodeWithViolation);
                 }
+                accViolationStepTemp.Clear();
             }
         }
 
