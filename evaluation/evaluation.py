@@ -1,6 +1,8 @@
+import dataclasses
 import json
 import os
 import pandas as pd
+import matplotlib.pyplot as plt
 
 runId = "testRunId"
 
@@ -12,6 +14,17 @@ action_termination_cause = [
     "LocalReset",
     "GlobalReset",
 ]
+
+@dataclasses.dataclass
+class Statistics:
+    success_rate: float
+    min_global_steps: int
+    max_global_steps: int
+    mean_global_steps: float
+    std_global_steps: float
+
+
+
 
 # print(os.listdir())
 
@@ -56,20 +69,24 @@ def load_repr1_to_eps(filePath):
 
 eps_df = load_repr1_to_eps(filePath)
 
-print(eps_df)
-print(eps_df.columns)
+# print(eps_df)
+# print(eps_df.columns)
 
 actions = eps_df.action.unique()
-print(actions)
+# print(actions)
 accs = eps_df.query("terminationCause == 1").groupby("action").accName.unique()
-print(accs)
-print(eps_df.compositeEpisodeNumber.max())
+# print(accs)
+print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
 assert eps_df.query("terminationCause == 1")[eps_df.query("terminationCause == 1").accName.isnull()].empty  # otherwise there exist acc violations that are not properly tracked
 
 comp_eps_df = eps_df.query("localEpisodeNumber == 0")[['compositeEpisodeNumber', 'globalSuccess', 'globalSteps',]]
 print(comp_eps_df)
-print(comp_eps_df.globalSteps.mean())
-print(comp_eps_df.globalSteps.min())
-print(comp_eps_df.globalSteps.max())
+stats = Statistics(comp_eps_df.globalSuccess.mean(), 
+comp_eps_df.globalSteps.min(),
+comp_eps_df.globalSteps.max(),
+comp_eps_df.globalSteps.mean(),
+comp_eps_df.globalSteps.std(),)
+print(stats)
+plt.hist(comp_eps_df.globalSteps)
 
 print(eps_df.query("action == 'MoveOverBridge'").terminationCause.value_counts())
