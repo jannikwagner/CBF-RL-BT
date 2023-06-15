@@ -5,7 +5,7 @@ public class CompositeEpisodeStatistic
 {
     public int compositeEpisodeNumber = -1;
     public bool globalSuccess = false;
-    public int steps = -1;
+    public int globalSteps = -1;
     public int postConditionReachedCount = 0;
     public int accViolatedCount = 0;
     public int localResetCount = 0;
@@ -45,7 +45,7 @@ public class ActionStatistic
 
 public class EpisodeStatistic
 {
-    public int steps = -1;
+    public int localSteps = -1;
     public float reward = 0;
     public int localEpisodeNumber = -1;
     public ActionTerminationCause terminationCause;
@@ -54,9 +54,9 @@ public class EpisodeStatistic
 
 public class ACCViolatedInfo
 {
-    public string name;
-    public int stepsToRecover;
-    public bool recovered;
+    public string accName;
+    public int accStepsToRecover;
+    public bool accRecovered;
 }
 
 public class ACCViolatedStatistic
@@ -75,7 +75,7 @@ public enum ActionTerminationCause
     GlobalReset,
 }
 
-// different approach
+// different approach, properly collected, but currently not serialized
 public class EpisodeRecord
 {
     public int compositeEpisodeNumber = -1;

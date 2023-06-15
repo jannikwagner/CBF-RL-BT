@@ -21,7 +21,7 @@ with open(filePath, "r") as f:
 
 comp_ep_df = pd.DataFrame(data)
 
-gloabl_steps = comp_ep_df.steps
+gloabl_steps = comp_ep_df.globalSteps
 global_success = comp_ep_df.globalSuccess
 
 # could instead also be done in unity
@@ -41,17 +41,15 @@ for i in range(len(data)):
 
             if episode["accInfo"]:
                 for key, value in episode["accInfo"].items():
-                    episode["acc."+key] = value
+                    episode[key] = value
             del episode["accInfo"]
 
             episode["globalSuccess"] = global_success[i]
             episode["globalSteps"] = gloabl_steps[i]
-
-            # episode["localEpisodeNumber"] = localEpisodeNumber
-            # localEpisodeNumber += 1  # this is wrong because the episodes are sorted by action
 
             augmented_episodes.append(episode)
 
 eps_df = pd.DataFrame(augmented_episodes)
 
 print(eps_df)
+print(eps_df.columns)

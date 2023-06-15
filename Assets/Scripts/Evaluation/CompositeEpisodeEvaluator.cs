@@ -29,7 +29,7 @@ public class CompositeEpisodeEvaluator
             {
                 var actionTerminationEvent = _event as ActionTerminationEvent;
 
-                var episodeStatistics = new EpisodeStatistic { steps = actionTerminationEvent.localStep, reward = actionTerminationEvent.reward, localEpisodeNumber = localEpisodeNumber };
+                var episodeStatistics = new EpisodeStatistic { localSteps = actionTerminationEvent.localStep, reward = actionTerminationEvent.reward, localEpisodeNumber = localEpisodeNumber };
                 string action = actionTerminationEvent.action;
                 compositeEpisodeStatistics.actionStatistics[action].episodes.Add(episodeStatistics);
                 compositeEpisodeStatistics.actionStatistics[action].episodeCount += 1;
@@ -106,7 +106,7 @@ public class CompositeEpisodeEvaluator
                 var globalTerminationEvent = _event as GlobalTerminationEvent;
 
                 compositeEpisodeStatistics.globalSuccess = globalTerminationEvent is GlobalSuccessEvent;
-                compositeEpisodeStatistics.steps = globalTerminationEvent.btStep;
+                compositeEpisodeStatistics.globalSteps = globalTerminationEvent.btStep;
 
                 foreach (var episode in episodes)
                 {
@@ -140,7 +140,7 @@ public class CompositeEpisodeEvaluator
 
         List<EpisodeStatistic> episodes = compositeEpisodeStatistics.actionStatistics[action].episodes;
         var previousEpisodeStatistics = episodes[episodes.Count - 2];  // necessarily the previous episode of that action
-        previousEpisodeStatistics.accInfo = new ACCViolatedInfo { name = acc, stepsToRecover = stepsToRecover, recovered = successfullyRecovered };
+        previousEpisodeStatistics.accInfo = new ACCViolatedInfo { accName = acc, accStepsToRecover = stepsToRecover, accRecovered = successfullyRecovered };
 
         episode.accName = acc;  // not necessary, already set before
         episode.accStepsToRecover = stepsToRecover;
