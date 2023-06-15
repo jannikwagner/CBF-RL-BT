@@ -3,6 +3,7 @@ import json
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 runId = "testRunId"
 
@@ -23,9 +24,6 @@ class Statistics:
     max_global_steps: int
     mean_global_steps: float
     std_global_steps: float
-
-
-# print(os.listdir())
 
 
 def load_repr1_to_eps(filePath):
@@ -73,14 +71,10 @@ def load_repr1_to_eps(filePath):
 
 eps_df = load_repr1_to_eps(filePath)
 
-# print(eps_df)
-# print(eps_df.columns)
-
 actions = eps_df.action.unique()
-# print(actions)
 accs = eps_df.query("terminationCause == 1").groupby("action").accName.unique()
-# print(accs)
 print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
+
 assert eps_df.query("terminationCause == 1")[
     eps_df.query("terminationCause == 1").accName.isnull()
 ].empty  # otherwise there exist acc violations that are not properly tracked
@@ -101,10 +95,9 @@ stats = Statistics(
     comp_eps_df.globalSteps.std(),
 )
 print(stats)
-# plt.hist(comp_eps_df.globalSteps)
-# plt.show()
 
-for action in actions:
+
+def print_action_summary(eps_df, action):
     print(action)
     action_df = eps_df.query("action == @action")
     print(action_df.terminationCause.value_counts())
@@ -116,3 +109,47 @@ for action in actions:
     print("mean local steps:", action_df.localSteps.mean())
     print("std local steps:", action_df.localSteps.std())
     print()
+
+
+# for action in actions:
+#     print_action_summary(eps_df, action)
+
+
+filePath2 = f"evaluation/stats/{runId}/statisticsWCBF.json"
+eps_df2 = load_repr1_to_eps(filePath2)
+
+
+def get_acc_violation_rate(eps_df, actions):
+    local_success_rate = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        local_success_rate.append((action_df.terminationCause == 1).mean())
+    return local_success_rate
+
+
+acc_violation_rates = {
+    "WOCBF": get_acc_violation_rate(eps_df, actions),
+    "WCBF": get_acc_violation_rate(eps_df2, actions),
+}
+
+
+x = np.arange(len(actions))  # the label locations
+width = 0.25  # the width of the bars
+multiplier = 0
+
+fig, ax = plt.subplots(layout="constrained")
+
+for attribute, measurement in acc_violation_rates.items():
+    offset = width * multiplier
+    rects = ax.bar(x + offset, measurement, width, label=attribute)
+    ax.bar_label(rects, padding=3)
+    multiplier += 1
+
+# Add some text for labels, title and custom x-axis tick labels, etc.
+ax.set_ylabel("acc violation rate")
+ax.set_title("ACC violation rates")
+ax.set_xticks(x + width, actions)
+ax.legend(loc="upper left", ncols=3)
+# ax.set_ylim(0, 1)
+
+plt.show()
