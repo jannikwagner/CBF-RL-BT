@@ -1,9 +1,9 @@
 import dataclasses
+import json
+
 import matplotlib.pyplot as plt
 import numpy as np
-
 import pandas as pd
-import json
 
 
 action_termination_cause = [
@@ -177,3 +177,24 @@ def get_num_eps_per_action(eps_df: pd.DataFrame, actions):
         avg_eps = action_df.groupby("compositeEpisodeNumber").count().terminationCause
         eps_per_action_list.append(avg_eps)
     return eps_per_action_list
+
+
+def gather_statistics(comp_eps_df):
+    stats = Statistics(
+        comp_eps_df.globalSuccess.mean(),
+        comp_eps_df.globalSteps.min(),
+        comp_eps_df.globalSteps.max(),
+        comp_eps_df.globalSteps.mean(),
+        comp_eps_df.globalSteps.std(),
+    )
+
+    return stats
+
+
+def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):
+    steps_per_action_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        avg_eps = action_df.groupby("compositeEpisodeNumber").localSteps.sum().mean()
+        steps_per_action_list.append(avg_eps)
+    return steps_per_action_list

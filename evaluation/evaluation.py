@@ -1,13 +1,14 @@
-import pandas as pd
 from helpers import (
-    boxplot_per_action,
+    load_repr1_to_eps,
+    gather_statistics,
+    print_action_summary,
     get_acc_violation_rate,
     get_avg_num_eps_per_action,
     get_comp_eps_df,
     get_num_eps_per_action,
-    load_repr1_to_eps,
-    Statistics,
+    get_avg_total_steps_per_action,
     plot_per_action,
+    boxplot_per_action,
 )
 
 
@@ -23,21 +24,18 @@ actions = eps_df_wcbf.action.unique()
 accs = eps_df_wcbf.query("terminationCause == 1").groupby("action").accName.unique()
 # print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
 
+comp_eps_df_wcbf = get_comp_eps_df(eps_df_wcbf)
+comp_eps_df_wocbf = get_comp_eps_df(eps_df_wocbf)
 
-comp_eps_df = get_comp_eps_df(eps_df_wcbf)
-# print(comp_eps_df)
-stats = Statistics(
-    comp_eps_df.globalSuccess.mean(),
-    comp_eps_df.globalSteps.min(),
-    comp_eps_df.globalSteps.max(),
-    comp_eps_df.globalSteps.mean(),
-    comp_eps_df.globalSteps.std(),
-)
-print(stats)
+stats_wcbf = gather_statistics(comp_eps_df_wcbf)
+stats_wocbf = gather_statistics(comp_eps_df_wocbf)
 
+print(stats_wcbf)
+print(stats_wocbf)
 
-# for action in actions:
-#     print_action_summary(eps_df, action)
+for action in actions:
+    print_action_summary(eps_df_wcbf, action)
+    print_action_summary(eps_df_wocbf, action)
 
 
 acc_violation_rates = {
@@ -45,11 +43,9 @@ acc_violation_rates = {
     "WOCBF": get_acc_violation_rate(eps_df_wocbf, actions),
 }
 
-
-ylabel = "acc violation rate"
-title = "ACC violation rates"
-
-plot_per_action(actions, acc_violation_rates, ylabel, title)
+plot_per_action(
+    actions, acc_violation_rates, "acc violation rate", "ACC violation rates"
+)
 
 
 eps_per_action = {
@@ -57,17 +53,7 @@ eps_per_action = {
     "WOCBF": get_avg_num_eps_per_action(eps_df_wocbf, actions),
 }
 
-
 plot_per_action(actions, eps_per_action, "Episodes", "Episodes per action")
-
-
-def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):
-    steps_per_action_list = []
-    for action in actions:
-        action_df = eps_df.query("action == @action")
-        avg_eps = action_df.groupby("compositeEpisodeNumber").localSteps.sum().mean()
-        steps_per_action_list.append(avg_eps)
-    return steps_per_action_list
 
 
 steps_per_action = {
@@ -83,8 +69,6 @@ eps_data_per_action = {
     "WOCBF": get_num_eps_per_action(eps_df_wocbf, actions),
 }
 
-
-ylabel = "# episodes"
-title = "Episodes per composite episode"
-
-boxplot_per_action(actions, eps_data_per_action, ylabel, title)
+boxplot_per_action(
+    actions, eps_data_per_action, "# episodes", "Episodes per composite episode"
+)
