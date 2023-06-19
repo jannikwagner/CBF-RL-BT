@@ -1,10 +1,13 @@
 import dataclasses
 import json
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
+
+COLORS = list(mcolors.TABLEAU_COLORS.values())
 
 action_termination_cause = [
     "PostConditionReached",
@@ -133,26 +136,33 @@ def boxplot_per_action(actions, datas, ylabel, title):
     x = np.arange(len(actions))  # the label locations
     width = 0.33  # the width of the bars
     multiplier = 0
+    bps_list = []
 
     fig, ax = plt.subplots(layout="constrained")
 
-    for attribute, data in datas.items():
+    for i, (attribute, data) in enumerate(datas.items()):
         offset = width * multiplier
         # print(data)
-        rects = ax.boxplot(
+        bps = ax.boxplot(
             data,
             positions=x + offset,
             widths=width * 0.9,
             labels=[attribute] * len(data),
-        )  # , showfliers=False)
-        ax.set_label(rects)
+            notch=True,
+            patch_artist=True,
+            showfliers=True,
+            boxprops=dict(facecolor=COLORS[i]),
+        )
+        bps_list.append(bps)
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     ax.set_xticks(x + width / 2 * (len(datas) - 1), actions)
-    ax.legend(loc="upper left", ncols=3)
+    ax.legend(
+        [bps["boxes"][0] for bps in bps_list], datas.keys(), loc="upper left", ncols=3
+    )
     # ax.set_ylim(0, 1)
 
     plt.show()
