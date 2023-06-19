@@ -13,29 +13,19 @@ from helpers import (
 
 run_id = "testRunId"
 
+file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF.json"
+eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
+
 file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
+eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
 
-action_termination_cause = [
-    "PostConditionReached",
-    "ACCViolated",
-    "LocalReset",
-    "GlobalReset",
-]
+actions = eps_df_wcbf.action.unique()
+accs = eps_df_wcbf.query("terminationCause == 1").groupby("action").accName.unique()
+# print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
 
 
-eps_df = load_repr1_to_eps(file_path_wocbf)
-
-actions = eps_df.action.unique()
-accs = eps_df.query("terminationCause == 1").groupby("action").accName.unique()
-print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
-
-assert eps_df.query("terminationCause == 1")[
-    eps_df.query("terminationCause == 1").accName.isnull()
-].empty  # otherwise there exist acc violations that are not properly tracked
-
-
-comp_eps_df = get_comp_eps_df(eps_df)
-print(comp_eps_df)
+comp_eps_df = get_comp_eps_df(eps_df_wcbf)
+# print(comp_eps_df)
 stats = Statistics(
     comp_eps_df.globalSuccess.mean(),
     comp_eps_df.globalSteps.min(),
@@ -50,13 +40,9 @@ print(stats)
 #     print_action_summary(eps_df, action)
 
 
-file_path2 = f"evaluation/stats/{run_id}/statisticsWCBF.json"
-eps_df2 = load_repr1_to_eps(file_path2)
-
-
 acc_violation_rates = {
-    "WOCBF": get_acc_violation_rate(eps_df, actions),
-    "WCBF": get_acc_violation_rate(eps_df2, actions),
+    "WCBF": get_acc_violation_rate(eps_df_wcbf, actions),
+    "WOCBF": get_acc_violation_rate(eps_df_wocbf, actions),
 }
 
 
@@ -67,8 +53,8 @@ plot_per_action(actions, acc_violation_rates, ylabel, title)
 
 
 eps_per_action = {
-    "WOCBF": get_avg_num_eps_per_action(eps_df, actions),
-    "WCBF": get_avg_num_eps_per_action(eps_df2, actions),
+    "WCBF": get_avg_num_eps_per_action(eps_df_wcbf, actions),
+    "WOCBF": get_avg_num_eps_per_action(eps_df_wocbf, actions),
 }
 
 
@@ -85,16 +71,16 @@ def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):
 
 
 steps_per_action = {
-    "WOCBF": get_avg_total_steps_per_action(eps_df, actions),
-    "WCBF": get_avg_total_steps_per_action(eps_df2, actions),
+    "WCBF": get_avg_total_steps_per_action(eps_df_wcbf, actions),
+    "WOCBF": get_avg_total_steps_per_action(eps_df_wocbf, actions),
 }
 
 plot_per_action(actions, steps_per_action, "Steps", "Steps per action")
 
 
 eps_data_per_action = {
-    "WOCBF": get_num_eps_per_action(eps_df, actions),
-    "WCBF": get_num_eps_per_action(eps_df2, actions),
+    "WCBF": get_num_eps_per_action(eps_df_wcbf, actions),
+    "WOCBF": get_num_eps_per_action(eps_df_wocbf, actions),
 }
 
 

@@ -6,6 +6,14 @@ import pandas as pd
 import json
 
 
+action_termination_cause = [
+    "PostConditionReached",
+    "ACCViolated",
+    "LocalReset",
+    "GlobalReset",
+]
+
+
 @dataclasses.dataclass
 class Statistics:
     success_rate: float
@@ -55,6 +63,11 @@ def load_repr1_to_eps(file_path):
     eps_df.sort_values(
         by=["compositeEpisodeNumber", "localEpisodeNumber"], inplace=True
     )
+
+    assert eps_df.query("terminationCause == 1")[
+        eps_df.query("terminationCause == 1").accName.isnull()
+    ].empty  # otherwise there exist acc violations that are not properly tracked
+
     return eps_df
 
 
