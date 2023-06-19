@@ -7,7 +7,7 @@ import numpy as np
 
 run_id = "testRunId"
 
-file_path = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
+file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
 
 action_termination_cause = [
     "PostConditionReached",
@@ -69,7 +69,7 @@ def load_repr1_to_eps(file_path):
     return eps_df
 
 
-eps_df = load_repr1_to_eps(file_path)
+eps_df = load_repr1_to_eps(file_path_wocbf)
 
 actions = eps_df.action.unique()
 accs = eps_df.query("terminationCause == 1").groupby("action").accName.unique()
@@ -133,23 +133,23 @@ acc_violation_rates = {
 }
 
 
-def plot_per_action(actions, acc_violation_rates, ylabel, title):
+def plot_per_action(actions, means, ylabel, title):
     x = np.arange(len(actions))  # the label locations
-    width = 0.25  # the width of the bars
+    width = 0.33  # the width of the bars
     multiplier = 0
 
     fig, ax = plt.subplots(layout="constrained")
 
-    for attribute, measurement in acc_violation_rates.items():
+    for attribute, measurement in means.items():
         offset = width * multiplier
-        rects = ax.bar(x + offset, measurement, width, label=attribute)
+        rects = ax.bar(x + offset, measurement, width * 0.9, label=attribute)
         ax.bar_label(rects, padding=3)
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.set_xticks(x + width, actions)
+    ax.set_xticks(x + width / 2 * (len(means) - 1), actions)
     ax.legend(loc="upper left", ncols=3)
     # ax.set_ylim(0, 1)
 
@@ -199,3 +199,54 @@ steps_per_action = {
 }
 
 plot_per_action(actions, steps_per_action, "Steps", "Steps per action")
+
+
+def get_eps_per_action(eps_df, actions):
+    eps_per_action_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        avg_eps = action_df.groupby("compositeEpisodeNumber").count().terminationCause
+        eps_per_action_list.append(avg_eps)
+    return eps_per_action_list
+
+
+eps_data_per_action = {
+    "WOCBF": get_eps_per_action(eps_df, actions),
+    "WCBF": get_eps_per_action(eps_df2, actions),
+}
+
+
+def boxplot_per_action(actions, datas, ylabel, title):
+    # TODO: add labels
+    x = np.arange(len(actions))  # the label locations
+    width = 0.33  # the width of the bars
+    multiplier = 0
+
+    fig, ax = plt.subplots(layout="constrained")
+
+    for attribute, data in datas.items():
+        offset = width * multiplier
+        # print(data)
+        rects = ax.boxplot(
+            data,
+            positions=x + offset,
+            widths=width * 0.9,
+            labels=[attribute] * len(data),
+        )  # , showfliers=False)
+        ax.set_label(rects, attribute)
+        multiplier += 1
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xticks(x + width / 2 * (len(datas) - 1), actions)
+    ax.legend(loc="upper left", ncols=3)
+    # ax.set_ylim(0, 1)
+
+    plt.show()
+
+
+ylabel = "# episodes"
+title = "Episodes per composite episode"
+
+boxplot_per_action(actions, eps_data_per_action, ylabel, title)
