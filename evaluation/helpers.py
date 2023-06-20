@@ -107,9 +107,9 @@ def plot_per_action(actions, means, ylabel: str, title: str):
 
     fig, ax = plt.subplots(layout="constrained")
 
-    for attribute, measurement in means.items():
+    for attribute, data in means.items():
         offset = width * multiplier
-        rects = ax.bar(x + offset, measurement, width * 0.9, label=attribute)
+        rects = ax.bar(x + offset, data, width * 0.9, label=attribute)
         ax.bar_label(rects, padding=3)
         multiplier += 1
 
@@ -206,5 +206,14 @@ def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):
     for action in actions:
         action_df = eps_df.query("action == @action")
         avg_eps = action_df.groupby("compositeEpisodeNumber").localSteps.sum().mean()
+        steps_per_action_list.append(avg_eps)
+    return steps_per_action_list
+
+
+def get_total_steps_per_action(eps_df: pd.DataFrame, actions):
+    steps_per_action_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        avg_eps = action_df.groupby("compositeEpisodeNumber").localSteps.sum()
         steps_per_action_list.append(avg_eps)
     return steps_per_action_list

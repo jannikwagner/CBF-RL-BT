@@ -2,11 +2,12 @@ from helpers import (
     load_repr1_to_eps,
     gather_statistics,
     print_action_summary,
+    get_comp_eps_df,
     get_acc_violation_rate,
     get_avg_num_eps_per_action,
-    get_comp_eps_df,
     get_num_eps_per_action,
     get_avg_total_steps_per_action,
+    get_total_steps_per_action,
     plot_per_action,
     boxplot_per_action,
 )
@@ -48,7 +49,6 @@ acc_violation_rates = {
     "WCBF": get_acc_violation_rate(eps_df_wcbf, actions),
     "WOCBF": get_acc_violation_rate(eps_df_wocbf, actions),
 }
-
 plot_per_action(
     actions, acc_violation_rates, "acc violation rate", "ACC violation rates"
 )
@@ -58,23 +58,31 @@ avg_eps_per_action = {
     "WCBF": get_avg_num_eps_per_action(eps_df_wcbf, actions),
     "WOCBF": get_avg_num_eps_per_action(eps_df_wocbf, actions),
 }
-
-plot_per_action(actions, avg_eps_per_action, "Episodes", "Episodes per action")
-
+plot_per_action(
+    actions, avg_eps_per_action, "# episodes", "Episodes per composite episode"
+)
 
 eps_data_per_action = {
     "WCBF": get_num_eps_per_action(eps_df_wcbf, actions),
     "WOCBF": get_num_eps_per_action(eps_df_wocbf, actions),
 }
-
 boxplot_per_action(
     actions, eps_data_per_action, "# episodes", "Episodes per composite episode"
 )
 
 
-steps_per_action = {
+avg_steps_per_action = {
     "WCBF": get_avg_total_steps_per_action(eps_df_wcbf, actions),
     "WOCBF": get_avg_total_steps_per_action(eps_df_wocbf, actions),
 }
+plot_per_action(
+    actions, avg_steps_per_action, "Steps", "Total steps per composite episode"
+)
 
-plot_per_action(actions, steps_per_action, "Steps", "Steps per action")
+steps_per_action = {
+    "WCBF": get_total_steps_per_action(eps_df_wcbf, actions),
+    "WOCBF": get_total_steps_per_action(eps_df_wocbf, actions),
+}
+boxplot_per_action(
+    actions, steps_per_action, "Steps", "Total steps per composite episode"
+)
