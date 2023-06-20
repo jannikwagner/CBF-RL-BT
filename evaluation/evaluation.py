@@ -8,6 +8,7 @@ from helpers import (
     get_num_eps_per_action,
     get_avg_total_steps_per_action,
     get_total_steps_per_action,
+    global_boxplot,
     plot_per_action,
     boxplot_per_action,
 )
@@ -34,10 +35,8 @@ stats_wocbf = gather_statistics(comp_eps_df_wocbf)
 print(stats_wcbf)
 print(stats_wocbf)
 
-global_steps = {
-    "Global Steps": [comp_eps_df_wcbf.globalSteps, comp_eps_df_wocbf.globalSteps]
-}
-boxplot_per_action(["WCBF", "WOCBF"], global_steps, "Global Steps", "Global Steps")
+global_steps = [comp_eps_df_wcbf.globalSteps, comp_eps_df_wocbf.globalSteps]
+global_boxplot(["WCBF", "WOCBF"], global_steps, "steps", "Global Steps")
 
 
 # for action in actions:
