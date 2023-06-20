@@ -124,7 +124,6 @@ def plot_per_action(actions, means, ylabel: str, title: str):
 
 
 def boxplot_per_action(actions, datas, ylabel, title):
-    # TODO: add labels
     x = np.arange(len(actions))  # the label locations
     width = 1 / (len(datas) + 1)  # the width of the bars
     multiplier = 0
@@ -134,12 +133,10 @@ def boxplot_per_action(actions, datas, ylabel, title):
 
     for i, (attribute, data) in enumerate(datas.items()):
         offset = width * multiplier
-        # print(data)
         bps = ax.boxplot(
             data,
             positions=x + offset,
             widths=width * 0.9,
-            labels=[attribute] * len(data),
             patch_artist=True,
             boxprops=dict(facecolor=COLORS[i]),
             medianprops=dict(color="black"),
@@ -159,7 +156,34 @@ def boxplot_per_action(actions, datas, ylabel, title):
     ax.legend(
         [bps["boxes"][0] for bps in bps_list], datas.keys(), loc="upper left", ncols=3
     )
-    # ax.set_ylim(0, 1)
+
+    plt.show()
+
+
+def global_boxplot(labels, data, ylabel, title):
+    x = np.arange(len(labels))  # the label locations
+    width = 0.5  # the width of the bars
+
+    fig, ax = plt.subplots(layout="constrained")
+
+    bps = ax.boxplot(
+        data,
+        positions=x,
+        widths=width,
+        patch_artist=True,
+        boxprops=dict(facecolor=COLORS[0]),
+        medianprops=dict(color="black"),
+        showfliers=True,
+        showmeans=True,
+        meanline=True,
+        notch=True,
+        bootstrap=1000,
+    )
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xticks(x, labels, rotation=45, fontsize=8)
 
     plt.show()
 
