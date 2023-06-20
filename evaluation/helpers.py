@@ -180,19 +180,8 @@ def get_acc_violation_rate(eps_df: pd.DataFrame, actions):
     return local_success_rate
 
 
-def get_avg_num_eps_per_action(eps_df: pd.DataFrame, actions):
-    # eps_per_action = eps_df.groupby(["action", "compositeEpisodeNumber"]).count().terminationCause.reset_index("compositeEpisodeNumber").groupby("action").terminationCause.mean()
-    eps_per_action_list = []
-    for action in actions:
-        action_df = eps_df.query("action == @action")
-        avg_eps = (
-            action_df.groupby("compositeEpisodeNumber").terminationCause.count().mean()
-        )
-        eps_per_action_list.append(avg_eps)
-    return eps_per_action_list
-
-
 def get_num_eps_per_action(eps_df: pd.DataFrame, actions):
+    # eps_per_action = eps_df.groupby(["action", "compositeEpisodeNumber"]).count().terminationCause.reset_index("compositeEpisodeNumber").groupby("action").terminationCause
     eps_per_action_list = []
     for action in actions:
         action_df = eps_df.query("action == @action")
@@ -201,13 +190,8 @@ def get_num_eps_per_action(eps_df: pd.DataFrame, actions):
     return eps_per_action_list
 
 
-def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):
-    steps_per_action_list = []
-    for action in actions:
-        action_df = eps_df.query("action == @action")
-        avg_eps = action_df.groupby("compositeEpisodeNumber").localSteps.sum().mean()
-        steps_per_action_list.append(avg_eps)
-    return steps_per_action_list
+def get_avg_num_eps_per_action(eps_df: pd.DataFrame, actions):
+    return [eps.mean() for eps in get_num_eps_per_action(eps_df, actions)]
 
 
 def get_total_steps_per_action(eps_df: pd.DataFrame, actions):
@@ -217,3 +201,7 @@ def get_total_steps_per_action(eps_df: pd.DataFrame, actions):
         avg_eps = action_df.groupby("compositeEpisodeNumber").localSteps.sum()
         steps_per_action_list.append(avg_eps)
     return steps_per_action_list
+
+
+def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):
+    return [steps.mean() for steps in get_total_steps_per_action(eps_df, actions)]
