@@ -140,10 +140,14 @@ def boxplot_per_action(actions, datas, ylabel, title):
             positions=x + offset,
             widths=width * 0.9,
             labels=[attribute] * len(data),
-            notch=True,
             patch_artist=True,
-            showfliers=True,
             boxprops=dict(facecolor=COLORS[i]),
+            medianprops=dict(color="black"),
+            showfliers=True,
+            showmeans=True,
+            meanline=True,
+            notch=True,
+            bootstrap=1000,
         )
         bps_list.append(bps)
         multiplier += 1
