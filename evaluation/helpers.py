@@ -100,14 +100,6 @@ def print_action_summary(eps_df, action):
     print()
 
 
-def get_acc_violation_rate(eps_df: pd.DataFrame, actions):
-    local_success_rate = []
-    for action in actions:
-        action_df = eps_df.query("action == @action")
-        local_success_rate.append((action_df.terminationCause == 1).mean())
-    return local_success_rate
-
-
 def plot_per_action(actions, means, ylabel: str, title: str):
     x = np.arange(len(actions))  # the label locations
     width = 0.33  # the width of the bars
@@ -168,27 +160,6 @@ def boxplot_per_action(actions, datas, ylabel, title):
     plt.show()
 
 
-def get_avg_num_eps_per_action(eps_df: pd.DataFrame, actions):
-    # eps_per_action = eps_df.groupby(["action", "compositeEpisodeNumber"]).count().terminationCause.reset_index("compositeEpisodeNumber").groupby("action").terminationCause.mean()
-    eps_per_action_list = []
-    for action in actions:
-        action_df = eps_df.query("action == @action")
-        avg_eps = (
-            action_df.groupby("compositeEpisodeNumber").count().terminationCause.mean()
-        )
-        eps_per_action_list.append(avg_eps)
-    return eps_per_action_list
-
-
-def get_num_eps_per_action(eps_df: pd.DataFrame, actions):
-    eps_per_action_list = []
-    for action in actions:
-        action_df = eps_df.query("action == @action")
-        avg_eps = action_df.groupby("compositeEpisodeNumber").count().terminationCause
-        eps_per_action_list.append(avg_eps)
-    return eps_per_action_list
-
-
 def gather_statistics(comp_eps_df):
     stats = Statistics(
         comp_eps_df.globalSuccess.mean(),
@@ -199,6 +170,35 @@ def gather_statistics(comp_eps_df):
     )
 
     return stats
+
+
+def get_acc_violation_rate(eps_df: pd.DataFrame, actions):
+    local_success_rate = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        local_success_rate.append((action_df.terminationCause == 1).mean())
+    return local_success_rate
+
+
+def get_avg_num_eps_per_action(eps_df: pd.DataFrame, actions):
+    # eps_per_action = eps_df.groupby(["action", "compositeEpisodeNumber"]).count().terminationCause.reset_index("compositeEpisodeNumber").groupby("action").terminationCause.mean()
+    eps_per_action_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        avg_eps = (
+            action_df.groupby("compositeEpisodeNumber").terminationCause.count().mean()
+        )
+        eps_per_action_list.append(avg_eps)
+    return eps_per_action_list
+
+
+def get_num_eps_per_action(eps_df: pd.DataFrame, actions):
+    eps_per_action_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        avg_eps = action_df.groupby("compositeEpisodeNumber").terminationCause.count()
+        eps_per_action_list.append(avg_eps)
+    return eps_per_action_list
 
 
 def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):

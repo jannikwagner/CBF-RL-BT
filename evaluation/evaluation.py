@@ -54,20 +54,12 @@ plot_per_action(
 )
 
 
-eps_per_action = {
+avg_eps_per_action = {
     "WCBF": get_avg_num_eps_per_action(eps_df_wcbf, actions),
     "WOCBF": get_avg_num_eps_per_action(eps_df_wocbf, actions),
 }
 
-plot_per_action(actions, eps_per_action, "Episodes", "Episodes per action")
-
-
-steps_per_action = {
-    "WCBF": get_avg_total_steps_per_action(eps_df_wcbf, actions),
-    "WOCBF": get_avg_total_steps_per_action(eps_df_wocbf, actions),
-}
-
-plot_per_action(actions, steps_per_action, "Steps", "Steps per action")
+plot_per_action(actions, avg_eps_per_action, "Episodes", "Episodes per action")
 
 
 eps_data_per_action = {
@@ -78,3 +70,11 @@ eps_data_per_action = {
 boxplot_per_action(
     actions, eps_data_per_action, "# episodes", "Episodes per composite episode"
 )
+
+
+steps_per_action = {
+    "WCBF": get_avg_total_steps_per_action(eps_df_wcbf, actions),
+    "WOCBF": get_avg_total_steps_per_action(eps_df_wocbf, actions),
+}
+
+plot_per_action(actions, steps_per_action, "Steps", "Steps per action")
