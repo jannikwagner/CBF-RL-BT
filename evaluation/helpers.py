@@ -102,7 +102,7 @@ def print_action_summary(eps_df, action):
 
 def plot_per_action(actions, means, ylabel: str, title: str):
     x = np.arange(len(actions))  # the label locations
-    width = 0.33  # the width of the bars
+    width = 1 / (len(means) + 1)  # the width of the bars
     multiplier = 0
 
     fig, ax = plt.subplots(layout="constrained")
@@ -116,7 +116,7 @@ def plot_per_action(actions, means, ylabel: str, title: str):
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.set_xticks(x + width / 2 * (len(means) - 1), actions)
+    ax.set_xticks(x + width / 2 * (len(means) - 1), actions, rotation=45, fontsize=8)
     ax.legend(loc="upper left", ncols=3)
     # ax.set_ylim(0, 1)
 
@@ -126,7 +126,7 @@ def plot_per_action(actions, means, ylabel: str, title: str):
 def boxplot_per_action(actions, datas, ylabel, title):
     # TODO: add labels
     x = np.arange(len(actions))  # the label locations
-    width = 0.33  # the width of the bars
+    width = 1 / (len(datas) + 1)  # the width of the bars
     multiplier = 0
     bps_list = []
 
@@ -155,7 +155,7 @@ def boxplot_per_action(actions, datas, ylabel, title):
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.set_xticks(x + width / 2 * (len(datas) - 1), actions)
+    ax.set_xticks(x + width / 2 * (len(datas) - 1), actions, rotation=45, fontsize=8)
     ax.legend(
         [bps["boxes"][0] for bps in bps_list], datas.keys(), loc="upper left", ncols=3
     )
