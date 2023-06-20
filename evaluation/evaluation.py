@@ -33,9 +33,15 @@ stats_wocbf = gather_statistics(comp_eps_df_wocbf)
 print(stats_wcbf)
 print(stats_wocbf)
 
-for action in actions:
-    print_action_summary(eps_df_wcbf, action)
-    print_action_summary(eps_df_wocbf, action)
+global_steps = {
+    "Global Steps": [comp_eps_df_wcbf.globalSteps, comp_eps_df_wocbf.globalSteps]
+}
+boxplot_per_action(["WCBF", "WOCBF"], global_steps, "Global Steps", "Global Steps")
+
+
+# for action in actions:
+#     print_action_summary(eps_df_wcbf, action)
+#     print_action_summary(eps_df_wocbf, action)
 
 
 acc_violation_rates = {
