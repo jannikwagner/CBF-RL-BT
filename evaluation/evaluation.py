@@ -3,11 +3,13 @@ from helpers import (
     gather_statistics,
     print_action_summary,
     get_comp_eps_df,
-    get_acc_violation_rate,
-    get_avg_num_eps_per_action,
+    get_acc_violation_rate_per_action,
     get_num_eps_per_action,
-    get_avg_total_steps_per_action,
+    get_avg_num_eps_per_action,
     get_total_steps_per_action,
+    get_avg_total_steps_per_action,
+    get_acc_steps_to_recover,
+    get_acc_steps_to_recover_per_action,
     global_boxplot,
     plot_per_action,
     boxplot_per_action,
@@ -47,17 +49,29 @@ global_boxplot(
 )
 
 
+steps_to_recover = [
+    get_acc_steps_to_recover(eps_df_wcbf),
+    get_acc_steps_to_recover(eps_df_wocbf),
+]
+global_boxplot(["WCBF", "WOCBF"], steps_to_recover, "steps", "Steps to recover")
+
+steps_to_recover_per_action = {
+    "WCBF": get_acc_steps_to_recover_per_action(eps_df_wcbf, actions),
+    "WOCBF": get_acc_steps_to_recover_per_action(eps_df_wocbf, actions),
+}
+boxplot_per_action(actions, steps_to_recover_per_action, "steps", "Steps to recover")
+
 # for action in actions:
 #     print_action_summary(eps_df_wcbf, action)
 #     print_action_summary(eps_df_wocbf, action)
 
 
-acc_violation_rates = {
-    "WCBF": get_acc_violation_rate(eps_df_wcbf, actions),
-    "WOCBF": get_acc_violation_rate(eps_df_wocbf, actions),
+acc_violation_rates_per_action = {
+    "WCBF": get_acc_violation_rate_per_action(eps_df_wcbf, actions),
+    "WOCBF": get_acc_violation_rate_per_action(eps_df_wocbf, actions),
 }
 plot_per_action(
-    actions, acc_violation_rates, "acc violation rate", "ACC violation rates"
+    actions, acc_violation_rates_per_action, "acc violation rate", "ACC violation rates"
 )
 
 

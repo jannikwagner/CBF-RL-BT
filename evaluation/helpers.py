@@ -213,12 +213,33 @@ def gather_statistics(comp_eps_df):
     return stats
 
 
-def get_acc_violation_rate(eps_df: pd.DataFrame, actions):
+def get_acc_violation_rate_per_action(eps_df: pd.DataFrame, actions):
     local_success_rate = []
     for action in actions:
         action_df = eps_df.query("action == @action")
         local_success_rate.append((action_df.terminationCause == 1).mean())
     return local_success_rate
+
+
+def get_acc_steps_to_recover_per_action(eps_df: pd.DataFrame, actions, threshold=10):
+    # threshold is a hack to ignore erroneous acc violations
+    # TODO: fix bug that causes erroneous acc violations
+    steps_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        acc_steps_to_recover = get_acc_steps_to_recover(action_df, threshold)
+        steps_list.append(acc_steps_to_recover)
+    return steps_list
+
+
+def get_acc_steps_to_recover(eps_df, threshold=10):
+    # threshold is a hack to ignore erroneous acc violations
+    # TODO: fix bug that causes erroneous acc violations
+    acc_steps_to_recover = eps_df.query(
+        "terminationCause == 1 & accRecovered & accStepsToRecover >= @threshold"
+    ).accStepsToRecover
+
+    return acc_steps_to_recover
 
 
 def get_num_eps_per_action(eps_df: pd.DataFrame, actions):
