@@ -25,8 +25,8 @@ eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
 file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
 eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
 
-actions = eps_df_wcbf.action.unique()
-accs = eps_df_wcbf.query("terminationCause == 1").groupby("action").accName.unique()
+actions = eps_df_wocbf.action.unique()
+accs = eps_df_wocbf.query("terminationCause == 1").groupby("action").accName.unique()
 # print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
 
 comp_eps_df_wcbf = get_comp_eps_df(eps_df_wcbf)
