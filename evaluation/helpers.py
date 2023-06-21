@@ -136,6 +136,11 @@ def plot_per_action(actions, means, ylabel: str, title: str):
     plt.show()
 
 
+def boxplot_per_acc(action_acc_tuples, data, ylabel, title):
+    labels = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
+    boxplot_per_action(labels, data, ylabel, title)
+
+
 def boxplot_per_action(actions, datas, ylabel, title):
     x = np.arange(len(actions))  # the label locations
     width = 1 / (len(datas) + 1)  # the width of the bars
@@ -221,9 +226,26 @@ def get_acc_violation_rate_per_action(eps_df: pd.DataFrame, actions):
     return local_success_rate
 
 
-def get_acc_steps_to_recover_per_action(eps_df: pd.DataFrame, actions, threshold=10):
-    # threshold is a hack to ignore erroneous acc violations
-    # TODO: fix bug that causes erroneous acc violations
+ACC_STEPS_TO_RECOVER_THRESHOLD = 10
+
+
+def get_acc_steps_to_recover_per_acc(
+    eps_df: pd.DataFrame, action_acc_tuples, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD
+):
+    steps_list = []
+    for action, acc in action_acc_tuples:
+        acc_df = eps_df.query(
+            "action == @action & terminationCause == 1 & accName == @acc"
+        )
+        acc_steps_to_recover = get_acc_steps_to_recover(acc_df, threshold)
+        steps_list.append(acc_steps_to_recover)
+
+    return steps_list
+
+
+def get_acc_steps_to_recover_per_action(
+    eps_df: pd.DataFrame, actions, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD
+):
     steps_list = []
     for action in actions:
         action_df = eps_df.query("action == @action")
@@ -232,7 +254,7 @@ def get_acc_steps_to_recover_per_action(eps_df: pd.DataFrame, actions, threshold
     return steps_list
 
 
-def get_acc_steps_to_recover(eps_df, threshold=10):
+def get_acc_steps_to_recover(eps_df, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD):
     # threshold is a hack to ignore erroneous acc violations
     # TODO: fix bug that causes erroneous acc violations
     acc_steps_to_recover = eps_df.query(

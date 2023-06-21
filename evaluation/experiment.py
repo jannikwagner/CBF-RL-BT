@@ -1,4 +1,6 @@
 from helpers import (
+    boxplot_per_acc,
+    get_acc_steps_to_recover_per_acc,
     load_repr1_to_eps,
     gather_statistics,
     print_action_summary,
@@ -25,8 +27,11 @@ eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
 file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
 eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
 
-actions = eps_df_wcbf.action.unique()
-accs = eps_df_wcbf.query("terminationCause == 1").groupby("action").accName.unique()
+actions = eps_df_wocbf.action.unique()
+accs = eps_df_wocbf.query("terminationCause == 1").groupby("action").accName.unique()
+acc_dict = dict(accs)
+action_acc_tuples = [(action, acc) for action in acc_dict for acc in acc_dict[action]]
+
 # print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
 
 comp_eps_df_wcbf = get_comp_eps_df(eps_df_wcbf)
