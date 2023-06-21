@@ -83,6 +83,8 @@ def get_comp_eps_df(eps_df):
         ]
     ]
 
+    comp_eps_df.sort_values(by="compositeEpisodeNumber", inplace=True)
+
     comp_eps_df.index = comp_eps_df.compositeEpisodeNumber
 
     local_step_sum = eps_df.groupby("compositeEpisodeNumber").localSteps.sum()
