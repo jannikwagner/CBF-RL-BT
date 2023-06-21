@@ -3,11 +3,13 @@ from helpers import (
     gather_statistics,
     print_action_summary,
     get_comp_eps_df,
-    get_acc_violation_rate,
-    get_avg_num_eps_per_action,
+    get_acc_violation_rate_per_action,
     get_num_eps_per_action,
-    get_avg_total_steps_per_action,
+    get_avg_num_eps_per_action,
     get_total_steps_per_action,
+    get_avg_total_steps_per_action,
+    get_acc_steps_to_recover,
+    get_acc_steps_to_recover_per_action,
     global_boxplot,
     plot_per_action,
     boxplot_per_action,
@@ -31,9 +33,3 @@ comp_eps_df_wocbf = get_comp_eps_df(eps_df_wocbf)
 
 stats_wcbf = gather_statistics(comp_eps_df_wcbf)
 stats_wocbf = gather_statistics(comp_eps_df_wocbf)
-
-
-eps_df = eps_df_wcbf
-
-num_local_episodes = eps_df.groupby("compositeEpisodeNumber").terminationCause.count()
-print(num_local_episodes)
