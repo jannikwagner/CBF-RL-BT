@@ -136,8 +136,8 @@ def plot_per_action(actions, means, ylabel: str, title: str):
     plt.show()
 
 
-def boxplot_per_acc(accs, data, ylabel, title):
-    labels = [f"{action}.{acc}" for action in accs.index for acc in accs[action]]
+def boxplot_per_acc(action_acc_tuples, data, ylabel, title):
+    labels = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
     boxplot_per_action(labels, data, ylabel, title)
 
 
@@ -230,16 +230,15 @@ ACC_STEPS_TO_RECOVER_THRESHOLD = 10
 
 
 def get_acc_steps_to_recover_per_acc(
-    eps_df: pd.DataFrame, accs, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD
+    eps_df: pd.DataFrame, action_acc_tuples, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD
 ):
     steps_list = []
-    for action in accs.index:
-        for acc in accs[action]:
-            acc_df = eps_df.query(
-                "action == @action & terminationCause == 1 & accName == @acc"
-            )
-            acc_steps_to_recover = get_acc_steps_to_recover(acc_df, threshold)
-            steps_list.append(acc_steps_to_recover)
+    for action, acc in action_acc_tuples:
+        acc_df = eps_df.query(
+            "action == @action & terminationCause == 1 & accName == @acc"
+        )
+        acc_steps_to_recover = get_acc_steps_to_recover(acc_df, threshold)
+        steps_list.append(acc_steps_to_recover)
 
     return steps_list
 
