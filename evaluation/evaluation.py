@@ -38,6 +38,14 @@ print(stats_wocbf)
 global_steps = [comp_eps_df_wcbf.globalSteps, comp_eps_df_wocbf.globalSteps]
 global_boxplot(["WCBF", "WOCBF"], global_steps, "steps", "Global Steps")
 
+local_episodes_count = [
+    comp_eps_df_wcbf.localEpisodesCount,
+    comp_eps_df_wocbf.localEpisodesCount,
+]
+global_boxplot(
+    ["WCBF", "WOCBF"], local_episodes_count, "# episodes", "Local episodes count"
+)
+
 
 # for action in actions:
 #     print_action_summary(eps_df_wcbf, action)
