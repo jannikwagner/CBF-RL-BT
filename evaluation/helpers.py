@@ -257,6 +257,7 @@ def get_avg_num_eps_per_action(eps_df: pd.DataFrame, actions):
 
 
 def get_total_steps_per_action(eps_df: pd.DataFrame, actions):
+    # summed up local steps (episode lengths) within a composite episode per action
     steps_per_action_list = []
     for action in actions:
         action_df = eps_df.query("action == @action")
@@ -267,3 +268,12 @@ def get_total_steps_per_action(eps_df: pd.DataFrame, actions):
 
 def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):
     return [steps.mean() for steps in get_total_steps_per_action(eps_df, actions)]
+
+
+def get_local_steps_per_action(eps_df: pd.DataFrame, actions):
+    steps_per_action_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        avg_eps = action_df.localSteps
+        steps_per_action_list.append(avg_eps)
+    return steps_per_action_list
