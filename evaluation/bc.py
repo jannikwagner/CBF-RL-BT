@@ -1,13 +1,24 @@
 from dataclasses import dataclass
 from typing import Sequence
 
-@dataclass
-class Condition:
-    name: str
 
+class Node:
+    pass
+class ExecutionNode(Node):
+    pass
 @dataclass
-class Action:
+class Condition(ExecutionNode):
     name: str
+@dataclass
+class Action(ExecutionNode):
+    name: str
+@dataclass
+class CompositeNode(Node):
+    children: Sequence[Node]
+class SequenceNode(CompositeNode):
+    pass
+class Fallback(CompositeNode):
+    pass
 
 C_B2 = Condition("B2 pressed")
 C_PB = Condition("Past bridge")
@@ -47,6 +58,37 @@ ppas = [
     PPA(C_UP, ( ), A_MUP),
 ]
 
+ppas2 = [
+    PPA(C_B2, (C_PB, ), A_MB2),
+    PPA(C_PB, (C_OB, ), A_MOB),
+    PPA(C_OB, (C_B1, C_T2, C_UP, ), A_MTB),
+    PPA(C_B1, (C_T1, C_UP, ), A_MB1),
+    PPA(C_T2, ( ), A_MT2),
+    PPA(C_T1, ( ), A_MT1),
+    PPA(C_UP, ( ), A_MUP),
+]
+
+ppas3 = [
+    PPA(C_B2, (C_PB, ), A_MB2),
+    PPA(C_PB, (C_OB, ), A_MOB),
+    PPA(C_OB, (C_T2, C_UP, ), A_MTB),
+    PPA(C_B1, (C_T1, C_UP, ), A_MB1),
+    PPA(C_T2, (C_B1, ), A_MT2),
+    PPA(C_T1, ( ), A_MT1),
+    PPA(C_UP, ( ), A_MUP),
+]
+
+# current
+ppas4 = [
+    PPA(C_B2, (C_B1, C_T2, C_UP, C_PB, ), A_MB2),
+    PPA(C_B1, (C_T1, C_UP, ), A_MB1),
+    PPA(C_T2, ( ), A_MT2),
+    PPA(C_UP, ( ), A_MUP),
+    PPA(C_T1, ( ), A_MT1),
+    PPA(C_OB, ( ), A_MTB),
+    PPA(C_PB, (C_OB, ), A_MOB),
+]
+
 def build_tree(goal: Condition, ppas: Sequence[PPA]):
     ppa = [ppa for ppa in ppas if ppa.postcondition == goal][0]
     precondition_trees = [build_tree(precondition, ppas) for precondition in ppa.preconditions]
@@ -67,4 +109,6 @@ def print_tree(tree: tuple, depth=0):
     else:
         raise NotImplementedError
 
-print_tree(build_tree(C_B2, ppas))
+print_tree(build_tree(C_B2, ppas2))
+print_tree(build_tree(C_B2, ppas3))
+print_tree(build_tree(C_B2, ppas4))
