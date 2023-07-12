@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from typing import Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -113,35 +114,53 @@ def print_action_summary(eps_df, action):
     print()
 
 
-def plot_per_action(actions, means, ylabel: str, title: str):
+def plot_per_action(
+    actions: Sequence[str],
+    labels: Sequence[str],
+    values: Sequence,
+    ylabel: str,
+    title: str,
+):
     x = np.arange(len(actions))  # the label locations
-    width = 1 / (len(means) + 1)  # the width of the bars
+    width = 1 / (len(values) + 1)  # the width of the bars
     multiplier = 0
 
     fig, ax = plt.subplots(layout="constrained")
 
-    for attribute, data in means.items():
+    for label, data in zip(labels, values):
         offset = width * multiplier
-        rects = ax.bar(x + offset, data, width * 0.9, label=attribute)
+        rects = ax.bar(x + offset, data, width * 0.9, label=label)
         ax.bar_label(rects, padding=3)
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.set_xticks(x + width / 2 * (len(means) - 1), actions, rotation=45, fontsize=8)
+    ax.set_xticks(x + width / 2 * (len(values) - 1), actions, rotation=45, fontsize=8)
     ax.legend(loc="upper left", ncols=3)
     # ax.set_ylim(0, 1)
 
     plt.show()
 
 
-def boxplot_per_acc(action_acc_tuples, data, ylabel, title):
-    labels = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
-    boxplot_per_action(labels, data, ylabel, title)
+def boxplot_per_acc(
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    labels: Sequence[str],
+    data: Sequence,
+    ylabel: str,
+    title: str,
+):
+    action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
+    boxplot_per_action(action_accs, labels, data, ylabel, title)
 
 
-def boxplot_per_action(actions, datas, ylabel, title):
+def boxplot_per_action(
+    actions: Sequence[str],
+    labels: Sequence[str],
+    datas: Sequence,
+    ylabel: str,
+    title: str,
+):
     x = np.arange(len(actions))  # the label locations
     width = 1 / (len(datas) + 1)  # the width of the bars
     multiplier = 0
@@ -149,7 +168,7 @@ def boxplot_per_action(actions, datas, ylabel, title):
 
     fig, ax = plt.subplots(layout="constrained")
 
-    for i, (attribute, data) in enumerate(datas.items()):
+    for i, (label, data) in enumerate(zip(labels, datas)):
         offset = width * multiplier
         bps = ax.boxplot(
             data,
@@ -171,14 +190,12 @@ def boxplot_per_action(actions, datas, ylabel, title):
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     ax.set_xticks(x + width / 2 * (len(datas) - 1), actions, rotation=45, fontsize=8)
-    ax.legend(
-        [bps["boxes"][0] for bps in bps_list], datas.keys(), loc="upper left", ncols=3
-    )
+    ax.legend([bps["boxes"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
 
     plt.show()
 
 
-def global_boxplot(labels, data, ylabel, title):
+def global_boxplot(labels: Sequence[str], data: Sequence, ylabel: str, title: str):
     x = np.arange(len(labels))  # the label locations
     width = 0.5  # the width of the bars
 
