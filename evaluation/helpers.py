@@ -154,6 +154,18 @@ def boxplot_per_acc(
     boxplot_per_action(action_accs, labels, data, ylabel, title)
 
 
+BOXPLOT_SETTINGS = dict(
+    patch_artist=True,
+    medianprops=dict(color="black"),
+    showfliers=True,
+    showmeans=True,
+    meanline=True,
+    meanprops=dict(color="red"),
+    notch=True,
+    bootstrap=1000,
+)
+
+
 def boxplot_per_action(
     actions: Sequence[str],
     labels: Sequence[str],
@@ -168,20 +180,14 @@ def boxplot_per_action(
 
     fig, ax = plt.subplots(layout="constrained")
 
-    for i, (label, data) in enumerate(zip(labels, datas)):
+    for i, data in enumerate(datas):
         offset = width * multiplier
         bps = ax.boxplot(
             data,
             positions=x + offset,
             widths=width * 0.9,
-            patch_artist=True,
             boxprops=dict(facecolor=COLORS[i]),
-            medianprops=dict(color="black"),
-            showfliers=True,
-            showmeans=True,
-            meanline=True,
-            notch=True,
-            bootstrap=1000,
+            **BOXPLOT_SETTINGS,
         )
         bps_list.append(bps)
         multiplier += 1
@@ -205,14 +211,8 @@ def global_boxplot(labels: Sequence[str], data: Sequence, ylabel: str, title: st
         data,
         positions=x,
         widths=width,
-        patch_artist=True,
         boxprops=dict(facecolor=COLORS[0]),
-        medianprops=dict(color="black"),
-        showfliers=True,
-        showmeans=True,
-        meanline=True,
-        notch=True,
-        bootstrap=1000,
+        **BOXPLOT_SETTINGS,
     )
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
