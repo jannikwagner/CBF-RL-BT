@@ -114,6 +114,17 @@ def print_action_summary(eps_df, action):
     print()
 
 
+def plot_per_acc(
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    labels: Sequence[str],
+    values: Sequence,
+    ylabel: str,
+    title: str,
+):
+    action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
+    plot_per_action(action_accs, labels, values, ylabel, title)
+
+
 def plot_per_action(
     actions: Sequence[str],
     labels: Sequence[str],
@@ -235,11 +246,30 @@ def gather_statistics(comp_eps_df):
     return stats
 
 
-def get_acc_violation_rate_per_action(eps_df: pd.DataFrame, actions):
+def get_acc_violation_rate(eps_df: pd.DataFrame):
+    return (eps_df.terminationCause == 1).mean()
+
+
+def get_acc_violation_rate_per_action(eps_df: pd.DataFrame, actions: Sequence[str]):
     local_success_rate = []
     for action in actions:
         action_df = eps_df.query("action == @action")
-        local_success_rate.append((action_df.terminationCause == 1).mean())
+        local_success_rate.append(get_acc_violation_rate(action_df))
+    return local_success_rate
+
+
+def get_acc_violation_rate_per_acc(
+    eps_df: pd.DataFrame, action_acc_tuples: Sequence[Tuple[str, str],]
+):
+    local_success_rate = []
+    for action, acc in action_acc_tuples:
+        num_eps_with_this_action = len(eps_df.query("action == @action"))
+        num_eps_with_this_action_and_this_acc_violation = len(
+            eps_df.query("action == @action & terminationCause == 1 & accName == @acc")
+        )
+        local_success_rate.append(
+            num_eps_with_this_action_and_this_acc_violation / num_eps_with_this_action
+        )
     return local_success_rate
 
 
@@ -247,7 +277,9 @@ ACC_STEPS_TO_RECOVER_THRESHOLD = 0
 
 
 def get_acc_steps_to_recover_per_acc(
-    eps_df: pd.DataFrame, action_acc_tuples, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD
+    eps_df: pd.DataFrame,
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    threshold=ACC_STEPS_TO_RECOVER_THRESHOLD,
 ):
     steps_list = []
     for action, acc in action_acc_tuples:

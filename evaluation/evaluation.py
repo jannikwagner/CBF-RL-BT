@@ -3,17 +3,20 @@ from helpers import (
     gather_statistics,
     print_action_summary,
     get_comp_eps_df,
+    get_acc_violation_rate,
     get_acc_violation_rate_per_action,
+    get_acc_violation_rate_per_acc,
     get_num_eps_per_action,
     get_avg_num_eps_per_action,
     get_total_steps_per_action,
     get_avg_total_steps_per_action,
     get_acc_steps_to_recover,
     get_acc_steps_to_recover_per_action,
-    get_local_steps_per_action,
     get_acc_steps_to_recover_per_acc,
-    global_boxplot,
+    get_local_steps_per_action,
     plot_per_action,
+    plot_per_acc,
+    global_boxplot,
     boxplot_per_action,
     boxplot_per_acc,
 )
@@ -45,13 +48,14 @@ stats = [gather_statistics(comp_eps_df) for comp_eps_df in comp_eps_dfs]
 print(stats)
 
 global_steps = [comp_eps_df.globalSteps for comp_eps_df in comp_eps_dfs]
-global_boxplot(labels, global_steps, "steps", "Global Steps")
+global_boxplot(labels, global_steps, "steps", "Global Steps (Composite episode length)")
 
 local_episodes_count = [comp_eps_df.localEpisodesCount for comp_eps_df in comp_eps_dfs]
 global_boxplot(labels, local_episodes_count, "# episodes", "Local episodes count")
 
 
 steps_to_recover = [get_acc_steps_to_recover(eps_df) for eps_df in eps_dfs]
+print(steps_to_recover)
 global_boxplot(labels, steps_to_recover, "steps", "Steps to recover")
 
 steps_to_recover_per_action = [
@@ -73,6 +77,8 @@ boxplot_per_acc(
 #     print_action_summary(eps_df_wcbf, action)
 #     print_action_summary(eps_df_wocbf, action)
 
+acc_violation_rates = [get_acc_violation_rate(eps_df) for eps_df in eps_dfs]
+print(acc_violation_rates)
 
 acc_violation_rates_per_action = [
     get_acc_violation_rate_per_action(eps_df, actions) for eps_df in eps_dfs
@@ -85,28 +91,55 @@ plot_per_action(
     "ACC violation rates",
 )
 
+acc_violation_rates_per_acc = [
+    get_acc_violation_rate_per_acc(eps_df, action_acc_tuples) for eps_df in eps_dfs
+]
+plot_per_acc(
+    action_acc_tuples,
+    labels,
+    acc_violation_rates_per_acc,
+    "acc violation rate",
+    "ACC violation rates",
+)
 
-avg_eps_per_action = [get_avg_num_eps_per_action(eps_df, actions) for eps_df in eps_dfs]
+
+avg_num_eps_per_action = [
+    get_avg_num_eps_per_action(eps_df, actions) for eps_df in eps_dfs
+]
 plot_per_action(
-    actions, labels, avg_eps_per_action, "# episodes", "Episodes per composite episode"
+    actions,
+    labels,
+    avg_num_eps_per_action,
+    "# episodes",
+    "Episodes per composite episode",
 )
 
-eps_data_per_action = [get_num_eps_per_action(eps_df, actions) for eps_df in eps_dfs]
+num_eps_per_action = [get_num_eps_per_action(eps_df, actions) for eps_df in eps_dfs]
 boxplot_per_action(
-    actions, labels, eps_data_per_action, "# episodes", "Episodes per composite episode"
+    actions, labels, num_eps_per_action, "# episodes", "Episodes per composite episode"
 )
 
 
-avg_steps_per_action = [
+avg_total_steps_per_action = [
     get_avg_total_steps_per_action(eps_df, actions) for eps_df in eps_dfs
 ]
 plot_per_action(
-    actions, labels, avg_steps_per_action, "Steps", "Total steps per composite episode"
+    actions,
+    labels,
+    avg_total_steps_per_action,
+    "Steps",
+    "Total steps per composite episode",
 )
 
-steps_per_action = [get_total_steps_per_action(eps_df, actions) for eps_df in eps_dfs]
+total_steps_per_action = [
+    get_total_steps_per_action(eps_df, actions) for eps_df in eps_dfs
+]
 boxplot_per_action(
-    actions, labels, steps_per_action, "Steps", "Total steps per composite episode"
+    actions,
+    labels,
+    total_steps_per_action,
+    "Steps",
+    "Total steps per composite episode",
 )
 
 
