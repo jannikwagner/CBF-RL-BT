@@ -153,23 +153,53 @@ boxplot_per_action(
     actions, labels, local_steps_per_action, "steps", "Local Steps (Episode length)"
 )
 
+# unnecessary
 eps_reaching_pc_dfs = [eps_df.query("terminationCause == 0") for eps_df in eps_dfs]
+eps_not_reaching_pc_dfs = [eps_df.query("terminationCause != 0") for eps_df in eps_dfs]
 
 local_steps_reaching_pc = [eps_df.localSteps for eps_df in eps_reaching_pc_dfs]
+local_steps_not_reaching_pc = [eps_df.localSteps for eps_df in eps_not_reaching_pc_dfs]
 global_boxplot(
     labels,
-    local_steps_reaching_pc,
+    local_steps_not_reaching_pc,
     "steps",
-    "Local Steps (Episode length) of episodes reaching PC",
+    "Local Steps (Episode length) of episodes not reaching PC",
 )
 
 local_steps_reaching_pc_per_action = [
     get_local_steps_per_action(eps_df, actions) for eps_df in eps_reaching_pc_dfs
 ]
+local_steps_not_reaching_pc_per_action = [
+    get_local_steps_per_action(eps_df, actions) for eps_df in eps_not_reaching_pc_dfs
+]
 boxplot_per_action(
     actions,
     labels,
-    local_steps_reaching_pc_per_action,
+    local_steps_not_reaching_pc_per_action,
     "steps",
-    "Local Steps (Episode length) of episodes reaching PC",
+    "Local Steps (Episode length) of episodes not reaching PC",
 )
+
+# compare local steps for episodes reaching PC and episodes not reaching PC
+for i in range(len(labels)):
+    label = labels[i]
+    reaching_pc = local_steps_reaching_pc[i]
+    not_reaching_pc = local_steps_not_reaching_pc[i]
+    pc_labels = ["reaching pc", "not reaching pc"]
+    data = [reaching_pc, not_reaching_pc]
+    global_boxplot(pc_labels, data, "steps", f"Local Steps {label}")
+
+# compare local steps for episodes reaching PC and episodes not reaching PCfor i in range(labels):
+for i in range(len(labels)):
+    label = labels[i]
+    reaching_pc = local_steps_reaching_pc_per_action[i]
+    not_reaching_pc = local_steps_not_reaching_pc_per_action[i]
+    pc_labels = ["reaching pc", "not reaching pc"]
+    data = [reaching_pc, not_reaching_pc]
+    boxplot_per_action(
+        actions,
+        pc_labels,
+        data,
+        "steps",
+        f"Local Steps {label}",
+    )
