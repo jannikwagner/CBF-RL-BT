@@ -152,3 +152,24 @@ local_steps_per_action = [
 boxplot_per_action(
     actions, labels, local_steps_per_action, "steps", "Local Steps (Episode length)"
 )
+
+eps_reaching_pc_dfs = [eps_df.query("terminationCause == 0") for eps_df in eps_dfs]
+
+local_steps_reaching_pc = [eps_df.localSteps for eps_df in eps_reaching_pc_dfs]
+global_boxplot(
+    labels,
+    local_steps_reaching_pc,
+    "steps",
+    "Local Steps (Episode length) of episodes reaching PC",
+)
+
+local_steps_reaching_pc_per_action = [
+    get_local_steps_per_action(eps_df, actions) for eps_df in eps_reaching_pc_dfs
+]
+boxplot_per_action(
+    actions,
+    labels,
+    local_steps_reaching_pc_per_action,
+    "steps",
+    "Local Steps (Episode length) of episodes reaching PC",
+)
