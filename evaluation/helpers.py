@@ -226,7 +226,7 @@ def get_acc_violation_rate_per_action(eps_df: pd.DataFrame, actions):
     return local_success_rate
 
 
-ACC_STEPS_TO_RECOVER_THRESHOLD = 10
+ACC_STEPS_TO_RECOVER_THRESHOLD = 0
 
 
 def get_acc_steps_to_recover_per_acc(
