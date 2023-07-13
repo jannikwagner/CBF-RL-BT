@@ -30,7 +30,7 @@ namespace Env5
             triggerGoalDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.goalTrigger.localPosition, controller.env.goal.localPosition));
 
             // playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
-            X3DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerPastX3);
+            X3DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerX3FromLeft);
         }
 
         public override void OnActionReceived(ActionBuffers actions)

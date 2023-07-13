@@ -68,9 +68,12 @@ def load_repr1_to_eps(file_path):
         by=["compositeEpisodeNumber", "localEpisodeNumber"], inplace=True
     )
 
-    assert eps_df.query("terminationCause == 1")[
-        eps_df.query("terminationCause == 1").accName.isnull()
-    ].empty  # otherwise there exist acc violations that are not properly tracked
+    assert (
+        eps_df.query("terminationCause == 1").empty
+        or eps_df.query("terminationCause == 1")[
+            eps_df.query("terminationCause == 1").accName.isnull()
+        ].empty
+    )  # otherwise there exist acc violations that are not properly tracked
 
     return eps_df
 
@@ -168,7 +171,7 @@ def boxplot_per_acc(
 BOXPLOT_SETTINGS = dict(
     patch_artist=True,
     medianprops=dict(color="black"),
-    showfliers=True,
+    showfliers=False,
     showmeans=True,
     meanline=True,
     meanprops=dict(color="red"),

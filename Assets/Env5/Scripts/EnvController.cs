@@ -80,39 +80,62 @@ namespace Env5
             return goal.gameObject.GetComponent<CollisionDetector>().Touching(goalTrigger.gameObject);
         }
 
-        public bool TargetUp()
-        {
-            return DistanceTargetUp() == 0;
-        }
-
-        public float DistanceTargetUp()
-        {
-            var distance = target.localPosition.x - x1 - Utility.eps;
-            return Mathf.Max(distance, 0);
-        }
-        public float DistancePlayerBeforeX1()
+        public float DistancePlayerX1FromRight()
         {
             var distance = player.localPosition.x - x1 - Utility.eps;
             return Mathf.Max(distance, 0);
         }
-        public float DistancePlayerPastX3()
+        public float DistancePlayerX3FromLeft()
         {
             var distance = x3 - player.localPosition.x - Utility.eps;
             return Mathf.Max(distance, 0);
         }
-        public bool PlayerPastX3()
+        public bool PlayerRightOfX3()
         {
-            return DistancePlayerPastX3() == 0;
+            return DistancePlayerX3FromLeft() == 0;
         }
-        public bool PlayerUp()
+        public float DistancePlayerX3FromRight()
         {
-            return DistancePlayerUp() == 0;
+            var distance = player.localPosition.x - x3 - Utility.eps;
+            return Mathf.Max(distance, 0);
         }
-
+        public bool PlayerLeftOfX3()
+        {
+            return DistancePlayerX3FromRight() == 0;
+        }
+        public float DistancePlayerX1FromLeft()
+        {
+            var distance = x1 - player.localPosition.x - Utility.eps;
+            return Mathf.Max(distance, 0);
+        }
+        public bool PlayerRightOfX1()
+        {
+            return DistancePlayerX1FromLeft() == 0;
+        }
+        public float DistancePlayerBridgeFromNorth()
+        {
+            float bridgeNorthEdge = BridgeWidth / 2;
+            var distance = player.localPosition.z - bridgeNorthEdge - Utility.eps;
+            return Mathf.Max(distance, 0);
+        }
+        public float DistancePlayerBridgeFromSouth()
+        {
+            float bridgeSouthEdge = -BridgeWidth / 2;
+            var distance = bridgeSouthEdge - player.localPosition.z - Utility.eps;
+            return Mathf.Max(distance, 0);
+        }
+        public bool PlayerAboveBridge()
+        {
+            return DistancePlayerBridgeFromSouth() == 0 && DistancePlayerBridgeFromNorth() == 0 && PlayerRightOfX1();
+        }
         public float DistancePlayerUp()
         {
             var distance = elevatedGroundY + playerScale / 2f - player.localPosition.y - Utility.eps;
             return Mathf.Max(distance, 0);
+        }
+        public bool PlayerUp()
+        {
+            return DistancePlayerUp() == 0;
         }
 
         public void Initialize()

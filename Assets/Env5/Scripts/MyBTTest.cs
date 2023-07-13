@@ -65,8 +65,8 @@ namespace Env5
             var buttonPressed = new Condition("ButtonPressed", controller.env.ButtonPressed);
             var isControllingGoalTrigger = new Condition("IsControllingGoalTrigger", controller.IsControllingGoalTrigger);
             var goalPressed = new Condition("GoalPressed", controller.env.GoalPressed);
-            var onBridge = new Condition("OnBridge", controller.TouchingBridgeDown);
-            var playerPastX3 = new Condition("PlayerPastX3", controller.env.PlayerPastX3);
+            var onBridge = new Condition("OnBridge", controller.env.PlayerAboveBridge);
+            var playerPastX3 = new Condition("PlayerPastX3", controller.env.PlayerRightOfX3);
             conditions = new List<Condition> { isControllingTarget, playerUp, buttonPressed, isControllingGoalTrigger, goalPressed, onBridge, playerPastX3 };
 
             _tree = new BT(
