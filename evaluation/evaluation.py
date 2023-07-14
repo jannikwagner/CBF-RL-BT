@@ -24,23 +24,18 @@ from helpers import (
 
 run_id = "testRunId"
 
-file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF_eps1e-2_newDyn.json"
-file_path_wcbf2 = f"evaluation/stats/{run_id}/statisticsWCBF_eps1e-1_newDyn_newACC.json"
-file_path_wcbf3 = f"evaluation/stats/{run_id}/statisticsWCBF_eps1e-2_newDyn_newACC.json"
+file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF_eps1e-2.json"
 eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
-eps_df_wcbf2 = load_repr1_to_eps(file_path_wcbf2)
-print(eps_df_wcbf2)
 
-file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF_eps1e-2_newDyn.json"
+file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF_eps1e-2.json"
 eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
 
-file_paths = [file_path_wcbf, file_path_wcbf2, file_path_wcbf3]
+file_paths = [file_path_wcbf, file_path_wocbf]
 eps_dfs = [load_repr1_to_eps(file_path) for file_path in file_paths]
 
 labels = [
     "WCBF_1e-2",
-    "WCBF_1e-1_nA",
-    "WCBF_1e-2_nA",
+    "WOCBF_1e-2",
 ]
 
 actions = eps_df_wocbf.action.unique()
@@ -135,7 +130,7 @@ plot_per_action(
     labels,
     avg_total_steps_per_action,
     "Steps",
-    "Total steps per composite episode",
+    "Average total steps per composite episode",
 )
 
 total_steps_per_action = [
