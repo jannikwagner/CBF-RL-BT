@@ -61,7 +61,7 @@ class PPA:
     action: Action
 
 
-ppas = [
+ppas1 = [
     PPA(C_B2, (C_PB,), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
     PPA(
@@ -229,7 +229,7 @@ def accs_bottom_up_loop(
         node = path[-1]
         if isinstance(node, Action):
             node_accs, node_preconditions = accs_bottom_up(path)
-            accs.extend((node, node_accs, node_preconditions))
+            accs.append((node, node_accs, node_preconditions))
         if isinstance(node, ExecutionNode):
             path.pop()
             pointers.pop()
@@ -246,10 +246,19 @@ def accs_bottom_up_loop(
     return accs
 
 
-print_tree(build_tree(C_B2, ppas2))
-# print_tree(build_tree(C_B2, ppas3))
-# print_tree(build_tree(C_B2, ppas4))
+ppas = ppas4
+goal = C_B2
 
-action_acc_precondition = accs_bottom_up_loop(build_tree(C_B2, ppas2))
-for line in action_acc_precondition:
-    print(line)
+bt = build_tree(goal, ppas)
+print_tree(bt)
+print()
+
+action_acc_precondition = accs_bottom_up_loop(bt)
+# print(action_acc_precondition)
+for action, accs, preconditions in action_acc_precondition:
+    print(action)
+    print("accs:", accs)
+    print("preconditions:", preconditions)
+    print()
+    ppa = [ppa for ppa in ppas if ppa.action == action][0]
+    assert list(ppa.preconditions) == list(preconditions)
