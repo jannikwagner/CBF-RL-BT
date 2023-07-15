@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Sequence, Tuple
 
 
 class Node:
@@ -172,8 +172,6 @@ def build_tree(goal: Condition, ppas: Sequence[PPA]):
         [ppa.postcondition, SequenceNode([*precondition_trees, ppa.action])]
     )
 
-    raise NotImplementedError
-
 
 def print_tree(tree: Node, depth=0):
     prefix = "| " * depth
@@ -192,6 +190,66 @@ def print_tree(tree: Node, depth=0):
         raise NotImplementedError
 
 
+def accs_bottom_up(
+    path: Sequence[Node],
+) -> Tuple[Sequence[Condition], Sequence[Condition]]:
+    preconditions = []
+    accs = []
+    assert isinstance(path[-1], Action)
+    assert isinstance(path[0], Fallback)
+    for i, node in enumerate(path):
+        if isinstance(node, Fallback):
+            assert node.children[1] == path[i + 1]
+            assert isinstance(node.children[0], Condition)
+        elif isinstance(node, SequenceNode):
+            accs.extend(preconditions)
+            preconditions = []
+            for child in node.children:
+                if child == path[i + 1]:
+                    break
+                assert isinstance(child, (Condition, Fallback))
+                if isinstance(child, Condition):
+                    preconditions.append(child)
+                elif isinstance(child, Fallback):
+                    assert isinstance(child.children[0], Condition)
+                    preconditions.append(child.children[0])
+        else:
+            assert isinstance(node, Action)
+            assert node == path[-1]
+    return accs, preconditions
+
+
+def accs_bottom_up_loop(
+    tree: Node,
+) -> Sequence[Tuple[Action, Sequence[Condition], Sequence[Condition]]]:
+    path = [tree]
+    pointers = [0]
+    accs = []
+    while path:
+        node = path[-1]
+        if isinstance(node, Action):
+            node_accs, node_preconditions = accs_bottom_up(path)
+            accs.extend((node, node_accs, node_preconditions))
+        if isinstance(node, ExecutionNode):
+            path.pop()
+            pointers.pop()
+        elif isinstance(node, CompositeNode):
+            if pointers[-1] < len(node.children):
+                path.append(node.children[pointers[-1]])
+                pointers[-1] += 1
+                pointers.append(0)
+            else:
+                path.pop()
+                pointers.pop()
+        else:
+            raise NotImplementedError
+    return accs
+
+
 print_tree(build_tree(C_B2, ppas2))
-print_tree(build_tree(C_B2, ppas3))
-print_tree(build_tree(C_B2, ppas4))
+# print_tree(build_tree(C_B2, ppas3))
+# print_tree(build_tree(C_B2, ppas4))
+
+action_acc_precondition = accs_bottom_up_loop(build_tree(C_B2, ppas2))
+for line in action_acc_precondition:
+    print(line)
