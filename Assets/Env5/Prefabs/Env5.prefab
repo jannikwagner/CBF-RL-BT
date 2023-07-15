@@ -179,7 +179,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2240619585222286826
 Transform:
   m_ObjectHideFlags: 0
@@ -1809,7 +1809,6 @@ MonoBehaviour:
   moveToTarget: {fileID: 760492578527463795}
   pushTargetToButton: {fileID: 125194164082413185}
   moveToGoalTrigger: {fileID: 1961971100187755110}
-  pushTriggerToGoal: {fileID: 280573827063923440}
   pushTriggerToGoalNew: {fileID: 3524731210142737004}
   controller: {fileID: 2350770349054637415}
 --- !u!114 &1685125455920507372

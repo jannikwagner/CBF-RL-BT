@@ -16,7 +16,7 @@ namespace Env5
         public MoveToTarget moveToTarget;
         public PushTargetToButton pushTargetToButton;
         public MoveToGoalTrigger moveToGoalTrigger;
-        public PushTriggerToGoal pushTriggerToGoal;
+        // public PushTriggerToGoal pushTriggerToGoal;
         public PushTriggerToGoalNew pushTriggerToGoalNew;
         public PlayerController controller;
         private bool useCBF = true;
@@ -35,6 +35,7 @@ namespace Env5
 
         private void Start()
         {
+            Debug.Log("MyBTTest Start");
             var agents = new EnvBaseAgent[] { moveToTarget, pushTargetToButton, movePlayerUp, moveToGoalTrigger, moveToBridge, moveOverBridge, pushTriggerToGoalNew };
             evaluationManager = new EvaluationManager();
             foreach (var agent in agents)
@@ -55,6 +56,7 @@ namespace Env5
             var runId = "testRunId";
 
             evaluationManager.Init(this, conditions, agents, actions, runId);
+            Debug.Log("MyBTTest Start done");
         }
 
         private void InitTree()
@@ -65,8 +67,8 @@ namespace Env5
             var buttonPressed = new Condition("ButtonPressed", controller.env.ButtonPressed);
             var isControllingGoalTrigger = new Condition("IsControllingGoalTrigger", controller.IsControllingGoalTrigger);
             var goalPressed = new Condition("GoalPressed", controller.env.GoalPressed);
-            var onBridge = new Condition("OnBridge", controller.TouchingBridgeDown);
-            var playerPastX3 = new Condition("PlayerPastX3", controller.env.PlayerPastX3);
+            var onBridge = new Condition("OnBridge", controller.env.PlayerAboveBridge);
+            var playerPastX3 = new Condition("PlayerPastX3", controller.env.PlayerRightOfX3);
             conditions = new List<Condition> { isControllingTarget, playerUp, buttonPressed, isControllingGoalTrigger, goalPressed, onBridge, playerPastX3 };
 
             _tree = new BT(

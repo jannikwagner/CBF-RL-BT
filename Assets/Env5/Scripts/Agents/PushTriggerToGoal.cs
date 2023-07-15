@@ -32,7 +32,7 @@ namespace Env5
 
             // playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
             playerTargetDistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
-            X3DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerPastX3);
+            X3DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerX3FromLeft);
         }
 
         public override void OnActionReceived(ActionBuffers actions)

@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from typing import Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -67,9 +68,12 @@ def load_repr1_to_eps(file_path):
         by=["compositeEpisodeNumber", "localEpisodeNumber"], inplace=True
     )
 
-    assert eps_df.query("terminationCause == 1")[
-        eps_df.query("terminationCause == 1").accName.isnull()
-    ].empty  # otherwise there exist acc violations that are not properly tracked
+    assert (
+        eps_df.query("terminationCause == 1").empty
+        or eps_df.query("terminationCause == 1")[
+            eps_df.query("terminationCause == 1").accName.isnull()
+        ].empty
+    )  # otherwise there exist acc violations that are not properly tracked
 
     return eps_df
 
@@ -82,6 +86,19 @@ def get_comp_eps_df(eps_df):
             "globalSteps",
         ]
     ]
+
+    comp_eps_df.sort_values(by="compositeEpisodeNumber", inplace=True)
+
+    comp_eps_df.index = comp_eps_df.compositeEpisodeNumber
+
+    local_step_sum = eps_df.groupby("compositeEpisodeNumber").localSteps.sum()
+
+    local_episodes_count = eps_df.groupby(
+        "compositeEpisodeNumber"
+    ).terminationCause.count()
+
+    comp_eps_df["localStepsSum"] = local_step_sum
+    comp_eps_df["localEpisodesCount"] = local_episodes_count
 
     return comp_eps_df
 
@@ -100,31 +117,76 @@ def print_action_summary(eps_df, action):
     print()
 
 
-def plot_per_action(actions, means, ylabel: str, title: str):
+def plot_per_acc(
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    labels: Sequence[str],
+    values: Sequence,
+    ylabel: str,
+    title: str,
+):
+    action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
+    plot_per_action(action_accs, labels, values, ylabel, title)
+
+
+def plot_per_action(
+    actions: Sequence[str],
+    labels: Sequence[str],
+    values: Sequence,
+    ylabel: str,
+    title: str,
+):
     x = np.arange(len(actions))  # the label locations
-    width = 1 / (len(means) + 1)  # the width of the bars
+    width = 1 / (len(values) + 1)  # the width of the bars
     multiplier = 0
 
     fig, ax = plt.subplots(layout="constrained")
 
-    for attribute, data in means.items():
+    for label, data in zip(labels, values):
         offset = width * multiplier
-        rects = ax.bar(x + offset, data, width * 0.9, label=attribute)
+        rects = ax.bar(x + offset, data, width * 0.9, label=label)
         ax.bar_label(rects, padding=3)
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.set_xticks(x + width / 2 * (len(means) - 1), actions, rotation=45, fontsize=8)
+    ax.set_xticks(x + width / 2 * (len(values) - 1), actions, rotation=45, fontsize=8)
     ax.legend(loc="upper left", ncols=3)
     # ax.set_ylim(0, 1)
 
     plt.show()
 
 
-def boxplot_per_action(actions, datas, ylabel, title):
-    # TODO: add labels
+def boxplot_per_acc(
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    labels: Sequence[str],
+    data: Sequence,
+    ylabel: str,
+    title: str,
+):
+    action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
+    boxplot_per_action(action_accs, labels, data, ylabel, title)
+
+
+BOXPLOT_SETTINGS = dict(
+    patch_artist=True,
+    medianprops=dict(color="black"),
+    showfliers=False,
+    showmeans=True,
+    meanline=True,
+    meanprops=dict(color="red"),
+    notch=True,
+    bootstrap=1000,
+)
+
+
+def boxplot_per_action(
+    actions: Sequence[str],
+    labels: Sequence[str],
+    datas: Sequence,
+    ylabel: str,
+    title: str,
+):
     x = np.arange(len(actions))  # the label locations
     width = 1 / (len(datas) + 1)  # the width of the bars
     multiplier = 0
@@ -132,22 +194,14 @@ def boxplot_per_action(actions, datas, ylabel, title):
 
     fig, ax = plt.subplots(layout="constrained")
 
-    for i, (attribute, data) in enumerate(datas.items()):
+    for i, data in enumerate(datas):
         offset = width * multiplier
-        # print(data)
         bps = ax.boxplot(
             data,
             positions=x + offset,
             widths=width * 0.9,
-            labels=[attribute] * len(data),
-            patch_artist=True,
             boxprops=dict(facecolor=COLORS[i]),
-            medianprops=dict(color="black"),
-            showfliers=True,
-            showmeans=True,
-            meanline=True,
-            notch=True,
-            bootstrap=1000,
+            **BOXPLOT_SETTINGS,
         )
         bps_list.append(bps)
         multiplier += 1
@@ -156,10 +210,29 @@ def boxplot_per_action(actions, datas, ylabel, title):
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     ax.set_xticks(x + width / 2 * (len(datas) - 1), actions, rotation=45, fontsize=8)
-    ax.legend(
-        [bps["boxes"][0] for bps in bps_list], datas.keys(), loc="upper left", ncols=3
+    ax.legend([bps["boxes"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
+
+    plt.show()
+
+
+def global_boxplot(labels: Sequence[str], data: Sequence, ylabel: str, title: str):
+    x = np.arange(len(labels))  # the label locations
+    width = 0.5  # the width of the bars
+
+    fig, ax = plt.subplots(layout="constrained")
+
+    bps = ax.boxplot(
+        data,
+        positions=x,
+        widths=width,
+        boxprops=dict(facecolor=COLORS[0]),
+        **BOXPLOT_SETTINGS,
     )
-    # ax.set_ylim(0, 1)
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xticks(x, labels, rotation=45, fontsize=8)
 
     plt.show()
 
@@ -176,12 +249,71 @@ def gather_statistics(comp_eps_df):
     return stats
 
 
-def get_acc_violation_rate(eps_df: pd.DataFrame, actions):
+def get_acc_violation_rate(eps_df: pd.DataFrame):
+    return (eps_df.terminationCause == 1).mean()
+
+
+def get_acc_violation_rate_per_action(eps_df: pd.DataFrame, actions: Sequence[str]):
     local_success_rate = []
     for action in actions:
         action_df = eps_df.query("action == @action")
-        local_success_rate.append((action_df.terminationCause == 1).mean())
+        local_success_rate.append(get_acc_violation_rate(action_df))
     return local_success_rate
+
+
+def get_acc_violation_rate_per_acc(
+    eps_df: pd.DataFrame, action_acc_tuples: Sequence[Tuple[str, str],]
+):
+    local_success_rate = []
+    for action, acc in action_acc_tuples:
+        num_eps_with_this_action = len(eps_df.query("action == @action"))
+        num_eps_with_this_action_and_this_acc_violation = len(
+            eps_df.query("action == @action & terminationCause == 1 & accName == @acc")
+        )
+        local_success_rate.append(
+            num_eps_with_this_action_and_this_acc_violation / num_eps_with_this_action
+        )
+    return local_success_rate
+
+
+ACC_STEPS_TO_RECOVER_THRESHOLD = 0
+
+
+def get_acc_steps_to_recover_per_acc(
+    eps_df: pd.DataFrame,
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    threshold=ACC_STEPS_TO_RECOVER_THRESHOLD,
+):
+    steps_list = []
+    for action, acc in action_acc_tuples:
+        acc_df = eps_df.query(
+            "action == @action & terminationCause == 1 & accName == @acc"
+        )
+        acc_steps_to_recover = get_acc_steps_to_recover(acc_df, threshold)
+        steps_list.append(acc_steps_to_recover)
+
+    return steps_list
+
+
+def get_acc_steps_to_recover_per_action(
+    eps_df: pd.DataFrame, actions, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD
+):
+    steps_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        acc_steps_to_recover = get_acc_steps_to_recover(action_df, threshold)
+        steps_list.append(acc_steps_to_recover)
+    return steps_list
+
+
+def get_acc_steps_to_recover(eps_df, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD):
+    # threshold is a hack to ignore erroneous acc violations
+    # TODO: fix bug that causes erroneous acc violations
+    acc_steps_to_recover = eps_df.query(
+        "terminationCause == 1 & accRecovered & accStepsToRecover >= @threshold"
+    ).accStepsToRecover
+
+    return acc_steps_to_recover
 
 
 def get_num_eps_per_action(eps_df: pd.DataFrame, actions):
@@ -199,6 +331,7 @@ def get_avg_num_eps_per_action(eps_df: pd.DataFrame, actions):
 
 
 def get_total_steps_per_action(eps_df: pd.DataFrame, actions):
+    # summed up local steps (episode lengths) within a composite episode per action
     steps_per_action_list = []
     for action in actions:
         action_df = eps_df.query("action == @action")
@@ -209,3 +342,12 @@ def get_total_steps_per_action(eps_df: pd.DataFrame, actions):
 
 def get_avg_total_steps_per_action(eps_df: pd.DataFrame, actions):
     return [steps.mean() for steps in get_total_steps_per_action(eps_df, actions)]
+
+
+def get_local_steps_per_action(eps_df: pd.DataFrame, actions):
+    steps_per_action_list = []
+    for action in actions:
+        action_df = eps_df.query("action == @action")
+        avg_eps = action_df.localSteps
+        steps_per_action_list.append(avg_eps)
+    return steps_per_action_list

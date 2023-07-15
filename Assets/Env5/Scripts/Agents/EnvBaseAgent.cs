@@ -231,8 +231,9 @@ namespace Env5
             var acceleration = agent.GetAcceleration(action);
             // apply acceleration before velocity! needed to be safe because of discretization of continuous system
             // note: applying all steps accels at once is safer than actually necessary, but also simpler.
+            // 0.5 is apparently also safe
             float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
-            velocity = velocity + acceleration * deltaTime;
+            velocity = velocity + 0.5f * acceleration * deltaTime;
             var dxdt = new PosVelState { position = velocity, velocity = acceleration };
             return dxdt.ToArray();
         }
@@ -257,9 +258,9 @@ namespace Env5
         {
             var targetVelocity = agent.controller.env.target.GetComponentInParent<Rigidbody>().velocity;
             var velocity = agent.controller.rb.velocity - targetVelocity;
-            var acceleration = agent.GetAcceleration(action) + 0.5f * targetVelocity;
+            var acceleration = agent.GetAcceleration(action); // + 0.5f * targetVelocity; // not sure why I added this here            
             float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
-            velocity = velocity + acceleration * deltaTime;
+            velocity = velocity + 0.5f * acceleration * deltaTime;
             var dxdt = new PosVelState { position = velocity, velocity = acceleration };
             return dxdt.ToArray();
         }
