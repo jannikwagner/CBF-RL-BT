@@ -64,23 +64,8 @@ class PPA:
 ppas1 = [
     PPA(C_B2, (C_PB,), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
-    PPA(
-        C_OB,
-        (
-            C_B1,
-            C_T2,
-            C_UP,
-        ),
-        A_MTB,
-    ),
-    PPA(
-        C_B1,
-        (
-            C_T1,
-            C_UP,
-        ),
-        A_MB1,
-    ),
+    PPA(C_OB, (C_B1, C_T2, C_UP), A_MTB),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
     PPA(C_T2, (C_B1,), A_MT2),
     PPA(C_T1, (), A_MT1),
     PPA(C_UP, (), A_MUP),
@@ -89,23 +74,8 @@ ppas1 = [
 ppas2 = [
     PPA(C_B2, (C_PB,), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
-    PPA(
-        C_OB,
-        (
-            C_B1,
-            C_T2,
-            C_UP,
-        ),
-        A_MTB,
-    ),
-    PPA(
-        C_B1,
-        (
-            C_T1,
-            C_UP,
-        ),
-        A_MB1,
-    ),
+    PPA(C_OB, (C_B1, C_T2, C_UP), A_MTB),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
     PPA(C_T2, (), A_MT2),
     PPA(C_T1, (), A_MT1),
     PPA(C_UP, (), A_MUP),
@@ -114,22 +84,8 @@ ppas2 = [
 ppas3 = [
     PPA(C_B2, (C_PB,), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
-    PPA(
-        C_OB,
-        (
-            C_T2,
-            C_UP,
-        ),
-        A_MTB,
-    ),
-    PPA(
-        C_B1,
-        (
-            C_T1,
-            C_UP,
-        ),
-        A_MB1,
-    ),
+    PPA(C_OB, (C_T2, C_UP), A_MTB),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
     PPA(C_T2, (C_B1,), A_MT2),
     PPA(C_T1, (), A_MT1),
     PPA(C_UP, (), A_MUP),
@@ -137,24 +93,8 @@ ppas3 = [
 
 # current
 ppas4 = [
-    PPA(
-        C_B2,
-        (
-            C_B1,
-            C_T2,
-            C_UP,
-            C_PB,
-        ),
-        A_MB2,
-    ),
-    PPA(
-        C_B1,
-        (
-            C_T1,
-            C_UP,
-        ),
-        A_MB1,
-    ),
+    PPA(C_B2, (C_B1, C_T2, C_UP, C_PB), A_MB2),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
     PPA(C_T2, (), A_MT2),
     PPA(C_UP, (), A_MUP),
     PPA(C_T1, (), A_MT1),
@@ -246,19 +186,57 @@ def accs_bottom_up_loop(
     return accs
 
 
-ppas = ppas4
 goal = C_B2
 
-bt = build_tree(goal, ppas)
-print_tree(bt)
-print()
 
-action_acc_precondition = accs_bottom_up_loop(bt)
 # print(action_acc_precondition)
-for action, accs, preconditions in action_acc_precondition:
-    print(action)
-    print("accs:", accs)
-    print("preconditions:", preconditions)
-    print()
-    ppa = [ppa for ppa in ppas if ppa.action == action][0]
-    assert list(ppa.preconditions) == list(preconditions)
+def print_accs(action_acc_preconditions):
+    for action, accs, preconditions in action_acc_preconditions:
+        print(action)
+        print("accs:", accs)
+        print("preconditions:", preconditions)
+        print()
+
+
+def check_preconditions(action_acc_preconditions, ppas):
+    for action, accs, preconditions in action_acc_preconditions:
+        ppa = [ppa for ppa in ppas if ppa.action == action][0]
+        assert list(ppa.preconditions) == list(preconditions)
+
+
+desired_action_accs = [
+    (A_MB2, (C_T2, C_PB)),
+    (A_MB1, (C_T1, C_UP)),
+    (A_MT2, (C_B1,)),
+    (A_MUP, (C_T1,)),
+    (A_MUP, (C_T2, C_B1)),
+    (A_MT1, ()),
+    (A_MOB, (C_OB,)),
+    (A_MTB, (C_B1, C_UP)),
+]
+
+
+def check_accs(action_acc_preconditions, desired_action_accs):
+    for action, desired_accs in desired_action_accs:
+        satisfied = any(
+            all(
+                desired_acc in list(given_accs) + list(given_preconditions)
+                for desired_acc in desired_accs
+            )
+            for given_action, given_accs, given_preconditions in action_acc_preconditions
+            if action == given_action
+        )
+        if not satisfied:
+            print("not satisfied:", action, desired_accs)
+
+
+alternative_ppas = [ppas1, ppas2, ppas3, ppas4]
+for i, ppas in enumerate(alternative_ppas):
+    print(i + 1)
+    print(ppas)
+    bt = build_tree(goal, ppas)
+    print_tree(bt)
+    action_acc_preconditions = accs_bottom_up_loop(bt)
+    print_accs(action_acc_preconditions)
+    check_preconditions(action_acc_preconditions, ppas)
+    check_accs(action_acc_preconditions, desired_action_accs)
