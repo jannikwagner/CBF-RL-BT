@@ -224,11 +224,9 @@ namespace BTTest
         public Action(String name) : base(name) { }
         public override TaskStatus Tick()
         {
+            this.Bt.CurrentAction = this;
+
             TaskStatus status = base.Tick();
-            if (status == TaskStatus.Running)
-            {
-                this.Bt.CurrentAction = this;
-            }
             return status;
         }
     }

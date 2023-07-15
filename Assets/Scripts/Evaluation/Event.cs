@@ -41,6 +41,8 @@ public abstract class ActionTerminationEvent : ActionEvent { }
 public abstract class GlobalEvent : Event { }
 public abstract class GlobalTerminationEvent : GlobalEvent { }
 
+public class ActionStartEvent : ActionEvent { }
+
 public class PostConditionReachedEvent : ActionTerminationEvent { public string postCondition; public EventType type = EventType.PostConditionReached; }
 public class ACCViolatedEvent : ActionTerminationEvent { public string acc; public EventType type = EventType.ACCViolated; }
 public class LocalResetEvent : ActionTerminationEvent { public EventType type = EventType.LocalReset; }

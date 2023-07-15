@@ -32,6 +32,7 @@ public abstract class BaseAgent : Agent
         base.OnEpisodeBegin();
         actionCount = 0;
         Debug.Log(this + ": OnEpisodeBegin");
+        evaluationManager.AddEvent(new ActionStartEvent { localStep = actionCount });
     }
 
     public void Act()

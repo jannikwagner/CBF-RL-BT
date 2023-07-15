@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BTTest;
+using UnityEngine;
 
 public class CompositeEpisodeEvaluator
 {
@@ -13,6 +14,8 @@ public class CompositeEpisodeEvaluator
 
     public CompositeEpisodeStatistic EvaluateCompositeEpisode(List<Event> events)
     {
+        string currentAction = null;
+
         // first representation
         var compositeEpisodeStatistics = new CompositeEpisodeStatistic(actions);
         compositeEpisodeStatistics.compositeEpisodeNumber = events[0].compositeEpisodeNumber;
@@ -25,9 +28,35 @@ public class CompositeEpisodeEvaluator
 
         foreach (Event _event in events)
         {
-            if (_event is ActionTerminationEvent)
+            if (_event is ActionStartEvent)
+            {
+                if (currentAction != null)
+                {
+                    Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
+                    Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
+                    throw new Exception("ActionStartEvent received while another action is still active");
+
+                }
+                var actionStartEvent = _event as ActionStartEvent;
+                currentAction = actionStartEvent.action;
+            }
+
+            else if (_event is ActionTerminationEvent)
             {
                 var actionTerminationEvent = _event as ActionTerminationEvent;
+                if (currentAction == null)
+                {
+                    Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
+                    Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
+                    throw new Exception("ActionTerminationEvent received while no action is active");
+                }
+                if (currentAction != actionTerminationEvent.action)
+                {
+                    Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
+                    Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
+                    throw new Exception("ActionTerminationEvent received for action other than the currently active one");
+                }
+                currentAction = null;
 
                 var episodeStatistics = new EpisodeStatistic { localSteps = actionTerminationEvent.localStep, reward = actionTerminationEvent.reward, localEpisodeNumber = localEpisodeNumber };
                 string action = actionTerminationEvent.action;
@@ -134,15 +163,13 @@ public class CompositeEpisodeEvaluator
 
     private static void trackACCRecovery(CompositeEpisodeStatistic compositeEpisodeStatistics, string action, string acc, int stepsToRecover, bool successfullyRecovered, EpisodeStatistic episodeStatistic, EpisodeRecord episode)
     {
+        // representation 1
         ACCViolatedStatistic aCCViolatedStatistics = compositeEpisodeStatistics.actionStatistics[action].accViolatedStatistics[acc];
         aCCViolatedStatistics.recovered.Add(successfullyRecovered);
         aCCViolatedStatistics.stepsToRecover.Add(stepsToRecover);
-
-        List<EpisodeStatistic> episodes = compositeEpisodeStatistics.actionStatistics[action].episodes;
-        // if successfully recovered, the second last (because the episode where it is recovered is last),
-        // if not, the last, because we did not have the action again, otherwise it would have recovered
         episodeStatistic.accInfo = new ACCViolatedInfo { accName = acc, accStepsToRecover = stepsToRecover, accRecovered = successfullyRecovered };
 
+        // representation 2
         episode.accName = acc;  // not necessary, already set before
         episode.accStepsToRecover = stepsToRecover;
         episode.accRecovered = successfullyRecovered;
