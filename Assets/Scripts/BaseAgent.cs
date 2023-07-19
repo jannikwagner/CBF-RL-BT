@@ -7,6 +7,7 @@ using UnityEngine;
 public abstract class BaseAgent : Agent
 {
     public IEvaluationManager evaluationManager;
+    [HideInInspector]
     public bool useCBF = true;
     private int actionCount;
     private int maxActions = 5000;

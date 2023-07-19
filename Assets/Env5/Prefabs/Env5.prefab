@@ -1811,6 +1811,7 @@ MonoBehaviour:
   moveToGoalTrigger: {fileID: 1961971100187755110}
   pushTriggerToGoalNew: {fileID: 3524731210142737004}
   controller: {fileID: 2350770349054637415}
+  useCBF: 1
 --- !u!114 &1685125455920507372
 MonoBehaviour:
   m_ObjectHideFlags: 0
