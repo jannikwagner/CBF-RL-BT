@@ -167,7 +167,7 @@ C_B1 = Condition("B1 pressed")
 C_UP = Condition("Up")
 C_T2 = Condition("Controlling T2")
 C_T1 = Condition("Controlling T1")
-C_D = Condition("Done")
+C_D = Condition("Done?")
 
 conditions = [C_B2, C_PB, C_OB, C_B1, C_UP, C_T2, C_T1]
 
@@ -178,7 +178,7 @@ A_MT1 = Action("Move to T1")
 A_MUP = Action("Move up")
 A_MOB = Action("Move over bridge")
 A_MTB = Action("Move to bridge")
-A_D = Action("Done")
+A_D = Action("Done!")
 
 actions = [A_MB2, A_MB1, A_MT2, A_MT1, A_MUP, A_MOB, A_MTB]
 
@@ -191,7 +191,7 @@ ppas1 = [
     PPA(C_T1, (), A_MT1),
     PPA(C_UP, (), A_MUP),
 ]
-
+# compared to `ppas1`: remove C_B1 from precondition of A_MT2, because it is an ACC anyways.
 ppas2 = [
     PPA(C_B2, (C_PB,), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
@@ -201,7 +201,7 @@ ppas2 = [
     PPA(C_T1, (), A_MT1),
     PPA(C_UP, (), A_MUP),
 ]
-
+# incorrect
 ppas3 = [
     PPA(C_B2, (C_PB,), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
@@ -211,18 +211,36 @@ ppas3 = [
     PPA(C_T1, (), A_MT1),
     PPA(C_UP, (), A_MUP),
 ]
-
 # current
 ppas4 = [
     PPA(C_B2, (C_B1, C_T2, C_UP, C_PB), A_MB2),
+    PPA(C_PB, (C_OB,), A_MOB),
+    PPA(C_OB, (), A_MTB),
     PPA(C_B1, (C_T1, C_UP), A_MB1),
     PPA(C_T2, (), A_MT2),
-    PPA(C_UP, (), A_MUP),
     PPA(C_T1, (), A_MT1),
-    PPA(C_OB, (), A_MTB),
-    PPA(C_PB, (C_OB,), A_MOB),
+    PPA(C_UP, (), A_MUP),
 ]
-
+ppas41 = [
+    PPA(C_B2, (C_B1, C_T2, C_PB), A_MB2),
+    PPA(C_PB, (C_OB,), A_MOB),
+    PPA(C_OB, (C_UP,), A_MTB),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
+    PPA(C_T2, (), A_MT2),
+    PPA(C_T1, (), A_MT1),
+    PPA(C_UP, (), A_MUP),
+]
+# most general, incorrect
+ppas42 = [
+    PPA(C_B2, (C_T2, C_PB), A_MB2),
+    PPA(C_PB, (C_OB,), A_MOB),
+    PPA(C_OB, (C_B1, C_UP), A_MTB),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
+    PPA(C_T2, (), A_MT2),
+    PPA(C_T1, (), A_MT1),
+    PPA(C_UP, (), A_MUP),
+]
+# has duplicated sub tree, C_B1 as precondition of A_MT2 is unreasonable
 ppas5 = [
     PPA(C_B2, (C_T2, C_PB), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
@@ -232,8 +250,18 @@ ppas5 = [
     PPA(C_T1, (), A_MT1),
     PPA(C_UP, (), A_MUP),
 ]
-
+# nice tree, only C_B1 as precondition of A_MB2 is questionable but necessary in this tree
 ppas6 = [
+    PPA(C_B2, (C_B1, C_T2, C_PB), A_MB2),
+    PPA(C_PB, (C_OB,), A_MOB),
+    PPA(C_OB, (C_UP,), A_MTB),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
+    PPA(C_T2, (), A_MT2),
+    PPA(C_T1, (), A_MT1),
+    PPA(C_UP, (), A_MUP),
+]
+# multiple goals, reasonable preconditions
+ppas_multiple_goals = [
     PPA(C_D, (C_B1, C_B2), A_D),
     PPA(C_B2, (C_T2, C_PB), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
@@ -244,19 +272,19 @@ ppas6 = [
     PPA(C_UP, (), A_MUP),
 ]
 
-
-desired_action_accs = [
-    (A_MB2, (C_T2, C_PB)),
+# all the accs that logically make sense. Those happen to be exactly the accs/preconditions of the current bt (`accs4`)
+logically_required_accs = [
+    (A_MB2, (C_B1, C_T2, C_UP, C_PB)),
     (A_MB1, (C_T1, C_UP)),
     (A_MT2, (C_B1,)),
     (A_MUP, (C_T1,)),
-    (A_MUP, (C_T2, C_B1)),
+    (A_MUP, (C_B1, C_T2)),
     (A_MT1, ()),
-    (A_MOB, (C_OB,)),
-    (A_MTB, (C_B1, C_UP)),
+    (A_MOB, (C_B1, C_T2, C_UP, C_OB)),
+    (A_MTB, (C_B1, C_T2, C_UP)),
 ]
-
-desired_action_accs = [
+# the actually required accs given the current environment
+actually_required_accs = [
     (A_MB2, (C_PB,)),
     (A_MB1, (C_UP,)),
     (A_MT2, (C_B1,)),
@@ -267,7 +295,9 @@ desired_action_accs = [
     (A_MTB, (C_B1, C_UP)),
 ]
 
-alternative_ppas = [ppas1, ppas2, ppas3, ppas4, ppas5, ppas6]
+alternative_ppas = [ppas1, ppas2, ppas3, ppas4, ppas5, ppas6, ppas_multiple_goals]
+# favourites
+alternative_ppas = [ppas6, ppas_multiple_goals]
 
 for i, ppas in enumerate(alternative_ppas):
     goal = ppas[0].postcondition
@@ -281,4 +311,4 @@ for i, ppas in enumerate(alternative_ppas):
     print("accs")
     print_accs(action_acc_preconditions)
     check_preconditions(action_acc_preconditions, ppas)
-    check_accs(action_acc_preconditions, desired_action_accs)
+    check_accs(action_acc_preconditions, logically_required_accs)
