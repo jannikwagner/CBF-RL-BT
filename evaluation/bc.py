@@ -40,6 +40,7 @@ C_B1 = Condition("B1 pressed")
 C_UP = Condition("Up")
 C_T2 = Condition("Controlling T2")
 C_T1 = Condition("Controlling T1")
+C_D = Condition("Done")
 
 conditions = [C_B2, C_PB, C_OB, C_B1, C_UP, C_T2, C_T1]
 
@@ -50,6 +51,7 @@ A_MT1 = Action("Move to T1")
 A_MUP = Action("Move up")
 A_MOB = Action("Move over bridge")
 A_MTB = Action("Move to bridge")
+A_D = Action("Done")
 
 actions = [A_MB2, A_MB1, A_MT2, A_MT1, A_MUP, A_MOB, A_MTB]
 
@@ -100,6 +102,27 @@ ppas4 = [
     PPA(C_T1, (), A_MT1),
     PPA(C_OB, (), A_MTB),
     PPA(C_PB, (C_OB,), A_MOB),
+]
+
+ppas5 = [
+    PPA(C_B2, (C_T2, C_PB), A_MB2),
+    PPA(C_PB, (C_OB,), A_MOB),
+    PPA(C_OB, (C_B1, C_UP), A_MTB),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
+    PPA(C_T2, (C_B1,), A_MT2),
+    PPA(C_T1, (), A_MT1),
+    PPA(C_UP, (), A_MUP),
+]
+
+ppas6 = [
+    PPA(C_D, (C_B1, C_B2), A_D),
+    PPA(C_B2, (C_T2, C_PB), A_MB2),
+    PPA(C_PB, (C_OB,), A_MOB),
+    PPA(C_OB, (C_UP,), A_MTB),
+    PPA(C_B1, (C_T1, C_UP), A_MB1),
+    PPA(C_T2, (), A_MT2),
+    PPA(C_T1, (), A_MT1),
+    PPA(C_UP, (), A_MUP),
 ]
 
 
@@ -186,9 +209,6 @@ def accs_bottom_up_loop(
     return accs
 
 
-goal = C_B2
-
-
 # print(action_acc_precondition)
 def print_accs(action_acc_preconditions):
     for action, accs, preconditions in action_acc_preconditions:
@@ -215,6 +235,17 @@ desired_action_accs = [
     (A_MTB, (C_B1, C_UP)),
 ]
 
+desired_action_accs = [
+    (A_MB2, (C_PB,)),
+    (A_MB1, (C_UP,)),
+    (A_MT2, (C_B1,)),
+    (A_MUP, ()),
+    (A_MUP, (C_B1,)),
+    (A_MT1, ()),
+    (A_MOB, (C_OB,)),
+    (A_MTB, (C_B1, C_UP)),
+]
+
 
 def check_accs(action_acc_preconditions, desired_action_accs):
     for action, desired_accs in desired_action_accs:
@@ -230,13 +261,25 @@ def check_accs(action_acc_preconditions, desired_action_accs):
             print("not satisfied:", action, desired_accs)
 
 
-alternative_ppas = [ppas1, ppas2, ppas3, ppas4]
+def print_ppas(ppas):
+    for ppa in ppas:
+        print("postcondition:", ppa.postcondition)
+        print("preconditions:", ppa.preconditions)
+        print("action:", ppa.action)
+        print()
+
+
+alternative_ppas = [ppas1, ppas2, ppas3, ppas4, ppas5, ppas6]
 for i, ppas in enumerate(alternative_ppas):
+    goal = ppas[0].postcondition
     print(i + 1)
-    print(ppas)
+    print("goal:", goal)
+    print("ppas")
+    print_ppas(ppas)
     bt = build_tree(goal, ppas)
     print_tree(bt)
     action_acc_preconditions = accs_bottom_up_loop(bt)
+    print("accs")
     print_accs(action_acc_preconditions)
     check_preconditions(action_acc_preconditions, ppas)
     check_accs(action_acc_preconditions, desired_action_accs)

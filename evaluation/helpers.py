@@ -175,8 +175,9 @@ BOXPLOT_SETTINGS = dict(
     showmeans=True,
     meanline=True,
     meanprops=dict(color="red"),
-    notch=True,
-    bootstrap=1000,
+    # whis=[5, 95]
+    # notch=True,
+    # bootstrap=1000,
 )
 
 
@@ -207,6 +208,7 @@ def boxplot_per_action(
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
+    # plt.yscale('log')
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     ax.set_xticks(x + width / 2 * (len(datas) - 1), actions, rotation=45, fontsize=8)

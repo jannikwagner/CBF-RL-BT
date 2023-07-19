@@ -112,8 +112,8 @@ plot_per_action(
     actions,
     labels,
     avg_num_eps_per_action,
-    "# episodes",
-    "Episodes per composite episode",
+    "mean # episodes",
+    "Average number of episodes per composite episode",
 )
 
 num_eps_per_action = [get_num_eps_per_action(eps_df, actions) for eps_df in eps_dfs]
