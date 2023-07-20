@@ -83,7 +83,7 @@ namespace Env5
 
         private void StopControlTarget(bool press = false)
         {
-            if (IsControllingTarget())
+            if (IsControllingT1())
             {
                 ControlOther controlOther = this.GetComponent<ControlOther>();
                 controlOther.enabled = false;
@@ -95,7 +95,7 @@ namespace Env5
             }
         }
 
-        public bool IsControllingTarget()
+        public bool IsControllingT1()
         {
             ControlOther controlOther = this.GetComponent<ControlOther>();
             return controlOther.enabled && controlOther.other == env.target.GetComponent<Rigidbody>();
@@ -103,7 +103,7 @@ namespace Env5
 
         private void StopControlGoalTrigger(bool press = false)
         {
-            if (IsControllingGoalTrigger())
+            if (IsControllingT2())
             {
                 ControlOther controlOther = this.GetComponent<ControlOther>();
                 controlOther.enabled = false;
@@ -115,7 +115,7 @@ namespace Env5
             }
         }
 
-        public bool IsControllingGoalTrigger()
+        public bool IsControllingT2()
         {
             ControlOther controlOther = this.GetComponent<ControlOther>();
             return controlOther.enabled && controlOther.other == env.goalTrigger.GetComponent<Rigidbody>();

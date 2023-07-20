@@ -124,7 +124,7 @@ namespace Env5
             var distance = bridgeSouthEdge - player.localPosition.z - Utility.eps;
             return Mathf.Max(distance, 0);
         }
-        public bool PlayerAboveBridge()
+        public bool PlayerOnBridge()
         {
             return DistancePlayerBridgeFromSouth() == 0 && DistancePlayerBridgeFromNorth() == 0 && PlayerRightOfX1();
         }
