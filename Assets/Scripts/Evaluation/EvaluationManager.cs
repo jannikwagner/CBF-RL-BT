@@ -5,29 +5,23 @@ using UnityEngine;
 public interface IEvaluationManager
 {
     void AddEvent(Event _event);
-    public List<Event> Events { get; }
     public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions, string runId);
 }
 
 public class EvaluationManager : IEvaluationManager
 {
     private ILogDataProvider logDataProvider;
-    private List<Event> events;
     private List<Event> currentCompositeEpisodeEvents;
     private IEnumerable<Condition> conditions;
     private IEnumerable<BaseAgent> agents;
     private IEnumerable<LearningActionAgentSwitcher> actions;
-    private List<CompositeEpisodeStatistic> statistics = new List<CompositeEpisodeStatistic>();
     private string runId;
     private string folderPath;
     private IStorageManager storageManager;
-
-    public List<Event> Events { get => events; }
-    public ILogDataProvider LogDataProvider { get => logDataProvider; set => logDataProvider = value; }
+    private bool isActive = false;
 
     public EvaluationManager()
     {
-        events = new List<Event>();
         currentCompositeEpisodeEvents = new List<Event>();
     }
 
@@ -40,14 +34,19 @@ public class EvaluationManager : IEvaluationManager
         this.runId = runId;
         folderPath = $@"evaluation/stats/{runId}";
         storageManager = new StorageManager(folderPath);
+        isActive = true;
     }
 
     public void AddEvent(Event _event)
     {
+        if (!isActive)
+        {
+            return;
+        }
         AugmentEvent(_event);
         Debug.Log(JsonUtility.ToJson(_event));
-        events.Add(_event);
         currentCompositeEpisodeEvents.Add(_event);
+        // TODO: should maybe be a method and not based on a specific type of event
         if (_event is GlobalTerminationEvent)
         {
             this.EvaluateCurrentEpisode();
@@ -60,7 +59,6 @@ public class EvaluationManager : IEvaluationManager
         var compositeEpisodeEvaluator = new CompositeEpisodeEvaluator(actions);
 
         var statistic = compositeEpisodeEvaluator.EvaluateCompositeEpisode(currentCompositeEpisodeEvents);
-        this.statistics.Add(statistic);
         this.storageManager.AddStatistic(statistic);
     }
 

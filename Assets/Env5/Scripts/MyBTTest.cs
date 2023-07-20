@@ -25,6 +25,7 @@ namespace Env5
         private int compositeEpisodeCount;
         private IEvaluationManager evaluationManager;
         List<Condition> conditions;
+        public bool evaluationActive;
 
         public int MaxSteps { get => maxSteps; set => maxSteps = value; }
 
@@ -55,7 +56,10 @@ namespace Env5
 
             var runId = "testRunId";
 
-            evaluationManager.Init(this, conditions, agents, actions, runId);
+            if (evaluationActive)
+            {
+                evaluationManager.Init(this, conditions, agents, actions, runId);
+            }
             Debug.Log("MyBTTest Start done");
         }
 
