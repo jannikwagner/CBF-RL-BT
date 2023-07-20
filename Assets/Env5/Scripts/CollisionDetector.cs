@@ -9,9 +9,9 @@ namespace Env5
         // Start is called before the first frame update
         private HashSet<string> touchedObjects = new HashSet<string>();
 
-        public bool Touching(GameObject target)
+        public bool Touching(GameObject gameObject)
         {
-            return Touching(target.tag);
+            return Touching(gameObject.tag);
         }
         public bool Touching(string tag)
         {

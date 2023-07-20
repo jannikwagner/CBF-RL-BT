@@ -7,20 +7,16 @@ namespace Env5
     public class MoveToBridge : EnvBaseAgent
     {
         private IDistanceRewarder playerBridgeDistanceRewarder;
-        private IDistanceRewarder playerTargetDistancePunisher;
-        // private IDistanceRewarder playerTriggerDistanceRewarder;
+        private IDistanceRewarder playerTrigger1DistancePunisher;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.Width * 2f);
-            // Vector3 triggerPos = controller.env.goalTrigger.localPosition;
-            // sensor.AddObservation((triggerPos - playerPos) / controller.env.width);
-            Vector3 goalPos = controller.env.goal.localPosition;
-            sensor.AddObservation((goalPos - playerPos) / controller.env.Width);
-            Vector3 targetPos = controller.env.target.localPosition;
-            Vector3 distanceToTargetObs = (targetPos - playerPos) / controller.env.Width;
-            sensor.AddObservation(distanceToTargetObs);  // should not collide
-            // sensor.AddObservation((goalPos - triggerPos) / controller.env.width);
+            Vector3 button2Pos = controller.env.button2.localPosition;
+            sensor.AddObservation((button2Pos - playerPos) / controller.env.Width);
+            Vector3 trigger1Pos = controller.env.trigger1.localPosition;
+            Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceToTrigger1Obs);  // should not collide
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
 
@@ -29,8 +25,7 @@ namespace Env5
             base.OnEpisodeBegin();
             playerBridgeDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, new Vector3(controller.env.X3, controller.env.ElevatedGroundY, controller.env.bridgeDown.transform.localPosition.z)));
 
-            // playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
-            playerTargetDistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
+            playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -41,16 +36,8 @@ namespace Env5
                 Debug.Log("Moved to bridge! PC: " + PostCondition.Name);
                 AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
-            // Debug.Log("PushTargetToButton.OnActionReceived");
-            // if (controller.DistanceToTarget() <= 1.0f)
-            // {
-            //     AddReward(rFactor / maxActions);
-            // }
 
             AddReward(playerBridgeDistanceRewarder.Reward() * 1f);
-
-            // AddReward(playerTriggerDistanceRewarder.Reward() * rFactor);
-            // AddReward(-playerTargetDistancePunisher.Reward() * 1f);
         }
     }
 }

@@ -57,7 +57,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: d09cbd8bea2714e93a98db9b34ad32c3, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 1
   m_BehaviorName: MoveToBridge
   TeamId: 0
   m_UseChildSensors: 1
@@ -138,7 +138,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: d801497dac53740a5bb3f00b3298433b, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 1
   m_BehaviorName: MovePlayerUp
   TeamId: 0
   m_UseChildSensors: 1
@@ -219,7 +219,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 73ea7d449d7b048da89490dcccce1318, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 1
   m_BehaviorName: PushTriggerToGoalNew
   TeamId: 0
   m_UseChildSensors: 1
@@ -300,7 +300,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: f2321e80abf464e2fbfd0b2a02c33278, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 1
   m_BehaviorName: PushTargetToButton
   TeamId: 0
   m_UseChildSensors: 1
@@ -509,7 +509,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: a6f1cd803276144298c1d2d79e2a90ae, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 1
   m_BehaviorName: MoveToTarget
   TeamId: 0
   m_UseChildSensors: 1
@@ -590,7 +590,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 01f8a246953c141b29e22784a81350aa, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 1
   m_BehaviorName: MoveOverBridge
   TeamId: 0
   m_UseChildSensors: 1
@@ -671,7 +671,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 5b770d79aef4a4dc89120a6fb8e019fc, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 1
   m_BehaviorName: MoveToGoalTrigger
   TeamId: 0
   m_UseChildSensors: 1
@@ -1572,7 +1572,6 @@ GameObject:
   - component: {fileID: 7481095166327812007}
   - component: {fileID: 7481095166327812003}
   - component: {fileID: 2350770349054637415}
-  - component: {fileID: 5139993652238417315}
   - component: {fileID: 5997831232032838397}
   - component: {fileID: 1685125455920507372}
   - component: {fileID: 3446715112260403477}
@@ -1694,21 +1693,6 @@ MonoBehaviour:
   player: {fileID: 7481095166327812002}
   rb: {fileID: 7481095166327812003}
   env: {fileID: 7481095166365429463}
---- !u!114 &5139993652238417315
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7481095166327812006}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cdc00f31f396499d9d0357259fc29ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveToTarget: {fileID: 760492578527463795}
-  pushTargetToButton: {fileID: 125194164082413185}
-  controller: {fileID: 2350770349054637415}
 --- !u!114 &5997831232032838397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1823,10 +1807,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 7481095166327812002}
-  button: {fileID: 7481095166044813521}
-  target: {fileID: 2866625666179830494}
-  goalTrigger: {fileID: 7481095166394033199}
-  goal: {fileID: 7481095166641309692}
+  button1: {fileID: 7481095166044813521}
+  trigger1: {fileID: 2866625666179830494}
+  trigger2: {fileID: 7481095166394033199}
+  button2: {fileID: 7481095166641309692}
   bridgeDown: {fileID: 7481095165390883636}
   bridgeUp: {fileID: 7481095165469514434}
 --- !u!1 &7481095166394033187

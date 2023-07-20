@@ -6,10 +6,10 @@ namespace Env5
     public class EnvController : MonoBehaviour
     {
         public Transform player;
-        public Transform button;
-        public Transform target;
-        public Transform goalTrigger;
-        public Transform goal;
+        public Transform button1;
+        public Transform trigger1;
+        public Transform trigger2;
+        public Transform button2;
         public GameObject bridgeDown;
         public GameObject bridgeUp;
 
@@ -50,7 +50,7 @@ namespace Env5
 
         void FixedUpdate()
         {
-            if (ButtonPressed())
+            if (Button1Pressed())
             {
                 bridgeDown.SetActive(true);
                 bridgeUp.SetActive(false);
@@ -61,23 +61,20 @@ namespace Env5
                 bridgeUp.SetActive(true);
             }
 
-            if (GoalPressed())
+            if (button2Pressed())
             {
                 Debug.Log("You win!");
             }
-            // Debug.Log(button.gameObject.GetComponent<CollisionDetector>().Pressed);
         }
 
-        public bool ButtonPressed()
+        public bool Button1Pressed()
         {
-            // return Vector3.Distance(target.position, button.position) < buttonScale;
-            return button.gameObject.GetComponent<CollisionDetector>().Touching(target.gameObject);
+            return button1.gameObject.GetComponent<CollisionDetector>().Touching(trigger1.gameObject);
         }
 
-        public bool GoalPressed()
+        public bool button2Pressed()
         {
-            // return Vector3.Distance(goalTrigger.position, goal.position) < buttonScale;
-            return goal.gameObject.GetComponent<CollisionDetector>().Touching(goalTrigger.gameObject);
+            return button2.gameObject.GetComponent<CollisionDetector>().Touching(trigger2.gameObject);
         }
 
         public float DistancePlayerX1FromRight()
@@ -145,45 +142,37 @@ namespace Env5
             x2 = x1 + Width * part2;
             x3 = x2 + Width * part3;
             x4 = x3 + Width * part4;
-            // Debug.Log($"x0: {x0}, x1: {x1}, x2: {x2}, x3: {x3}, x4: {x4}");
             height = elevatedGroundY - groundY;
 
             float minX = x0 + margin + playerScale / 2;
             float maxX = x4 - margin - playerScale / 2;
-            float maxXTarget = x3 - margin - playerScale / 2;
+            float maxXTrigger1 = x3 - margin - playerScale / 2;
             float z0 = -Width / 2;
             float z1 = Width / 2;
             float minZ = z0 + margin + playerScale / 2;
             float maxZ = z1 - margin - playerScale / 2;
             float playerY = elevatedGroundY + playerScale / 2;
             float buttonY = elevatedGroundY + buttonHeight / 2;
-            // float podiumZ1 = -podiumBredth / 2;
-            // float podiumZ2 = podiumBredth / 2;
 
             player.localPosition = new Vector3(-18, playerY, -2);
             player.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            target.localPosition = new Vector3(-15, playerY, -2);
-            target.localRotation = Quaternion.Euler(0, 0, 0);
-            goalTrigger.localPosition = new Vector3(-17, playerY, 0);
+            trigger1.localPosition = new Vector3(-15, playerY, -2);
+            trigger1.localRotation = Quaternion.Euler(0, 0, 0);
+            trigger2.localPosition = new Vector3(-17, playerY, 0);
 
-            button.localPosition = new Vector3(-12, buttonY, -2);
+            button1.localPosition = new Vector3(-12, buttonY, -2);
 
             float buttonMaxX = -8;
             float buttonTiltStartX = -20;
             float buttonSmallMaxZ = -2;
             float buttonSmallMinZ = -6;
 
-            // float buttonX = Random.Range(minX, buttonMaxX);
-            // float buttonZ = buttonX < buttonTiltStartX ? Random.Range(minZ, maxZ) : Random.Range(buttonSmallMinZ, buttonSmallMaxZ);
-            // button.localPosition = new Vector3(buttonX, elevatedGroundYTarget, buttonZ);
-            button.localPosition = new Vector3(Random.Range(x0 + buttonScale / 2, x1 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
-            goal.localPosition = new Vector3(Random.Range(x3 + buttonScale / 2, x4 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
+            button1.localPosition = new Vector3(Random.Range(x0 + buttonScale / 2, x1 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
+            button2.localPosition = new Vector3(Random.Range(x3 + buttonScale / 2, x4 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
 
             player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
-            target.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
-            goalTrigger.localPosition = new Vector3(Random.Range(minX, maxXTarget), playerY, Random.Range(minZ, maxZ));
-            // target.position = button.position;
-            // target.localPosition = Utility.SamplePosition(minX, maxXTarget, minZ, maxZ, playerY, playerY, 2f, new Vector3[] { button.localPosition });
+            trigger1.localPosition = new Vector3(Random.Range(minX, maxXTrigger1), playerY, Random.Range(minZ, maxZ));
+            trigger2.localPosition = new Vector3(Random.Range(minX, maxXTrigger1), playerY, Random.Range(minZ, maxZ));
 
             bridgeDown.SetActive(false);
             bridgeUp.SetActive(true);
@@ -192,9 +181,9 @@ namespace Env5
         {
             var playerController = player.GetComponentInParent<PlayerController>();
             playerController.StopControl();
-            // It is manually set to true in PlayerController.StopControl() when the player touches the goal or button for the BT to behave correctly.
-            button.GetComponentInParent<CollisionDetector>().ManuallyRemove(target.gameObject.tag);
-            goal.GetComponentInParent<CollisionDetector>().ManuallyRemove(goalTrigger.gameObject.tag);
+            // It is manually set to true in PlayerController.StopControl() when the player touches button2 or button1 for the BT to behave correctly.
+            button1.GetComponentInParent<CollisionDetector>().ManuallyRemove(trigger1.gameObject.tag);
+            button2.GetComponentInParent<CollisionDetector>().ManuallyRemove(trigger2.gameObject.tag);
             Initialize();
         }
     }

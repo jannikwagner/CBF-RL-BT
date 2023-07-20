@@ -6,26 +6,20 @@ namespace Env5
 {
     public class PushTargetToButton : EnvBaseAgent
     {
-        // private IDistanceRewarder playerTargetDistanceRewarder;
-        private IDistanceRewarder targetButtonDistanceRewarder;
+        private IDistanceRewarder trigger1Button1DistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.Width * 2f);
-            // Vector3 targetPos = controller.env.target.localPosition;
-            // sensor.AddObservation((targetPos - playerPos) / controller.env.width);
-            Vector3 buttonPos = controller.env.button.localPosition;
-            sensor.AddObservation((buttonPos - playerPos) / controller.env.Width);
-            // sensor.AddObservation((buttonPos - targetPos) / controller.env.width);
+            Vector3 button1Pos = controller.env.button1.localPosition;
+            sensor.AddObservation((button1Pos - playerPos) / controller.env.Width);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
 
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            targetButtonDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.target.localPosition, controller.env.button.localPosition));
-
-            // playerTargetDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
+            trigger1Button1DistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.trigger1.localPosition, controller.env.button1.localPosition));
         }
 
         public override void OnActionReceived(ActionBuffers actions)
@@ -36,14 +30,7 @@ namespace Env5
                 Debug.Log("Button pressed! PC: " + PostCondition.Name);
                 AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
             }
-            // Debug.Log("PushTargetToButton.OnActionReceived");
-            // if (controller.DistanceToTarget() <= 1.0f)
-            // {
-            //     AddReward(rFactor / maxActions);
-            // }
-            AddReward(targetButtonDistanceRewarder.Reward() * 1f);
-
-            // AddReward(playerTargetDistanceRewarder.Reward() * rFactor);
+            AddReward(trigger1Button1DistanceRewarder.Reward() * 1f);
         }
     }
 }

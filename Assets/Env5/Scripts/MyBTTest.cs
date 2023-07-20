@@ -67,9 +67,9 @@ namespace Env5
             // conditions
             var isControllingT1 = new Condition("T1", controller.IsControllingT1);
             var playerUp = new Condition("Up", controller.env.PlayerUp);
-            var b1Pressed = new Condition("B1", controller.env.ButtonPressed);
+            var b1Pressed = new Condition("B1", controller.env.Button1Pressed);
             var isControllingT2 = new Condition("T2", controller.IsControllingT2);
-            var B2Pressed = new Condition("B2", controller.env.GoalPressed);
+            var B2Pressed = new Condition("B2", controller.env.button2Pressed);
             var onBridge = new Condition("OnBridge", controller.env.PlayerOnBridge);
             var playerPastX3 = new Condition("PastBridge", controller.env.PlayerRightOfX3);
             conditions = new List<Condition> { isControllingT1, playerUp, b1Pressed, isControllingT2, B2Pressed, onBridge, playerPastX3 };
@@ -90,7 +90,7 @@ namespace Env5
                                     } ),
 
                                     new Selector("Selector", new Node[]{
-                                        new PredicateCondition("TargetUp", playerUp),
+                                        new PredicateCondition("Up", playerUp),
                                         new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
                                     } ),
 
@@ -128,143 +128,12 @@ namespace Env5
                     new Do("Success", () =>
                     {
                         Debug.Log("Success Reset!");
-                        // Debug.Log(controller.env.ButtonPressed());
-                        // Debug.Log(controller.env.GoalPressed());
                         evaluationManager.AddEvent(new GlobalSuccessEvent());
                         NextEpisode();
                         return TaskStatus.Success;
                     })
                 })
             );
-            /*
-                // _tree = new BT(
-                //     new Sequence("Root", new Node[] {
-                //         new Selector("PushTriggerToGoalSelector", new Node[] {
-                //             new PredicateCondition("TriggerAtGoal", controller.env.win),
-                //             new Sequence("PushTriggerToGoalSequence", new Node[]{
-
-                //                 new Selector("PushTargetToButtonSelector", new Node[] {
-                //                     new PredicateCondition("TargetAtButton", controller.env.ButtonPressed),
-                //                     new Sequence("PushTargetToButtonSequence", new Node[]{
-
-                //                         new Selector("MoveSelector", new Node[]{
-                //                             new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
-                //                             new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
-                //                         } ),
-
-                //                         new Selector("PushTargetUpSelector", new Node[]{
-                //                             new PredicateCondition("TargetUp", controller.env.TargetUp),
-                //                             new LearningActionWPCACC("PushTargetUp", pushTargetUp, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
-                //                         } ),
-
-                //                         new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
-                //                     }),
-                //                 }),
-
-                //                 new Selector("MoveToGoalTriggerSelector", new Node[]{
-                //                     new PredicateCondition("CloseToTrigger", controller.IsCloseToGoalTrigger),
-                //                     new LearningActionWPCACC("MoveToTrigger", moveToGoalTrigger, controller.IsCloseToGoalTrigger, new System.Func<bool>[] {controller.env.ButtonPressed}),
-                //                 }),
-
-                //                 new LearningActionWPCACC("PushTriggerToGoal", pushTriggerToGoal, controller.env.win, new System.Func<bool>[] {controller.IsCloseToGoalTrigger, controller.env.ButtonPressed})
-                //             }),
-                //         }),
-
-                //         new Do("SuccessMessage", () =>
-                //         {
-                //             Debug.Log("Success!");
-                //             return TaskStatus.Success;
-                //         })
-                //     })
-                // );
-
-                // _tree = new BT(
-                //     new Sequence("Root", new Node[] {
-                //         new Selector("PushTargetToButtonSelector", new Node[] {
-                //             new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
-                //             new Sequence("PushTargetToButtonSequence", new Node[]{
-                //                 new Selector("MoveSelector", new Node[]{
-                //                     new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
-                //                     new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
-                //                 } ),
-                //                 new Selector("PushTargetUpSelector", new Node[]{
-                //                     new PredicateCondition("TargetUp", controller.env.TargetUp),
-                //                     new LearningActionWPCACC("PushTargetUp", pushTargetUp, controller.env.TargetUp, new System.Func<bool>[] {controller.IsCloseToTarget}),
-                //                 } ),
-                //                 new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget, controller.env.TargetUp})
-                //             }),
-                //         }),
-                //         new Do("SuccessMessage", () =>
-                //         {
-                //             Debug.Log("Success!");
-                //             return TaskStatus.Success;
-                //         })
-                //     })
-                // );
-
-                // _tree = new BT(
-                //     new Sequence("Root", new Node[] {
-                //         new Selector("PushSelector", new Node[] {
-                //             new PredicateCondition("TargetAtGoal", controller.env.ButtonPressed),
-                //             new Sequence("PushSequence", new Node[]{
-                //                 new Selector("MoveSelector", new Node[]{
-                //                     new PredicateCondition("CloseToTarget", controller.IsCloseToTarget),
-                //                     new LearningActionWPC("MoveToTarget", moveToTarget, controller.IsCloseToTarget),
-                //                 } ),
-                //                 new LearningActionWPCACC("PushTargetToButton", pushTargetToButton, controller.env.ButtonPressed, new System.Func<bool>[] {controller.IsCloseToTarget})
-                //             }),
-                //         }),
-                //         new Do("SuccessMessage", () =>
-                //         {
-                //             Debug.Log("Success!");
-                //             return TaskStatus.Success;
-                //         })
-                //     })
-                // );
-
-                // int count1 = 0;
-                // int count2 = 0;
-                // _tree = new BT(
-                //     new Sequence("Root", new Node[]{
-                //         new Selector("Selector", new Node[]{
-                //             new PredicateCondition("Count1", () =>
-                //             {
-                //                 count1++;
-                //                 Debug.Log("Count1: " + count1);
-                //                 return (count1 > 5);
-                //             }),
-                //             new Do("Count2", () =>
-                //             {
-                //                 count2++;
-                //                 Debug.Log("Count2: " + count2);
-                //                 if (count2 > 10)
-                //                 {
-                //                     return TaskStatus.Success;
-                //                 }
-                //                 return TaskStatus.Running;
-                //             }),
-                //         }),
-                //         new Do("SuccessMessage", () =>
-                //         {
-                //             Debug.Log("Success!");
-                //             return TaskStatus.Success;
-                //         })
-                //     })
-                // );
-
-                // int count3 = 0;
-                // _tree = new BT(
-                //     new Sequence("Root", new Node[]{
-                //         new PredicateCondition("Switcher", () => {var condition = ++count3 % 3 != 0; Debug.Log(condition); return condition;}),
-                //         new PrintAction("CustomAction"),
-                //         new Do("SuccessMessage", () =>
-                //         {
-                //             Debug.Log("Success!");
-                //             return TaskStatus.Success;
-                //         })
-                //     })
-                // );
-            */
         }
 
         // TODO: move CBFs to learning action nodes instead of agents to be able to use the same agent with different CBFs
@@ -294,12 +163,12 @@ namespace Env5
             var pushTargetToButton_leftOfX1CBFApplicator = new DiscreteCBFApplicator(leftOfX1CBF, pushTargetToButtonPosVelDynamics, deltaTime, debug: debugCBF);
             moveToB1.CBFApplicators = new List<CBFApplicator> { pushTargetToButton_leftOfX1CBFApplicator };
 
-            var moveToGoalTriggerPlayerTargetPosVelDynamics = new PlayerTargetPosVelDynamics(moveToT2);
+            var moveToGoalTriggerPlayerTargetPosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToT2);
             var moveToGoalTrigger_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToGoalTriggerPlayerTargetPosVelDynamics, deltaTime, debug: debugCBF);
             moveToT2.CBFApplicators = new List<CBFApplicator> { moveToGoalTrigger_buttonPressedCBFApplicator };
 
             var moveToBridgePosVelDynamics = new PlayerPosVelDynamics(moveToBridge);
-            var moveToBridgePlayerTargetPosVelDynamics = new PlayerTargetPosVelDynamics(moveToBridge);
+            var moveToBridgePlayerTargetPosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToBridge);
             var moveToBridge_upBridgeCBFApplicator = new DiscreteCBFApplicator(upBridgeCBF, moveToBridgePosVelDynamics, deltaTime, debug: debugCBF);
             var moveToBridge_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToBridgePlayerTargetPosVelDynamics, deltaTime, debug: debugCBF);
             moveToBridge.CBFApplicators = new List<CBFApplicator> { moveToBridge_buttonPressedCBFApplicator, moveToBridge_upBridgeCBFApplicator };
@@ -311,12 +180,6 @@ namespace Env5
             var pushTriggerToGoalNewPosVelDynamics = new PlayerPosVelDynamics(moveToB2);
             var pushTriggerToGoalNew_pastBridgeCBFApplicator = new DiscreteCBFApplicator(rightOfX3CBF, pushTriggerToGoalNewPosVelDynamics, deltaTime, debug: debugCBF);
             moveToB2.CBFApplicators = new List<CBFApplicator> { pushTriggerToGoalNew_pastBridgeCBFApplicator };
-
-            // var upBridgeCBFPosVelDynamics = new PlayerPosVelDynamics(pushTriggerToGoal);
-            // var upBridgeCBFApplicator = new DiscreteCBFApplicator(upBridgeCBF, upBridgeCBFPosVelDynamics, debug: debugCBF);
-            // var buttonPressedCBFPosVelDynamics2 = new PlayerTargetPosVelDynamics(pushTriggerToGoal);
-            // var buttonPressedCBFApplicator2 = new DiscreteCBFApplicator(buttonPressedCBF, buttonPressedCBFPosVelDynamics2, debug: debugCBF);
-            // pushTriggerToGoal.CBFApplicators = new List<CBFApplicator> { buttonPressedCBFApplicator2, upBridgeCBFApplicator };
         }
 
         void FixedUpdate()

@@ -6,43 +6,41 @@ namespace Env5
 {
     public class MoveToGoalTrigger : EnvBaseAgent
     {
-        private IDistanceRewarder playerTriggerDistanceRewarder;
-        private IDistanceRewarder playerTargetDistancePunisher;
+        private IDistanceRewarder playerTrigger2DistanceRewarder;
+        private IDistanceRewarder playerTrigger1DistancePunisher;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
             Vector3 playerPosObs = playerPos / controller.env.Width * 2f;
             sensor.AddObservation(playerPosObs);
-            Vector3 goalTriggerPos = controller.env.goalTrigger.localPosition;
-            Vector3 distanceToGoalTriggerObs = (goalTriggerPos - playerPos) / controller.env.Width;
-            sensor.AddObservation(distanceToGoalTriggerObs);
-            Vector3 targetPos = controller.env.target.localPosition;
-            Vector3 distanceToTargetObs = (targetPos - playerPos) / controller.env.Width;
-            sensor.AddObservation(distanceToTargetObs);  // should not collide
+            Vector3 trigger2Pos = controller.env.trigger2.localPosition;
+            Vector3 distanceTotrigger2Obs = (trigger2Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceTotrigger2Obs);
+            Vector3 trigger1Pos = controller.env.trigger1.localPosition;
+            Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceToTrigger1Obs);  // should not collide
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
 
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            playerTriggerDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToGoalTrigger);
-            playerTargetDistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTarget);
+            playerTrigger2DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger2);
+            playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
         }
 
         public override void OnActionReceived(ActionBuffers actions)
         {
             base.OnActionReceived(actions);
-            // Debug.Log("MoveToTarget.OnActionReceived");
             if (PostCondition != null && PostCondition.Func())
             {
-                Debug.Log("GoalTrigger reached! PC: " + PostCondition.Name);
+                Debug.Log("Trigger2 reached! PC: " + PostCondition.Name);
 
                 float velocityPunishment = -0.1f * controller.rb.velocity.magnitude / controller.maxSpeed;
-                // Debug.Log("velocityPunishment: " + velocityPunishment);
                 AddReward(velocityPunishment);
             }
-            AddReward(playerTriggerDistanceRewarder.Reward() * 1f);
-            AddReward(-playerTargetDistancePunisher.Reward() * 1f);
+            AddReward(playerTrigger2DistanceRewarder.Reward() * 1f);
+            AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
         }
     }
 }
