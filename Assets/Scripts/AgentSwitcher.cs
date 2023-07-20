@@ -111,7 +111,6 @@ public class AgentSwitcher : IAgentSwitcher
         {
             item.gameObject.SetActive(false);
         }
-        // currentAgent.ResetEnvGlobal();
         currentAgent = null;
     }
 

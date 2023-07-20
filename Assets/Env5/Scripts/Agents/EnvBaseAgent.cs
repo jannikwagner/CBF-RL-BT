@@ -70,11 +70,11 @@ namespace Env5
 
         public override void ResetEnvLocal()
         {
-            this.controller.env.Initialize();
+            this.controller.env.Reset();
         }
         public override void ResetEnvGlobal()
         {
-            this.controller.env.Initialize();
+            this.controller.env.Reset();
         }
 
         protected override void OnACCViolation()
