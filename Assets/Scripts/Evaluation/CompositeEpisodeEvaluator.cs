@@ -32,9 +32,12 @@ public class CompositeEpisodeEvaluator
             {
                 if (currentAction != null)
                 {
+                    // TODO: fix this bug instead of ignoring cases where it happens
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
-                    throw new Exception("ActionStartEvent received while another action is still active");
+                    // throw new Exception("ActionStartEvent received while another action is still active");
+                    Debug.Log("ActionStartEvent received while another action is still active");
+                    return null;
 
                 }
                 var actionStartEvent = _event as ActionStartEvent;
@@ -46,15 +49,21 @@ public class CompositeEpisodeEvaluator
                 var actionTerminationEvent = _event as ActionTerminationEvent;
                 if (currentAction == null)
                 {
+                    // TODO: fix this bug instead of ignoring cases where it happens
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
-                    throw new Exception("ActionTerminationEvent received while no action is active");
+                    // throw new Exception("ActionTerminationEvent received while no action is active");
+                    Debug.Log("ActionTerminationEvent received while no action is active");
+                    return null;
                 }
                 if (currentAction != actionTerminationEvent.action)
                 {
+                    // not observed so far
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
-                    throw new Exception("ActionTerminationEvent received for action other than the currently active one");
+                    // throw new Exception("ActionTerminationEvent received for action other than the currently active one");
+                    Debug.Log("ActionTerminationEvent received for action other than the currently active one");
+                    return null;
                 }
                 currentAction = null;
 

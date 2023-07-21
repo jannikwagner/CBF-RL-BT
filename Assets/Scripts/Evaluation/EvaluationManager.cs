@@ -59,7 +59,10 @@ public class EvaluationManager : IEvaluationManager
         var compositeEpisodeEvaluator = new CompositeEpisodeEvaluator(actions);
 
         var statistic = compositeEpisodeEvaluator.EvaluateCompositeEpisode(currentCompositeEpisodeEvents);
-        this.storageManager.AddStatistic(statistic);
+        if (statistic != null)
+        {
+            this.storageManager.AddStatistic(statistic);
+        }
     }
 
     private void AugmentEvent(Event _event)
