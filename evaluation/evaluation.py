@@ -24,18 +24,18 @@ from helpers import (
 
 run_id = "testRunId"
 
-file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF_eps1e-2.json"
+file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF.json"
 eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
 
-file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF_eps1e-2.json"
+file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
 eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
 
 file_paths = [file_path_wcbf, file_path_wocbf]
 eps_dfs = [load_repr1_to_eps(file_path) for file_path in file_paths]
 
 labels = [
-    "WCBF_1e-2",
-    "WOCBF_1e-2",
+    "WCBF",
+    "WOCBF",
 ]
 
 actions = eps_df_wocbf.action.unique()

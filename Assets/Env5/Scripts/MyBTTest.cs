@@ -134,6 +134,7 @@ namespace Env5
                     })
                 })
             );
+            Debug.Log(_tree.printTree());
         }
 
         // TODO: move CBFs to learning action nodes instead of agents to be able to use the same agent with different CBFs
