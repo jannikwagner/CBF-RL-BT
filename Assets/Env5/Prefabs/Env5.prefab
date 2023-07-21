@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Model: {fileID: 5022602860645237092, guid: d801497dac53740a5bb3f00b3298433b, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 2
-  m_BehaviorName: MovePlayerUp
+  m_BehaviorName: MoveUp
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Model: {fileID: 5022602860645237092, guid: 73ea7d449d7b048da89490dcccce1318, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 2
-  m_BehaviorName: PushTriggerToGoalNew
+  m_BehaviorName: MoveToButton2
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -301,7 +301,7 @@ MonoBehaviour:
   m_Model: {fileID: 5022602860645237092, guid: f2321e80abf464e2fbfd0b2a02c33278, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 2
-  m_BehaviorName: PushTargetToButton
+  m_BehaviorName: MoveToButton1
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -483,7 +483,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8072472495678200148}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1655495449689312412
 MonoBehaviour:
@@ -510,7 +510,7 @@ MonoBehaviour:
   m_Model: {fileID: 5022602860645237092, guid: a6f1cd803276144298c1d2d79e2a90ae, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 2
-  m_BehaviorName: MoveToTarget
+  m_BehaviorName: MoveToTrigger1
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -645,7 +645,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8072472495678200148}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3353867038465310080
 MonoBehaviour:
@@ -672,7 +672,7 @@ MonoBehaviour:
   m_Model: {fileID: 5022602860645237092, guid: 5b770d79aef4a4dc89120a6fb8e019fc, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 2
-  m_BehaviorName: MoveToGoalTrigger
+  m_BehaviorName: MoveToTrigger2
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -726,8 +726,8 @@ Transform:
   - {fileID: 5038762373401485563}
   - {fileID: 2163672461135485097}
   - {fileID: 9026292487715804735}
-  - {fileID: 7810651610400800947}
   - {fileID: 1070196032119634446}
+  - {fileID: 7810651610400800947}
   - {fileID: 5447892232484048399}
   - {fileID: 6032970176804430477}
   m_Father: {fileID: 7481095166327812002}
