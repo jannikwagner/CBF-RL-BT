@@ -16,6 +16,7 @@ namespace Env5
             sensor.AddObservation((button2Pos - playerPos) / controller.env.Width);
             Vector3 trigger1Pos = controller.env.trigger1.localPosition;
             Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceToTrigger1Obs);  // should not collide
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
 

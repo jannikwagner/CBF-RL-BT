@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Env5
 {
-    public class MoveToTarget : EnvBaseAgent
+    public class MoveToTrigger1 : EnvBaseAgent
     {
         private IDistanceRewarder playerTrigger1DistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)

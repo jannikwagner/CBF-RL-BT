@@ -10,13 +10,13 @@ namespace Env5
         [SerializeField]
         private BT _tree;
         public IAgentSwitcher agentSwitcher;
-        public MoveOverBridge moveOverBridge;
-        public MovePlayerUp moveUp;
+        public MoveUp moveUp;
         public MoveToBridge moveToBridge;
-        public MoveToTarget moveToT1;
-        public PushTargetToButton moveToB1;
-        public MoveToGoalTrigger moveToT2;
-        public PushTriggerToGoalNew moveToB2;
+        public MoveOverBridge moveOverBridge;
+        public MoveToTrigger1 moveToTrigger1;
+        public MoveToButton1 moveToButton1;
+        public MoveToTrigger2 moveToTrigger2;
+        public MoveToButton2 moveToButton2;
         public PlayerController controller;
         public bool useCBF;
         private int maxSteps = 10000;
@@ -36,7 +36,7 @@ namespace Env5
         private void Start()
         {
             Debug.Log("MyBTTest Start");
-            var agents = new EnvBaseAgent[] { moveToT1, moveToB1, moveUp, moveToT2, moveToBridge, moveOverBridge, moveToB2 };
+            var agents = new EnvBaseAgent[] { moveToTrigger1, moveToButton1, moveUp, moveToTrigger2, moveToBridge, moveOverBridge, moveToButton2 };
             evaluationManager = new EvaluationManager();
             foreach (var agent in agents)
             {
@@ -86,7 +86,7 @@ namespace Env5
 
                                     new Selector("Selector", new Node[]{
                                         new PredicateCondition("T1", isControllingT1),
-                                        new LearningActionAgentSwitcher("MoveToT1", moveToT1, agentSwitcher, isControllingT1),
+                                        new LearningActionAgentSwitcher("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1),
                                     } ),
 
                                     new Selector("Selector", new Node[]{
@@ -94,13 +94,13 @@ namespace Env5
                                         new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
                                     } ),
 
-                                    new LearningActionAgentSwitcher("MoveToB1", moveToB1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})
+                                    new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})
                                 }),
                             }),
 
                             new Selector("Selector", new Node[]{
                                 new PredicateCondition("T2", isControllingT2),
-                                new LearningActionAgentSwitcher("MoveToT2", moveToT2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}),
+                                new LearningActionAgentSwitcher("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}),
                             }),
 
                             new Selector("Selector", new Node[]{
@@ -121,7 +121,7 @@ namespace Env5
                                 })
                             }),
 
-                            new LearningActionAgentSwitcher("MoveToB2", moveToB2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3})
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3})
                         }),
                     }),
 
@@ -139,7 +139,7 @@ namespace Env5
         // TODO: move CBFs to learning action nodes instead of agents to be able to use the same agent with different CBFs
         private void InitCBFs()
         {
-            int steps = moveToT1.ActionsPerDecision;
+            int steps = moveToTrigger1.ActionsPerDecision;
             float deltaTime = Time.fixedDeltaTime * (steps);
             float eta = 1f;
             System.Func<float, float> alpha = ((float x) => x);
@@ -159,13 +159,13 @@ namespace Env5
             var upBridgeCBF = new MaxCBF(new List<ICBF> { upCBF, bridgeOpenLeftRightCBF });
             var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, topEdgeBridgeCBF, bottomEdgeBridgeCBF });
 
-            var moveToButton1_posVelDynamics = new PlayerPosVelDynamics(moveToB1);
+            var moveToButton1_posVelDynamics = new PlayerPosVelDynamics(moveToButton1);
             var moveToButton1_leftOfX1CBFApplicator = new DiscreteCBFApplicator(leftOfX1CBF, moveToButton1_posVelDynamics, deltaTime, debug: debugCBF);
-            moveToB1.CBFApplicators = new List<CBFApplicator> { moveToButton1_leftOfX1CBFApplicator };
+            moveToButton1.CBFApplicators = new List<CBFApplicator> { moveToButton1_leftOfX1CBFApplicator };
 
-            var moveToTrigger2_playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToT2);
+            var moveToTrigger2_playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToTrigger2);
             var moveToTrigger2_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToTrigger2_playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
-            moveToT2.CBFApplicators = new List<CBFApplicator> { moveToTrigger2_buttonPressedCBFApplicator };
+            moveToTrigger2.CBFApplicators = new List<CBFApplicator> { moveToTrigger2_buttonPressedCBFApplicator };
 
             var moveToBridge_posVelDynamics = new PlayerPosVelDynamics(moveToBridge);
             var moveToBridge_playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToBridge);
@@ -177,9 +177,9 @@ namespace Env5
             var moveOverBridge_bridgeOpenRightCBFApplicator = new DiscreteCBFApplicator(bridgeOpenRightCBF, moveOverBridge_posVelDynamics, deltaTime, debug: debugCBF);
             moveOverBridge.CBFApplicators = new List<CBFApplicator> { moveOverBridge_bridgeOpenRightCBFApplicator };
 
-            var moveToButton2_posVelDynamics = new PlayerPosVelDynamics(moveToB2);
+            var moveToButton2_posVelDynamics = new PlayerPosVelDynamics(moveToButton2);
             var moveToButton2_pastBridgeCBFApplicator = new DiscreteCBFApplicator(rightOfX3CBF, moveToButton2_posVelDynamics, deltaTime, debug: debugCBF);
-            moveToB2.CBFApplicators = new List<CBFApplicator> { moveToButton2_pastBridgeCBFApplicator };
+            moveToButton2.CBFApplicators = new List<CBFApplicator> { moveToButton2_pastBridgeCBFApplicator };
         }
 
         void FixedUpdate()

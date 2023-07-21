@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Env5
 {
-    public class MoveToGoalTrigger : EnvBaseAgent
+    public class MoveToTrigger2 : EnvBaseAgent
     {
         private IDistanceRewarder playerTrigger2DistanceRewarder;
         private IDistanceRewarder playerTrigger1DistancePunisher;
