@@ -159,27 +159,27 @@ namespace Env5
             var upBridgeCBF = new MaxCBF(new List<ICBF> { upCBF, bridgeOpenLeftRightCBF });
             var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, topEdgeBridgeCBF, bottomEdgeBridgeCBF });
 
-            var pushTargetToButtonPosVelDynamics = new PlayerPosVelDynamics(moveToB1);
-            var pushTargetToButton_leftOfX1CBFApplicator = new DiscreteCBFApplicator(leftOfX1CBF, pushTargetToButtonPosVelDynamics, deltaTime, debug: debugCBF);
-            moveToB1.CBFApplicators = new List<CBFApplicator> { pushTargetToButton_leftOfX1CBFApplicator };
+            var moveToButton1_posVelDynamics = new PlayerPosVelDynamics(moveToB1);
+            var moveToButton1_leftOfX1CBFApplicator = new DiscreteCBFApplicator(leftOfX1CBF, moveToButton1_posVelDynamics, deltaTime, debug: debugCBF);
+            moveToB1.CBFApplicators = new List<CBFApplicator> { moveToButton1_leftOfX1CBFApplicator };
 
-            var moveToGoalTriggerPlayerTargetPosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToT2);
-            var moveToGoalTrigger_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToGoalTriggerPlayerTargetPosVelDynamics, deltaTime, debug: debugCBF);
-            moveToT2.CBFApplicators = new List<CBFApplicator> { moveToGoalTrigger_buttonPressedCBFApplicator };
+            var moveToTrigger2_playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToT2);
+            var moveToTrigger2_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToTrigger2_playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
+            moveToT2.CBFApplicators = new List<CBFApplicator> { moveToTrigger2_buttonPressedCBFApplicator };
 
-            var moveToBridgePosVelDynamics = new PlayerPosVelDynamics(moveToBridge);
-            var moveToBridgePlayerTargetPosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToBridge);
-            var moveToBridge_upBridgeCBFApplicator = new DiscreteCBFApplicator(upBridgeCBF, moveToBridgePosVelDynamics, deltaTime, debug: debugCBF);
-            var moveToBridge_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToBridgePlayerTargetPosVelDynamics, deltaTime, debug: debugCBF);
+            var moveToBridge_posVelDynamics = new PlayerPosVelDynamics(moveToBridge);
+            var moveToBridge_playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToBridge);
+            var moveToBridge_upBridgeCBFApplicator = new DiscreteCBFApplicator(upBridgeCBF, moveToBridge_posVelDynamics, deltaTime, debug: debugCBF);
+            var moveToBridge_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToBridge_playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
             moveToBridge.CBFApplicators = new List<CBFApplicator> { moveToBridge_buttonPressedCBFApplicator, moveToBridge_upBridgeCBFApplicator };
 
-            var moveOverBridgePosVelDynamics = new PlayerPosVelDynamics(moveOverBridge);
-            var moveOverBridge_bridgeOpenRightCBFApplicator = new DiscreteCBFApplicator(bridgeOpenRightCBF, moveOverBridgePosVelDynamics, deltaTime, debug: debugCBF);
+            var moveOverBridge_posVelDynamics = new PlayerPosVelDynamics(moveOverBridge);
+            var moveOverBridge_bridgeOpenRightCBFApplicator = new DiscreteCBFApplicator(bridgeOpenRightCBF, moveOverBridge_posVelDynamics, deltaTime, debug: debugCBF);
             moveOverBridge.CBFApplicators = new List<CBFApplicator> { moveOverBridge_bridgeOpenRightCBFApplicator };
 
-            var pushTriggerToGoalNewPosVelDynamics = new PlayerPosVelDynamics(moveToB2);
-            var pushTriggerToGoalNew_pastBridgeCBFApplicator = new DiscreteCBFApplicator(rightOfX3CBF, pushTriggerToGoalNewPosVelDynamics, deltaTime, debug: debugCBF);
-            moveToB2.CBFApplicators = new List<CBFApplicator> { pushTriggerToGoalNew_pastBridgeCBFApplicator };
+            var moveToButton2_posVelDynamics = new PlayerPosVelDynamics(moveToB2);
+            var moveToButton2_pastBridgeCBFApplicator = new DiscreteCBFApplicator(rightOfX3CBF, moveToButton2_posVelDynamics, deltaTime, debug: debugCBF);
+            moveToB2.CBFApplicators = new List<CBFApplicator> { moveToButton2_pastBridgeCBFApplicator };
         }
 
         void FixedUpdate()
