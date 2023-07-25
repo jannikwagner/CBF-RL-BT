@@ -36,7 +36,7 @@ public class CompositeEpisodeEvaluator
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
                     // throw new Exception("ActionStartEvent received while another action is still active");
-                    Debug.Log("ActionStartEvent received while another action is still active");
+                    Debug.Log("Inconsistency: ActionStartEvent received while another action is still active");
                     return null;
 
                 }
@@ -53,7 +53,7 @@ public class CompositeEpisodeEvaluator
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
                     // throw new Exception("ActionTerminationEvent received while no action is active");
-                    Debug.Log("ActionTerminationEvent received while no action is active");
+                    Debug.Log("Inconsistency: ActionTerminationEvent received while no action is active");
                     return null;
                 }
                 if (currentAction != actionTerminationEvent.action)
@@ -62,7 +62,7 @@ public class CompositeEpisodeEvaluator
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
                     // throw new Exception("ActionTerminationEvent received for action other than the currently active one");
-                    Debug.Log("ActionTerminationEvent received for action other than the currently active one");
+                    Debug.Log("Inconsistency: ActionTerminationEvent received for action other than the currently active one");
                     return null;
                 }
                 currentAction = null;

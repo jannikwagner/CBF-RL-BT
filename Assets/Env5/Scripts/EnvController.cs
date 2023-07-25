@@ -123,7 +123,7 @@ namespace Env5
         }
         public bool PlayerOnBridge()
         {
-            return DistancePlayerBridgeFromSouth() == 0 && DistancePlayerBridgeFromNorth() == 0 && PlayerRightOfX1();
+            return DistancePlayerBridgeFromSouth() == 0 && DistancePlayerBridgeFromNorth() == 0 && PlayerRightOfX1() && PlayerUp();
         }
         public float DistancePlayerUp()
         {
