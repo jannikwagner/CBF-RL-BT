@@ -94,7 +94,7 @@ namespace Env5
                                         new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
                                     } ),
 
-                                    new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})
+                                    new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp}) // isControllingT1
                                 }),
                             }),
 
@@ -105,7 +105,7 @@ namespace Env5
 
                             new Selector("Selector", new Node[]{
                                 new PredicateCondition("Up2", playerUp),
-                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}),
+                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed, isControllingT2}),
                             }),
 
                             new Selector("Selector", new Node[]{
@@ -114,14 +114,14 @@ namespace Env5
 
                                     new Selector("Selector", new Node[]{
                                         new PredicateCondition("OnBridge", onBridge),
-                                        new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, playerUp})
+                                        new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp})
                                     }),
 
-                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, playerUp, onBridge})
+                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, playerUp, onBridge})
                                 })
                             }),
 
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3})
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3}) // isControllingT2
                         }),
                     }),
 
@@ -156,7 +156,7 @@ namespace Env5
                                         new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
                                     } ),
 
-                                    new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})
+                                    new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp}) // isControllingT1
                                 }),
                             }),
 
@@ -175,18 +175,18 @@ namespace Env5
                                         new Sequence("Sequence",new Node[]{
                                             new Selector("Selector", new Node[]{
                                                 new PredicateCondition("Up2", playerUp),
-                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}),
+                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed, isControllingT2}),
                                             }),
 
-                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, playerUp})
+                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp})
                                         }),
                                     }),
 
-                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, playerUp, onBridge})
+                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, onBridge})
                                 })
                             }),
 
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3})
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerPastX3}) // isControllingT2
                         }),
                     }),
 
@@ -217,7 +217,7 @@ namespace Env5
                                 new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
                             } ),
 
-                            new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})
+                            new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})  // isControllingT1
                         }),
                     }),
 
@@ -240,18 +240,18 @@ namespace Env5
                                         new Sequence("Sequence",new Node[]{
                                             new Selector("Selector", new Node[]{
                                                 new PredicateCondition("Up2", playerUp),
-                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}),
+                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed, }),
                                             }),
 
-                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, playerUp})
+                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp})
                                         }),
                                     }),
 
-                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, playerUp, onBridge})
+                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, onBridge})
                                 })
                             }),
 
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3})
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerPastX3})  // isControllingT2
                         }),
                     }),
 
