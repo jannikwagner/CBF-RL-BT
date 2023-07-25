@@ -251,6 +251,7 @@ ppas5 = [
     PPA(C_UP, (), A_MUP),
 ]
 # nice tree, only C_B1 as precondition of A_MB2 is questionable but necessary in this tree
+# tree missing only logical acc/precondition C_UP for A_MOB, A_MB2
 ppas6 = [
     PPA(C_B2, (C_B1, C_T2, C_PB), A_MB2),
     PPA(C_PB, (C_OB,), A_MOB),
@@ -261,6 +262,7 @@ ppas6 = [
     PPA(C_UP, (), A_MUP),
 ]
 # multiple goals, reasonable preconditions
+# tree missing only logical acc/precondition C_UP for A_MOB, A_MB2
 ppas_multiple_goals = [
     PPA(C_D, (C_B1, C_B2), A_D),
     PPA(C_B2, (C_T2, C_PB), A_MB2),
