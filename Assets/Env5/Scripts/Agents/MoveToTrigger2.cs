@@ -40,7 +40,7 @@ namespace Env5
                 AddReward(velocityPunishment);
             }
             AddReward(playerTrigger2DistanceRewarder.Reward() * 1f);
-            AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
+            // AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
         }
     }
 }

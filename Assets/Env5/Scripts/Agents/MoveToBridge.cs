@@ -38,7 +38,7 @@ namespace Env5
             }
 
             AddReward(playerBridgeDistanceRewarder.Reward() * 1f);
-            AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
+            // AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
         }
     }
 }
