@@ -134,6 +134,136 @@ namespace Env5
                     })
                 })
             );
+
+            // alternative ppas
+            _tree = new BT(
+                new Sequence("Root", new Node[] {
+                    new Selector("Selector", new Node[] {
+                        new PredicateCondition("B2", B2Pressed),
+                        new Sequence("Sequence", new Node[]{
+
+                            new Selector("Selector", new Node[] {
+                                new PredicateCondition("B1", b1Pressed),
+                                new Sequence("Sequence", new Node[]{
+
+                                    new Selector("Selector", new Node[]{
+                                        new PredicateCondition("T1", isControllingT1),
+                                        new LearningActionAgentSwitcher("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1),
+                                    } ),
+
+                                    new Selector("Selector", new Node[]{
+                                        new PredicateCondition("Up", playerUp),
+                                        new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
+                                    } ),
+
+                                    new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})
+                                }),
+                            }),
+
+                            new Selector("Selector", new Node[]{
+                                new PredicateCondition("T2", isControllingT2),
+                                new LearningActionAgentSwitcher("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}),
+                            }),
+
+                            new Selector("Selector", new Node[]{
+                                new PredicateCondition("PastBridge", playerPastX3),
+                                new Sequence("Sequence", new Node[]{
+
+                                    new Selector("Selector", new Node[]{
+                                        new PredicateCondition("OnBridge", onBridge),
+
+                                        new Sequence("Sequence",new Node[]{
+                                            new Selector("Selector", new Node[]{
+                                                new PredicateCondition("Up2", playerUp),
+                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}),
+                                            }),
+
+                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, playerUp})
+                                        }),
+                                    }),
+
+                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, playerUp, onBridge})
+                                })
+                            }),
+
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3})
+                        }),
+                    }),
+
+                    new Do("Success", () =>
+                    {
+                        Debug.Log("Success Reset!");
+                        evaluationManager.AddEvent(new GlobalSuccessEvent());
+                        NextEpisode();
+                        return TaskStatus.Success;
+                    })
+                })
+            );
+
+            // multi goal
+            _tree = new BT(
+                new Sequence("Root", new Node[] {
+                    new Selector("Selector", new Node[] {
+                        new PredicateCondition("B1", b1Pressed),
+                        new Sequence("Sequence", new Node[]{
+
+                            new Selector("Selector", new Node[]{
+                                new PredicateCondition("T1", isControllingT1),
+                                new LearningActionAgentSwitcher("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1),
+                            } ),
+
+                            new Selector("Selector", new Node[]{
+                                new PredicateCondition("Up", playerUp),
+                                new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
+                            } ),
+
+                            new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})
+                        }),
+                    }),
+
+                    new Selector("Selector", new Node[] {
+                        new PredicateCondition("B2", B2Pressed),
+                        new Sequence("Sequence", new Node[]{
+
+                            new Selector("Selector", new Node[]{
+                                new PredicateCondition("T2", isControllingT2),
+                                new LearningActionAgentSwitcher("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}),
+                            }),
+
+                            new Selector("Selector", new Node[]{
+                                new PredicateCondition("PastBridge", playerPastX3),
+                                new Sequence("Sequence", new Node[]{
+
+                                    new Selector("Selector", new Node[]{
+                                        new PredicateCondition("OnBridge", onBridge),
+
+                                        new Sequence("Sequence",new Node[]{
+                                            new Selector("Selector", new Node[]{
+                                                new PredicateCondition("Up2", playerUp),
+                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}),
+                                            }),
+
+                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, playerUp})
+                                        }),
+                                    }),
+
+                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, playerUp, onBridge})
+                                })
+                            }),
+
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3})
+                        }),
+                    }),
+
+                    new Do("Success", () =>
+                    {
+                        Debug.Log("Success Reset!");
+                        evaluationManager.AddEvent(new GlobalSuccessEvent());
+                        NextEpisode();
+                        return TaskStatus.Success;
+                    })
+                })
+            );
             Debug.Log(_tree.printTree());
         }
 
