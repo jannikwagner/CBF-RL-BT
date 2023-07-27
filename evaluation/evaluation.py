@@ -16,10 +16,10 @@ from helpers import (
     get_local_steps_per_action,
     get_termination_cause_rates,
     global_boxplot,
-    plot_per_action,
+    plot_per_group,
     plot_per_acc,
     global_boxplot,
-    boxplot_per_action,
+    boxplot_per_group,
     boxplot_per_acc,
     ActionTerminationCause,
     action_termination_causes,
@@ -58,16 +58,24 @@ global_boxplot(labels, global_steps, "steps", "Global Steps (Composite episode l
 local_episodes_count = [comp_eps_df.localEpisodesCount for comp_eps_df in comp_eps_dfs]
 global_boxplot(labels, local_episodes_count, "# episodes", "Local episodes count")
 
+termination_cause_rates = [get_termination_cause_rates(df) for df in eps_dfs]
+plot_per_group(
+    action_termination_causes,
+    labels,
+    termination_cause_rates,
+    "Termination cause rates",
+    "Termination cause rates",
+)
 
 for action in actions:
     action_dfs = [df.query("action == @action") for df in eps_dfs]
     termination_cause_rates = [get_termination_cause_rates(df) for df in action_dfs]
-    plot_per_action(
+    plot_per_group(
         action_termination_causes,
         labels,
         termination_cause_rates,
-        "Termination rates",
-        f"Termination cause - {action}",
+        "Termination cause rates",
+        f"Termination cause rates for action {action}",
     )
 
 
@@ -78,7 +86,7 @@ global_boxplot(labels, steps_to_recover, "steps", "Steps to recover")
 steps_to_recover_per_action = [
     get_acc_steps_to_recover_per_action(eps_df, actions) for eps_df in eps_dfs
 ]
-boxplot_per_action(
+boxplot_per_group(
     actions, labels, steps_to_recover_per_action, "steps", "Steps to recover"
 )
 
@@ -100,7 +108,7 @@ print(acc_violation_rates)
 acc_violation_rates_per_action = [
     get_acc_violation_rate_per_action(eps_df, actions) for eps_df in eps_dfs
 ]
-plot_per_action(
+plot_per_group(
     actions,
     labels,
     acc_violation_rates_per_action,
@@ -123,7 +131,7 @@ plot_per_acc(
 avg_num_eps_per_action = [
     get_avg_num_eps_per_action(eps_df, actions) for eps_df in eps_dfs
 ]
-plot_per_action(
+plot_per_group(
     actions,
     labels,
     avg_num_eps_per_action,
@@ -132,7 +140,7 @@ plot_per_action(
 )
 
 num_eps_per_action = [get_num_eps_per_action(eps_df, actions) for eps_df in eps_dfs]
-boxplot_per_action(
+boxplot_per_group(
     actions, labels, num_eps_per_action, "# episodes", "Episodes per composite episode"
 )
 
@@ -140,7 +148,7 @@ boxplot_per_action(
 avg_total_steps_per_action = [
     get_avg_total_steps_per_action(eps_df, actions) for eps_df in eps_dfs
 ]
-plot_per_action(
+plot_per_group(
     actions,
     labels,
     avg_total_steps_per_action,
@@ -151,7 +159,7 @@ plot_per_action(
 total_steps_per_action = [
     get_total_steps_per_action(eps_df, actions) for eps_df in eps_dfs
 ]
-boxplot_per_action(
+boxplot_per_group(
     actions,
     labels,
     total_steps_per_action,
@@ -166,7 +174,7 @@ global_boxplot(labels, local_steps, "steps", "Local Steps (Episode length)")
 local_steps_per_action = [
     get_local_steps_per_action(eps_df, actions) for eps_df in eps_dfs
 ]
-boxplot_per_action(
+boxplot_per_group(
     actions, labels, local_steps_per_action, "steps", "Local Steps (Episode length)"
 )
 
@@ -189,7 +197,7 @@ local_steps_reaching_pc_per_action = [
 local_steps_not_reaching_pc_per_action = [
     get_local_steps_per_action(eps_df, actions) for eps_df in eps_not_reaching_pc_dfs
 ]
-boxplot_per_action(
+boxplot_per_group(
     actions,
     labels,
     local_steps_not_reaching_pc_per_action,
@@ -213,7 +221,7 @@ for i in range(len(labels)):
     not_reaching_pc = local_steps_not_reaching_pc_per_action[i]
     pc_labels = ["reaching pc", "not reaching pc"]
     data = [reaching_pc, not_reaching_pc]
-    boxplot_per_action(
+    boxplot_per_group(
         actions,
         pc_labels,
         data,

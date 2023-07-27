@@ -15,8 +15,8 @@ from helpers import (
     get_local_steps_per_action,
     get_termination_cause_rates,
     global_boxplot,
-    plot_per_action,
-    boxplot_per_action,
+    plot_per_group,
+    boxplot_per_group,
     ActionTerminationCause,
     action_termination_causes,
 )
@@ -42,12 +42,12 @@ action_acc_tuples = [(action, acc) for action in acc_dict for acc in acc_dict[ac
 
 rates1 = get_termination_cause_rates(eps_df_wcbf)
 rates2 = get_termination_cause_rates(eps_df_wocbf)
-plot_per_action(
+plot_per_group(
     action_termination_causes,
     ["WCBF", "WOCBF"],
     [rates1, rates2],
     "Termination rates",
-    "Termination cause",
+    "Termination cause rates",
 )
 # print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
 
