@@ -69,15 +69,16 @@ namespace Env5
             var playerUp = new Condition("Up", controller.env.PlayerUp);
             var b1Pressed = new Condition("B1", controller.env.Button1Pressed);
             var isControllingT2 = new Condition("T2", controller.IsControllingT2);
-            var B2Pressed = new Condition("B2", controller.env.button2Pressed);
+            var b2Pressed = new Condition("B2", controller.env.button2Pressed);
             var onBridge = new Condition("OnBridge", controller.env.PlayerOnBridge);
             var playerPastX3 = new Condition("PastBridge", controller.env.PlayerRightOfX3);
-            conditions = new List<Condition> { isControllingT1, playerUp, b1Pressed, isControllingT2, B2Pressed, onBridge, playerPastX3 };
+            conditions = new List<Condition> { isControllingT1, playerUp, b1Pressed, isControllingT2, b2Pressed, onBridge, playerPastX3 };
 
+            // original tree, tree missing hpcs
             _tree = new BT(
                 new Sequence("Root", new Node[] {
                     new Selector("Selector", new Node[] {
-                        new PredicateCondition("B2", B2Pressed),
+                        new PredicateCondition("B2", b2Pressed),
                         new Sequence("Sequence", new Node[]{
 
                             new Selector("Selector", new Node[] {
@@ -121,7 +122,7 @@ namespace Env5
                                 })
                             }),
 
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3}) // isControllingT2
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, b2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3}) // isControllingT2
                         }),
                     }),
 
@@ -135,11 +136,11 @@ namespace Env5
                 })
             );
 
-            // alternative ppas
+            // alternative ppas, tree missing hpcs
             _tree = new BT(
                 new Sequence("Root", new Node[] {
                     new Selector("Selector", new Node[] {
-                        new PredicateCondition("B2", B2Pressed),
+                        new PredicateCondition("B2", b2Pressed),
                         new Sequence("Sequence", new Node[]{
 
                             new Selector("Selector", new Node[] {
@@ -186,7 +187,7 @@ namespace Env5
                                 })
                             }),
 
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerPastX3}) // isControllingT2
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, b2Pressed, new List<Condition> {b1Pressed, playerPastX3}) // isControllingT2
                         }),
                     }),
 
@@ -209,12 +210,12 @@ namespace Env5
 
                             new Selector("Selector", new Node[]{
                                 new PredicateCondition("T1", isControllingT1),
-                                new LearningActionAgentSwitcher("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1),
+                                new LearningActionAgentSwitcher("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1, null, new List<Condition> {b1Pressed}),
                             } ),
 
                             new Selector("Selector", new Node[]{
                                 new PredicateCondition("Up", playerUp),
-                                new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
+                                new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}, new List<Condition> {b1Pressed}),
                             } ),
 
                             new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})  // isControllingT1
@@ -222,12 +223,12 @@ namespace Env5
                     }),
 
                     new Selector("Selector", new Node[] {
-                        new PredicateCondition("B2", B2Pressed),
+                        new PredicateCondition("B2", b2Pressed),
                         new Sequence("Sequence", new Node[]{
 
                             new Selector("Selector", new Node[]{
                                 new PredicateCondition("T2", isControllingT2),
-                                new LearningActionAgentSwitcher("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}),
+                                new LearningActionAgentSwitcher("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}, new List<Condition> {b2Pressed}),
                             }),
 
                             new Selector("Selector", new Node[]{
@@ -240,18 +241,18 @@ namespace Env5
                                         new Sequence("Sequence",new Node[]{
                                             new Selector("Selector", new Node[]{
                                                 new PredicateCondition("Up2", playerUp),
-                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed, }),
+                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}, new List<Condition> {b2Pressed, playerPastX3, onBridge}),
                                             }),
 
-                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp})
+                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp}, new List<Condition> {b2Pressed, playerPastX3})
                                         }),
                                     }),
 
-                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, onBridge})
+                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, onBridge}, new List<Condition> {b2Pressed})
                                 })
                             }),
 
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, B2Pressed, new List<Condition> {b1Pressed, playerPastX3})  // isControllingT2
+                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, b2Pressed, new List<Condition> {b1Pressed, playerPastX3})  // isControllingT2
                         }),
                     }),
 

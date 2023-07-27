@@ -14,6 +14,7 @@ public abstract class BaseAgent : Agent
     private int actionsPerDecision = 5;
     private Condition postCondition;
     private IEnumerable<Condition> accs;
+    private IEnumerable<Condition> higherPostConditions;
     private IEnumerable<CBFApplicator> cbfApplicators;
     protected CBFDiscreteInvalidActionMasker masker = new CBFDiscreteInvalidActionMasker();
 
@@ -25,6 +26,7 @@ public abstract class BaseAgent : Agent
     public abstract int NumActions { get; }
     public IEnumerable<CBFApplicator> CBFApplicators { get => cbfApplicators; set => cbfApplicators = value; }
     public int ActionsPerDecision { get => actionsPerDecision; set => actionsPerDecision = value; }
+    public IEnumerable<Condition> HigherPostConditions { get => higherPostConditions; set => higherPostConditions = value; }
 
     public virtual void ResetEnvLocal() { }
     public virtual void ResetEnvGlobal() { }
@@ -86,6 +88,28 @@ public abstract class BaseAgent : Agent
         }
         return punished;
     }
+    public bool CheckHigherPostConditions()
+    {
+        bool reached = false;
+        if (HigherPostConditions != null)
+        {
+            foreach (var hpc in HigherPostConditions)
+            {
+                if (hpc.Func())
+                {
+                    OnACCViolation();
+                    if (!reached)
+                    {
+                        // AddReward(1f);  // probably should not give reward
+                        evaluationManager.AddEvent(new HigherPostConditionReachedEvent { postCondition = hpc.Name, localStep = actionCount });
+                    }
+                    reached = true;
+                    Debug.Log(this + ": HPC " + hpc.Name + " reached");
+                }
+            }
+        }
+        return reached;
+    }
 
     protected abstract void OnACCViolation();
 
@@ -95,6 +119,10 @@ public abstract class BaseAgent : Agent
         base.OnActionReceived(actions);
         AddReward(-1f / maxActions);
         bool done = CheckPostCondition();
+        if (!done)
+        {
+            done = CheckHigherPostConditions();
+        }
         if (!done)
         {
             done = CheckACCs();

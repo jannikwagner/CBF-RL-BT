@@ -100,11 +100,26 @@ public class CompositeEpisodeEvaluator
 
                 if (_event is PostConditionReachedEvent)
                 {
+                    PostConditionReachedEvent postConditionReachedEvent = _event as PostConditionReachedEvent;
                     compositeEpisodeStatistics.postConditionReachedCount++;
                     compositeEpisodeStatistics.actionStatistics[action].postConditionReachedCount++;
                     episodeStatistics.terminationCause = ActionTerminationCause.PostConditionReached;
+                    episodeStatistics.postCondition = postConditionReachedEvent.postCondition;
 
                     episode.terminationCause = ActionTerminationCause.PostConditionReached;
+                    episode.postCondition = postConditionReachedEvent.postCondition;
+                }
+
+                if (_event is HigherPostConditionReachedEvent)
+                {
+                    HigherPostConditionReachedEvent hpcEvent = _event as HigherPostConditionReachedEvent;
+                    compositeEpisodeStatistics.higherPostConditionReachedCount++;
+                    compositeEpisodeStatistics.actionStatistics[action].higherPostConditionReachedCount++;
+                    episodeStatistics.terminationCause = ActionTerminationCause.HigherPostConditionReached;
+                    episodeStatistics.postCondition = hpcEvent.postCondition;
+
+                    episode.terminationCause = ActionTerminationCause.HigherPostConditionReached;
+                    episode.postCondition = hpcEvent.postCondition;
                 }
 
                 else if (_event is ACCViolatedEvent)

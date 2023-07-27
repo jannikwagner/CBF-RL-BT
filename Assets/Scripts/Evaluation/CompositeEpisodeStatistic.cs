@@ -6,6 +6,7 @@ public class CompositeEpisodeStatistic
     public bool globalSuccess = false;
     public int globalSteps = -1;
     public int postConditionReachedCount = 0;
+    public int higherPostConditionReachedCount = 0;
     public int accViolatedCount = 0;
     public int localResetCount = 0;
     public Dictionary<string, ActionStatistic> actionStatistics = new Dictionary<string, ActionStatistic>();
@@ -25,6 +26,7 @@ public class ActionStatistic
     public int episodeCount = 0;
     public List<EpisodeStatistic> episodes = new List<EpisodeStatistic>();
     public int postConditionReachedCount = 0;
+    public int higherPostConditionReachedCount = 0;
     public int accViolatedCount = 0;
     public int localResetCount = 0;
     public Dictionary<string, ACCViolatedStatistic> accViolatedStatistics = new Dictionary<string, ACCViolatedStatistic>();
@@ -47,6 +49,7 @@ public class EpisodeStatistic
     public int localSteps = -1;
     public float reward = 0;
     public int localEpisodeNumber = -1;
+    public string postCondition = null;
     public ActionTerminationCause terminationCause;
     public ACCViolatedInfo accInfo = null;
 }
@@ -72,6 +75,7 @@ public enum ActionTerminationCause
     ACCViolated,
     LocalReset,
     GlobalReset,
+    HigherPostConditionReached,
 }
 
 // different approach, properly collected, but currently not serialized
@@ -88,4 +92,5 @@ public class EpisodeRecord
     public bool accRecovered = false;
     public bool globalSuccess = false;
     public int globalSteps = -1;
+    public string postCondition = null;
 }

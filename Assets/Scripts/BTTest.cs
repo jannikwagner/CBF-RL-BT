@@ -308,17 +308,20 @@ namespace BTTest
     {
         public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher) : base(name) { this.agent = agent; this.switcher = switcher; }
         public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition) : this(name, agent, switcher) { this.postCondition = postCondition; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, List<Condition> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, IEnumerable<Condition> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, IEnumerable<Condition> accs, IEnumerable<Condition> higherPostConditions) : this(name, agent, switcher, postCondition, accs) { this.higherPostConditions = higherPostConditions; }
         protected BaseAgent agent;
         protected IAgentSwitcher switcher;
         public Condition postCondition;
-        public List<Condition> accs;
+        public IEnumerable<Condition> accs;
+        public IEnumerable<Condition> higherPostConditions;
 
         public override TaskStatus OnUpdate()
         {
             // Debug.Log(Name + ": OnUpdate");
             agent.PostCondition = postCondition;
             agent.ACCs = accs;
+            agent.HigherPostConditions = higherPostConditions;
             switcher.Act(agent);
             return TaskStatus.Running;
         }
