@@ -40,6 +40,7 @@ public class CompositeEpisodeEvaluator
                     return null;
 
                 }
+
                 var actionStartEvent = _event as ActionStartEvent;
                 currentAction = actionStartEvent.action;
             }

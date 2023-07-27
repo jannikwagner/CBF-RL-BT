@@ -53,16 +53,18 @@ public abstract class BaseAgent : Agent
         return actionCount == maxActions;
     }
 
-    public void CheckPostCondition()
+    public bool CheckPostCondition()
     {
-        if (PostCondition != null && PostCondition.Func())
+        bool postconditionReached = PostCondition != null && PostCondition.Func();
+        if (postconditionReached)
         {
             AddReward(1f);
             Debug.Log(this + ": PostCondition " + PostCondition.Name + " met");
             evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition.Name, localStep = actionCount });
         }
+        return postconditionReached;
     }
-    public void CheckACCs()
+    public bool CheckACCs()
     {
         bool punished = false;
         if (ACCs != null)
@@ -75,13 +77,14 @@ public abstract class BaseAgent : Agent
                     if (!punished)
                     {
                         AddReward(-1f);
+                        evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name, localStep = actionCount });
                     }
                     punished = true;
                     Debug.Log(this + ": ACC " + acc.Name + " violated");
-                    evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name, localStep = actionCount });
                 }
             }
         }
+        return punished;
     }
 
     protected abstract void OnACCViolation();
@@ -91,9 +94,12 @@ public abstract class BaseAgent : Agent
         actionCount++;
         base.OnActionReceived(actions);
         AddReward(-1f / maxActions);
-        CheckPostCondition();
-        CheckACCs();
-        if (EpisodeShouldEnd())
+        bool done = CheckPostCondition();
+        if (!done)
+        {
+            done = CheckACCs();
+        }
+        if (!done && EpisodeShouldEnd())
         {
             AddReward(-1f);
             Debug.Log(this + "EpisodeShouldEnd, negative reward");
