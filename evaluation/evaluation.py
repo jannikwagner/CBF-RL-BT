@@ -14,20 +14,23 @@ from helpers import (
     get_acc_steps_to_recover_per_action,
     get_acc_steps_to_recover_per_acc,
     get_local_steps_per_action,
+    get_termination_cause_rates,
+    global_boxplot,
     plot_per_action,
     plot_per_acc,
     global_boxplot,
     boxplot_per_action,
     boxplot_per_acc,
+    ActionTerminationCause,
+    action_termination_causes,
 )
-
 
 run_id = "testRunId"
 
-file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF_nT2.json"
+file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF.json"
 eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
 
-file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF_nT.json"
+file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
 eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
 
 file_paths = [file_path_wcbf, file_path_wocbf]
@@ -54,6 +57,18 @@ global_boxplot(labels, global_steps, "steps", "Global Steps (Composite episode l
 
 local_episodes_count = [comp_eps_df.localEpisodesCount for comp_eps_df in comp_eps_dfs]
 global_boxplot(labels, local_episodes_count, "# episodes", "Local episodes count")
+
+
+for action in actions:
+    action_dfs = [df.query("action == @action") for df in eps_dfs]
+    termination_cause_rates = [get_termination_cause_rates(df) for df in action_dfs]
+    plot_per_action(
+        action_termination_causes,
+        labels,
+        termination_cause_rates,
+        "Termination rates",
+        f"Termination cause - {action}",
+    )
 
 
 steps_to_recover = [get_acc_steps_to_recover(eps_df) for eps_df in eps_dfs]

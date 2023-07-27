@@ -1,6 +1,7 @@
 import dataclasses
 import json
 from typing import Sequence, Tuple
+from enum import Enum
 
 import numpy as np
 import pandas as pd
@@ -10,12 +11,17 @@ import matplotlib.colors as mcolors
 
 COLORS = list(mcolors.TABLEAU_COLORS.values())
 
-action_termination_cause = [
+action_termination_causes = [
     "PostConditionReached",
     "ACCViolated",
     "LocalReset",
     "GlobalReset",
+    "HigherPostConditionReached",
 ]
+action_termination_causes_dict = dict(
+    zip(action_termination_causes, range(len(action_termination_causes)))
+)
+ActionTerminationCause = Enum("ActionTerminationCause", action_termination_causes_dict)
 
 
 @dataclasses.dataclass
@@ -144,7 +150,7 @@ def plot_per_action(
     for label, data in zip(labels, values):
         offset = width * multiplier
         rects = ax.bar(x + offset, data, width * 0.9, label=label)
-        ax.bar_label(rects, padding=3)
+        # ax.bar_label(rects, padding=1)
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
@@ -353,3 +359,13 @@ def get_local_steps_per_action(eps_df: pd.DataFrame, actions):
         avg_eps = action_df.localSteps
         steps_per_action_list.append(avg_eps)
     return steps_per_action_list
+
+
+def get_termination_cause_rates(df):
+    counts = df.groupby("terminationCause").action.count()
+    total = counts.sum()
+    rates = counts / total
+    for cause in action_termination_causes_dict.values():
+        if cause not in rates:
+            rates[cause] = 0
+    return [rates[cause] for cause in action_termination_causes_dict.values()]
