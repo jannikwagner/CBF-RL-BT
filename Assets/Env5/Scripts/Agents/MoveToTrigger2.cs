@@ -29,9 +29,8 @@ namespace Env5
             playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
         }
 
-        public override void OnActionReceived(ActionBuffers actions)
+        protected override void ApplyTaskSpecificReward()
         {
-            base.OnActionReceived(actions);
             if (PostCondition != null && PostCondition.Func())
             {
                 Debug.Log("Trigger2 reached! PC: " + PostCondition.Name);

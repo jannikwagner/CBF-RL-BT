@@ -6,6 +6,10 @@ using UnityEngine;
 
 public abstract class BaseAgent : Agent
 {
+    private const float PC_REWARD = 1f;
+    private const float ACC_REWARD = -1f;
+    private const float HPC_REWARD = 0f;
+    private const float TOTAL_TIME_PENALTY = -1f;
     public IEvaluationManager evaluationManager;
     [HideInInspector]
     public bool useCBF = true;
@@ -60,7 +64,7 @@ public abstract class BaseAgent : Agent
         bool postconditionReached = PostCondition != null && PostCondition.Func();
         if (postconditionReached)
         {
-            AddReward(1f);
+            AddReward(PC_REWARD);
             Debug.Log(this + ": PostCondition " + PostCondition.Name + " met");
             evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition.Name, localStep = actionCount });
         }
@@ -78,7 +82,7 @@ public abstract class BaseAgent : Agent
                     OnACCViolation();
                     if (!punished)
                     {
-                        AddReward(-1f);
+                        AddReward(ACC_REWARD);
                         evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name, localStep = actionCount });
                     }
                     punished = true;
@@ -100,7 +104,7 @@ public abstract class BaseAgent : Agent
                     OnACCViolation();
                     if (!reached)
                     {
-                        // AddReward(1f);  // probably should not give reward
+                        AddReward(HPC_REWARD);  // probably should not give reward
                         evaluationManager.AddEvent(new HigherPostConditionReachedEvent { postCondition = hpc.Name, localStep = actionCount });
                     }
                     reached = true;
@@ -112,12 +116,17 @@ public abstract class BaseAgent : Agent
     }
 
     protected abstract void OnACCViolation();
+    protected abstract void ApplyTaskSpecificReward();
+    protected abstract void ApplyAction(ActionBuffers actions);
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+        base.OnActionReceived(actions);  // is this needed?
+        ApplyAction(actions);
         actionCount++;
-        base.OnActionReceived(actions);
-        AddReward(-1f / maxActions);
+        // time penalty
+        AddReward(TOTAL_TIME_PENALTY / maxActions);
+        ApplyTaskSpecificReward();
         bool done = CheckPostCondition();
         if (!done)
         {

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Env5
 {
-    public class EnvBaseAgent : BaseAgent
+    public abstract class EnvBaseAgent : BaseAgent
     {
         public override void CollectObservations(VectorSensor sensor)  // currently not used but overridden
         {
@@ -42,14 +42,10 @@ namespace Env5
             return actuator.GetAcceleration(actions) * controller.MaxAcc;
         }
 
-        public override void OnActionReceived(ActionBuffers actions)
+        protected override void ApplyAction(ActionBuffers actions)
         {
             var acceleration = GetAcceleration(actions);
             controller.ApplyAcceleration(acceleration);
-            // important to call base.OnActionReceived last,
-            // ACCs and postconditions are checked there and reward is added
-            // TODO: investigate whether this works in build environment
-            base.OnActionReceived(actions);
         }
 
         public override void Heuristic(in ActionBuffers actionsOut)

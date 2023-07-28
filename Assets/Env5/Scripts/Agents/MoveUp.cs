@@ -20,9 +20,8 @@ namespace Env5
             upDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerX1FromRight);
         }
 
-        public override void OnActionReceived(ActionBuffers actions)
+        protected override void ApplyTaskSpecificReward()
         {
-            base.OnActionReceived(actions);
             if (PostCondition != null && PostCondition.Func())
             {
                 Debug.Log("Up! PC: " + PostCondition.Name);

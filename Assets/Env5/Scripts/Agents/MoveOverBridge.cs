@@ -28,9 +28,8 @@ namespace Env5
             X3DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerX3FromLeft);
         }
 
-        public override void OnActionReceived(ActionBuffers actions)
+        protected override void ApplyTaskSpecificReward()
         {
-            base.OnActionReceived(actions);
             if (PostCondition != null && PostCondition.Func())
             {
                 Debug.Log("Moved Over Bridge! PC: " + PostCondition.Name);

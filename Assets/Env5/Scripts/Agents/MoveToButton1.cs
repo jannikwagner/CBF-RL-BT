@@ -22,9 +22,8 @@ namespace Env5
             trigger1Button1DistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.trigger1.localPosition, controller.env.button1.localPosition));
         }
 
-        public override void OnActionReceived(ActionBuffers actions)
+        protected override void ApplyTaskSpecificReward()
         {
-            base.OnActionReceived(actions);
             if (PostCondition != null && PostCondition.Func())
             {
                 Debug.Log("Button pressed! PC: " + PostCondition.Name);
