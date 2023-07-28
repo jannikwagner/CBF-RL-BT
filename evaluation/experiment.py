@@ -13,9 +13,12 @@ from helpers import (
     get_acc_steps_to_recover,
     get_acc_steps_to_recover_per_action,
     get_local_steps_per_action,
+    get_termination_cause_rates,
     global_boxplot,
-    plot_per_action,
-    boxplot_per_action,
+    plot_per_group,
+    boxplot_per_group,
+    ActionTerminationCause,
+    action_termination_causes,
 )
 
 
@@ -23,15 +26,29 @@ run_id = "testRunId"
 
 file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF.json"
 eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
-
+print(eps_df_wcbf)
 file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
 eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
-
+print(eps_df_wocbf)
+print(len(eps_df_wocbf.query("terminationCause == 4")), len(eps_df_wocbf))
 actions = eps_df_wocbf.action.unique()
-accs = eps_df_wocbf.query("terminationCause == 1").groupby("action").accName.unique()
+cause = ActionTerminationCause.ACCViolated
+accs = (
+    eps_df_wocbf.query("terminationCause == @cause").groupby("action").accName.unique()
+)
 acc_dict = dict(accs)
 action_acc_tuples = [(action, acc) for action in acc_dict for acc in acc_dict[action]]
 
+
+rates1 = get_termination_cause_rates(eps_df_wcbf)
+rates2 = get_termination_cause_rates(eps_df_wocbf)
+plot_per_group(
+    action_termination_causes,
+    ["WCBF", "WOCBF"],
+    [rates1, rates2],
+    "Termination rates",
+    "Termination cause rates",
+)
 # print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
 
 comp_eps_df_wcbf = get_comp_eps_df(eps_df_wcbf)

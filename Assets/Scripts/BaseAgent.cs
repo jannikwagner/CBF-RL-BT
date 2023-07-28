@@ -6,13 +6,19 @@ using UnityEngine;
 
 public abstract class BaseAgent : Agent
 {
+    private const float PC_REWARD = 1f;
+    private const float ACC_REWARD = -1f;
+    private const float HPC_REWARD = 0f;
+    private const float TOTAL_TIME_PENALTY = -1f;
     public IEvaluationManager evaluationManager;
+    [HideInInspector]
     public bool useCBF = true;
     private int actionCount;
     private int maxActions = 5000;
     private int actionsPerDecision = 5;
     private Condition postCondition;
     private IEnumerable<Condition> accs;
+    private IEnumerable<Condition> higherPostConditions;
     private IEnumerable<CBFApplicator> cbfApplicators;
     protected CBFDiscreteInvalidActionMasker masker = new CBFDiscreteInvalidActionMasker();
 
@@ -24,6 +30,7 @@ public abstract class BaseAgent : Agent
     public abstract int NumActions { get; }
     public IEnumerable<CBFApplicator> CBFApplicators { get => cbfApplicators; set => cbfApplicators = value; }
     public int ActionsPerDecision { get => actionsPerDecision; set => actionsPerDecision = value; }
+    public IEnumerable<Condition> HigherPostConditions { get => higherPostConditions; set => higherPostConditions = value; }
 
     public virtual void ResetEnvLocal() { }
     public virtual void ResetEnvGlobal() { }
@@ -52,16 +59,19 @@ public abstract class BaseAgent : Agent
         return actionCount == maxActions;
     }
 
-    public void CheckPostCondition()
+    public bool CheckPostCondition()
     {
-        if (PostCondition != null && PostCondition.Func())
+        bool postconditionReached = PostCondition != null && PostCondition.Func();
+        if (postconditionReached)
         {
-            AddReward(1f);
-            Debug.Log(this + ": PostCondition " + PostCondition.Name + " met");
+            OnPCReached(PostCondition);
+            AddReward(PC_REWARD);
             evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition.Name, localStep = actionCount });
+            Debug.Log(this + ": PostCondition " + PostCondition.Name + " reached");
         }
+        return postconditionReached;
     }
-    public void CheckACCs()
+    public bool CheckACCs()
     {
         bool punished = false;
         if (ACCs != null)
@@ -70,29 +80,68 @@ public abstract class BaseAgent : Agent
             {
                 if (!acc.Func())
                 {
-                    OnACCViolation();
+                    OnACCViolation(acc);
+                    // only for the first violated acc should be reward given and event logged
                     if (!punished)
                     {
-                        AddReward(-1f);
+                        AddReward(ACC_REWARD);
+                        evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name, localStep = actionCount });
                     }
                     punished = true;
                     Debug.Log(this + ": ACC " + acc.Name + " violated");
-                    evaluationManager.AddEvent(new ACCViolatedEvent { acc = acc.Name, localStep = actionCount });
                 }
             }
         }
+        return punished;
+    }
+    public bool CheckHigherPostConditions()
+    {
+        bool reached = false;
+        if (HigherPostConditions != null)
+        {
+            foreach (var hpc in HigherPostConditions)
+            {
+                if (hpc.Func())
+                {
+                    OnHPCReached(hpc);
+                    // only for the first reached hpc should be reward given and event logged
+                    if (!reached)
+                    {
+                        AddReward(HPC_REWARD);  // probably should not give reward
+                        evaluationManager.AddEvent(new HigherPostConditionReachedEvent { postCondition = hpc.Name, localStep = actionCount });
+                    }
+                    reached = true;
+                    Debug.Log(this + ": HPC " + hpc.Name + " reached");
+                }
+            }
+        }
+        return reached;
     }
 
-    protected abstract void OnACCViolation();
+    protected virtual void OnPCReached(Condition pc) { }
+    protected virtual void OnHPCReached(Condition hpc) { }
+    protected virtual void OnACCViolation(Condition acc) { }
+    protected abstract void ApplyTaskSpecificReward();
+    protected abstract void ApplyAction(ActionBuffers actions);
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+        base.OnActionReceived(actions);  // is this needed?
+        ApplyAction(actions);
         actionCount++;
-        base.OnActionReceived(actions);
-        AddReward(-1f / maxActions);
-        CheckPostCondition();
-        CheckACCs();
-        if (EpisodeShouldEnd())
+        // time penalty
+        AddReward(TOTAL_TIME_PENALTY / maxActions);
+        ApplyTaskSpecificReward();
+        bool done = CheckPostCondition();
+        if (!done)
+        {
+            done = CheckHigherPostConditions();
+        }
+        if (!done)
+        {
+            done = CheckACCs();
+        }
+        if (!done && EpisodeShouldEnd())
         {
             AddReward(-1f);
             Debug.Log(this + "EpisodeShouldEnd, negative reward");

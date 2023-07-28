@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using Env5;
+using System.Linq;
 
 namespace BTTest
 {
@@ -103,6 +104,39 @@ namespace BTTest
                     FindNodesRec(child, predicate, nodes);
                 }
             }
+        }
+
+        public string printTree(Node tree = null, int depth = 0)
+        {
+            if (tree == null)
+            {
+                tree = Root;
+            }
+            string subTree = "";
+            string prefix = string.Concat(Enumerable.Repeat("| ", depth));
+            if (tree is CompositeNode)
+            {
+                var symbol = tree is Selector ? "F" : tree is Sequence ? "S" : "X";
+                subTree = subTree + prefix + symbol + "\n";
+                foreach (var child in (tree as CompositeNode).Children)
+                {
+                    subTree = subTree + printTree(child, depth + 1);
+                }
+            }
+            else if (tree is Action)
+            {
+                subTree = subTree + prefix + "[" + tree.Name + "]" + "\n";
+            }
+            else if (tree is ConditionNode)
+            {
+                subTree = subTree + prefix + "(" + tree.Name + ")" + "\n";
+            }
+            else
+            {
+                Debug.Log(tree);
+                throw new Exception("Unknown node type");
+            }
+            return subTree;
         }
     }
 
@@ -274,17 +308,20 @@ namespace BTTest
     {
         public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher) : base(name) { this.agent = agent; this.switcher = switcher; }
         public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition) : this(name, agent, switcher) { this.postCondition = postCondition; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, List<Condition> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, IEnumerable<Condition> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
+        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, IEnumerable<Condition> accs, IEnumerable<Condition> higherPostConditions) : this(name, agent, switcher, postCondition, accs) { this.higherPostConditions = higherPostConditions; }
         protected BaseAgent agent;
         protected IAgentSwitcher switcher;
         public Condition postCondition;
-        public List<Condition> accs;
+        public IEnumerable<Condition> accs;
+        public IEnumerable<Condition> higherPostConditions;
 
         public override TaskStatus OnUpdate()
         {
             // Debug.Log(Name + ": OnUpdate");
             agent.PostCondition = postCondition;
             agent.ACCs = accs;
+            agent.HigherPostConditions = higherPostConditions;
             switcher.Act(agent);
             return TaskStatus.Running;
         }

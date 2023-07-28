@@ -26,7 +26,8 @@ public enum EventType
     ActionGlobalReset,
     GlobalReset,
     GlobalSuccess,
-    // PreConditionViolated,
+    ActionStart,
+    HigherPostConditionReached,
 }
 
 public abstract class ActionEvent : Event
@@ -41,12 +42,12 @@ public abstract class ActionTerminationEvent : ActionEvent { }
 public abstract class GlobalEvent : Event { }
 public abstract class GlobalTerminationEvent : GlobalEvent { }
 
-public class ActionStartEvent : ActionEvent { }
+public class ActionStartEvent : ActionEvent { public EventType type = EventType.ActionStart; }
 
 public class PostConditionReachedEvent : ActionTerminationEvent { public string postCondition; public EventType type = EventType.PostConditionReached; }
+public class HigherPostConditionReachedEvent : ActionTerminationEvent { public string postCondition; public EventType type = EventType.HigherPostConditionReached; }
 public class ACCViolatedEvent : ActionTerminationEvent { public string acc; public EventType type = EventType.ACCViolated; }
 public class LocalResetEvent : ActionTerminationEvent { public EventType type = EventType.LocalReset; }
 public class ActionGlobalResetEvent : ActionTerminationEvent { public EventType type = EventType.ActionGlobalReset; }
 public class GlobalResetEvent : GlobalTerminationEvent { public EventType type = EventType.GlobalReset; }
 public class GlobalSuccessEvent : GlobalTerminationEvent { public EventType type = EventType.GlobalSuccess; }
-// public class PreConditionViolatedEvent : Event { public string preCondition; }

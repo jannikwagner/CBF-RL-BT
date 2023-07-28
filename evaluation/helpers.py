@@ -1,6 +1,7 @@
 import dataclasses
 import json
 from typing import Sequence, Tuple
+from enum import Enum
 
 import numpy as np
 import pandas as pd
@@ -10,12 +11,17 @@ import matplotlib.colors as mcolors
 
 COLORS = list(mcolors.TABLEAU_COLORS.values())
 
-action_termination_cause = [
+action_termination_causes = [
     "PostConditionReached",
     "ACCViolated",
     "LocalReset",
     "GlobalReset",
+    "HigherPostConditionReached",
 ]
+action_termination_causes_dict = dict(
+    zip(action_termination_causes, range(len(action_termination_causes)))
+)
+ActionTerminationCause = Enum("ActionTerminationCause", action_termination_causes_dict)
 
 
 @dataclasses.dataclass
@@ -125,17 +131,17 @@ def plot_per_acc(
     title: str,
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
-    plot_per_action(action_accs, labels, values, ylabel, title)
+    plot_per_group(action_accs, labels, values, ylabel, title)
 
 
-def plot_per_action(
-    actions: Sequence[str],
+def plot_per_group(
+    groups: Sequence[str],
     labels: Sequence[str],
     values: Sequence,
     ylabel: str,
     title: str,
 ):
-    x = np.arange(len(actions))  # the label locations
+    x = np.arange(len(groups))  # the label locations
     width = 1 / (len(values) + 1)  # the width of the bars
     multiplier = 0
 
@@ -144,14 +150,14 @@ def plot_per_action(
     for label, data in zip(labels, values):
         offset = width * multiplier
         rects = ax.bar(x + offset, data, width * 0.9, label=label)
-        ax.bar_label(rects, padding=3)
+        # ax.bar_label(rects, padding=1)
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.set_xticks(x + width / 2 * (len(values) - 1), actions, rotation=45, fontsize=8)
-    ax.legend(loc="upper left", ncols=3)
+    ax.set_xticks(x + width / 2 * (len(values) - 1), groups, rotation=45, fontsize=8)
+    ax.legend(loc="upper right", ncols=3)
     # ax.set_ylim(0, 1)
 
     plt.show()
@@ -165,7 +171,7 @@ def boxplot_per_acc(
     title: str,
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
-    boxplot_per_action(action_accs, labels, data, ylabel, title)
+    boxplot_per_group(action_accs, labels, data, ylabel, title)
 
 
 BOXPLOT_SETTINGS = dict(
@@ -175,19 +181,20 @@ BOXPLOT_SETTINGS = dict(
     showmeans=True,
     meanline=True,
     meanprops=dict(color="red"),
-    notch=True,
-    bootstrap=1000,
+    # whis=[5, 95]
+    # notch=True,
+    # bootstrap=1000,
 )
 
 
-def boxplot_per_action(
-    actions: Sequence[str],
+def boxplot_per_group(
+    groups: Sequence[str],
     labels: Sequence[str],
     datas: Sequence,
     ylabel: str,
     title: str,
 ):
-    x = np.arange(len(actions))  # the label locations
+    x = np.arange(len(groups))  # the label locations
     width = 1 / (len(datas) + 1)  # the width of the bars
     multiplier = 0
     bps_list = []
@@ -207,9 +214,10 @@ def boxplot_per_action(
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
+    # plt.yscale('log')
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.set_xticks(x + width / 2 * (len(datas) - 1), actions, rotation=45, fontsize=8)
+    ax.set_xticks(x + width / 2 * (len(datas) - 1), groups, rotation=45, fontsize=8)
     ax.legend([bps["boxes"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
 
     plt.show()
@@ -351,3 +359,13 @@ def get_local_steps_per_action(eps_df: pd.DataFrame, actions):
         avg_eps = action_df.localSteps
         steps_per_action_list.append(avg_eps)
     return steps_per_action_list
+
+
+def get_termination_cause_rates(df):
+    counts = df.groupby("terminationCause").action.count()
+    total = counts.sum()
+    rates = counts / total
+    for cause in action_termination_causes_dict.values():
+        if cause not in rates:
+            rates[cause] = 0
+    return [rates[cause] for cause in action_termination_causes_dict.values()]

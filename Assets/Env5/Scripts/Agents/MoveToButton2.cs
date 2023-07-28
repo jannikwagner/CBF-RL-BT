@@ -4,10 +4,9 @@ using UnityEngine;
 
 namespace Env5
 {
-    public class MoveToBridge : EnvBaseAgent
+    public class MoveToButton2 : EnvBaseAgent
     {
-        private IDistanceRewarder playerBridgeDistanceRewarder;
-        private IDistanceRewarder playerTrigger1DistancePunisher;
+        private IDistanceRewarder trigger2Button2DistanceRewarder;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
@@ -23,9 +22,7 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            playerBridgeDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, new Vector3(controller.env.X1, controller.env.ElevatedGroundY, controller.env.bridgeDown.transform.localPosition.z)));
-
-            playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
+            trigger2Button2DistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.trigger2.localPosition, controller.env.button2.localPosition));
         }
 
         protected override void OnPCReached(Condition pc)
@@ -33,11 +30,9 @@ namespace Env5
             base.OnPCReached(pc);
             AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
         }
-
         protected override void ApplyTaskSpecificReward()
         {
-            AddReward(playerBridgeDistanceRewarder.Reward() * 1f);
-            // AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
+            AddReward(trigger2Button2DistanceRewarder.Reward() * 1f);
         }
     }
 }

@@ -4,16 +4,18 @@ using UnityEngine;
 
 namespace Env5
 {
-    public class MoveToBridge : EnvBaseAgent
+    public class MoveToTrigger2 : EnvBaseAgent
     {
-        private IDistanceRewarder playerBridgeDistanceRewarder;
+        private IDistanceRewarder playerTrigger2DistanceRewarder;
         private IDistanceRewarder playerTrigger1DistancePunisher;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
-            sensor.AddObservation(playerPos / controller.env.Width * 2f);
-            Vector3 button2Pos = controller.env.button2.localPosition;
-            sensor.AddObservation((button2Pos - playerPos) / controller.env.Width);
+            Vector3 playerPosObs = playerPos / controller.env.Width * 2f;
+            sensor.AddObservation(playerPosObs);
+            Vector3 trigger2Pos = controller.env.trigger2.localPosition;
+            Vector3 distanceTotrigger2Obs = (trigger2Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceTotrigger2Obs);
             Vector3 trigger1Pos = controller.env.trigger1.localPosition;
             Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToTrigger1Obs);  // should not collide
@@ -23,20 +25,19 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
-            playerBridgeDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, new Vector3(controller.env.X1, controller.env.ElevatedGroundY, controller.env.bridgeDown.transform.localPosition.z)));
-
+            playerTrigger2DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger2);
             playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
         }
 
         protected override void OnPCReached(Condition pc)
         {
             base.OnPCReached(pc);
-            AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
+            float velocityPunishment = -0.1f * controller.rb.velocity.magnitude / controller.maxSpeed;
+            AddReward(velocityPunishment);
         }
-
         protected override void ApplyTaskSpecificReward()
         {
-            AddReward(playerBridgeDistanceRewarder.Reward() * 1f);
+            AddReward(playerTrigger2DistanceRewarder.Reward() * 1f);
             // AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
         }
     }

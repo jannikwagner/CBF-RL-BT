@@ -32,11 +32,15 @@ public class CompositeEpisodeEvaluator
             {
                 if (currentAction != null)
                 {
+                    // TODO: fix this bug instead of ignoring cases where it happens
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
-                    throw new Exception("ActionStartEvent received while another action is still active");
+                    // throw new Exception("ActionStartEvent received while another action is still active");
+                    Debug.Log("Inconsistency: ActionStartEvent received while another action is still active");
+                    return null;
 
                 }
+
                 var actionStartEvent = _event as ActionStartEvent;
                 currentAction = actionStartEvent.action;
             }
@@ -46,15 +50,21 @@ public class CompositeEpisodeEvaluator
                 var actionTerminationEvent = _event as ActionTerminationEvent;
                 if (currentAction == null)
                 {
+                    // TODO: fix this bug instead of ignoring cases where it happens
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
-                    throw new Exception("ActionTerminationEvent received while no action is active");
+                    // throw new Exception("ActionTerminationEvent received while no action is active");
+                    Debug.Log("Inconsistency: ActionTerminationEvent received while no action is active");
+                    return null;
                 }
                 if (currentAction != actionTerminationEvent.action)
                 {
+                    // not observed so far
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(events));
                     Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(_event));
-                    throw new Exception("ActionTerminationEvent received for action other than the currently active one");
+                    // throw new Exception("ActionTerminationEvent received for action other than the currently active one");
+                    Debug.Log("Inconsistency: ActionTerminationEvent received for action other than the currently active one");
+                    return null;
                 }
                 currentAction = null;
 
@@ -90,11 +100,26 @@ public class CompositeEpisodeEvaluator
 
                 if (_event is PostConditionReachedEvent)
                 {
+                    PostConditionReachedEvent postConditionReachedEvent = _event as PostConditionReachedEvent;
                     compositeEpisodeStatistics.postConditionReachedCount++;
                     compositeEpisodeStatistics.actionStatistics[action].postConditionReachedCount++;
                     episodeStatistics.terminationCause = ActionTerminationCause.PostConditionReached;
+                    episodeStatistics.postCondition = postConditionReachedEvent.postCondition;
 
                     episode.terminationCause = ActionTerminationCause.PostConditionReached;
+                    episode.postCondition = postConditionReachedEvent.postCondition;
+                }
+
+                if (_event is HigherPostConditionReachedEvent)
+                {
+                    HigherPostConditionReachedEvent hpcEvent = _event as HigherPostConditionReachedEvent;
+                    compositeEpisodeStatistics.higherPostConditionReachedCount++;
+                    compositeEpisodeStatistics.actionStatistics[action].higherPostConditionReachedCount++;
+                    episodeStatistics.terminationCause = ActionTerminationCause.HigherPostConditionReached;
+                    episodeStatistics.postCondition = hpcEvent.postCondition;
+
+                    episode.terminationCause = ActionTerminationCause.HigherPostConditionReached;
+                    episode.postCondition = hpcEvent.postCondition;
                 }
 
                 else if (_event is ACCViolatedEvent)

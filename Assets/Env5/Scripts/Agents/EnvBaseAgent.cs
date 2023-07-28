@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Env5
 {
-    public class EnvBaseAgent : BaseAgent
+    public abstract class EnvBaseAgent : BaseAgent
     {
         public override void CollectObservations(VectorSensor sensor)  // currently not used but overridden
         {
@@ -15,18 +15,18 @@ namespace Env5
             Vector3 playerPosObs = playerPos / controller.env.Width * 2f;
             sensor.AddObservation(playerPosObs);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
-            Vector3 targetPos = controller.env.target.localPosition;
-            Vector3 distanceToTargetObs = (targetPos - playerPos) / controller.env.Width;
-            sensor.AddObservation(distanceToTargetObs);
-            Vector3 goalTriggerPos = controller.env.goalTrigger.localPosition;
-            Vector3 distanceToGoalTriggerObs = (goalTriggerPos - playerPos) / controller.env.Width;
-            sensor.AddObservation(distanceToGoalTriggerObs);
-            Vector3 buttonPos = controller.env.button.localPosition;
-            Vector3 distanceToButtonObs = (buttonPos - playerPos) / controller.env.Width;
-            sensor.AddObservation(distanceToButtonObs);
-            Vector3 goalPos = controller.env.goal.localPosition;
-            Vector3 distanceToGoalObs = (goalPos - playerPos) / controller.env.Width;
-            sensor.AddObservation(distanceToGoalObs);
+            Vector3 trigger1Pos = controller.env.trigger1.localPosition;
+            Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceToTrigger1Obs);
+            Vector3 Trigger2Pos = controller.env.trigger2.localPosition;
+            Vector3 distanceToTrigger2Obs = (Trigger2Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceToTrigger2Obs);
+            Vector3 button1Pos = controller.env.button1.localPosition;
+            Vector3 distanceToButton1Obs = (button1Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceToButton1Obs);
+            Vector3 button2Pos = controller.env.button2.localPosition;
+            Vector3 distanceTobutton2Obs = (button2Pos - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceTobutton2Obs);
         }
 
         public PlayerController controller;
@@ -42,14 +42,10 @@ namespace Env5
             return actuator.GetAcceleration(actions) * controller.MaxAcc;
         }
 
-        public override void OnActionReceived(ActionBuffers actions)
+        protected override void ApplyAction(ActionBuffers actions)
         {
             var acceleration = GetAcceleration(actions);
             controller.ApplyAcceleration(acceleration);
-            // important to call base.OnActionReceived last,
-            // ACCs and postconditions are checked there and reward is added
-            // TODO: investigate whether this works in build environment
-            base.OnActionReceived(actions);
         }
 
         public override void Heuristic(in ActionBuffers actionsOut)
@@ -70,16 +66,11 @@ namespace Env5
 
         public override void ResetEnvLocal()
         {
-            this.controller.env.Initialize();
+            this.controller.env.Reset();
         }
         public override void ResetEnvGlobal()
         {
-            this.controller.env.Initialize();
-        }
-
-        protected override void OnACCViolation()
-        {
-            // Debug.Log("OnACCViolation" + controller.player.localPosition + controller.env.PlayerUp() + controller.env.DistancePlayerUp());
+            this.controller.env.Reset();
         }
     }
 
@@ -246,19 +237,19 @@ namespace Env5
             return x.ToArray();
         }
     }
-    public class PlayerTargetPosVelDynamics : IDynamicsProvider
+    public class PlayerTrigger1PosVelDynamics : IDynamicsProvider
     {
-        // relative position and velocity of player to target
+        // relative position and velocity of player to trigger1
         EnvBaseAgent agent;
-        public PlayerTargetPosVelDynamics(EnvBaseAgent agent)
+        public PlayerTrigger1PosVelDynamics(EnvBaseAgent agent)
         {
             this.agent = agent;
         }
         public float[] dxdt(ActionBuffers action)
         {
-            var targetVelocity = agent.controller.env.target.GetComponentInParent<Rigidbody>().velocity;
-            var velocity = agent.controller.rb.velocity - targetVelocity;
-            var acceleration = agent.GetAcceleration(action); // + 0.5f * targetVelocity; // not sure why I added this here            
+            var trigger1Velocity = agent.controller.env.trigger1.GetComponentInParent<Rigidbody>().velocity;
+            var velocity = agent.controller.rb.velocity - trigger1Velocity;
+            var acceleration = agent.GetAcceleration(action); // + 0.5f * trigger1Velocity; // not sure why I added this here            
             float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
             velocity = velocity + 0.5f * acceleration * deltaTime;
             var dxdt = new PosVelState { position = velocity, velocity = acceleration };
@@ -267,8 +258,8 @@ namespace Env5
 
         public float[] x()
         {
-            var position = agent.controller.player.localPosition - agent.controller.env.target.localPosition;
-            var velocity = agent.controller.rb.velocity - agent.controller.env.target.GetComponentInParent<Rigidbody>().velocity;
+            var position = agent.controller.player.localPosition - agent.controller.env.trigger1.localPosition;
+            var velocity = agent.controller.rb.velocity - agent.controller.env.trigger1.GetComponentInParent<Rigidbody>().velocity;
             var x = new PosVelState { position = position, velocity = velocity };
             return x.ToArray();
         }
