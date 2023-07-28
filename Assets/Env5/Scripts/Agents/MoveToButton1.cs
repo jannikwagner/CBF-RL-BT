@@ -22,13 +22,13 @@ namespace Env5
             trigger1Button1DistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.trigger1.localPosition, controller.env.button1.localPosition));
         }
 
+        protected override void OnPCReached(Condition pc)
+        {
+            base.OnPCReached(pc);
+            AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
+        }
         protected override void ApplyTaskSpecificReward()
         {
-            if (PostCondition != null && PostCondition.Func())
-            {
-                Debug.Log("Button pressed! PC: " + PostCondition.Name);
-                AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
-            }
             AddReward(trigger1Button1DistanceRewarder.Reward() * 1f);
         }
     }

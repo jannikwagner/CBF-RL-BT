@@ -72,11 +72,6 @@ namespace Env5
         {
             this.controller.env.Reset();
         }
-
-        protected override void OnACCViolation()
-        {
-            // Debug.Log("OnACCViolation" + controller.player.localPosition + controller.env.PlayerUp() + controller.env.DistancePlayerUp());
-        }
     }
 
     public interface IEnvActuator

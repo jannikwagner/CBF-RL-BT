@@ -28,14 +28,14 @@ namespace Env5
             playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
         }
 
+        protected override void OnPCReached(Condition pc)
+        {
+            base.OnPCReached(pc);
+            AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
+        }
+
         protected override void ApplyTaskSpecificReward()
         {
-            if (PostCondition != null && PostCondition.Func())
-            {
-                Debug.Log("Moved to bridge! PC: " + PostCondition.Name);
-                AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
-            }
-
             AddReward(playerBridgeDistanceRewarder.Reward() * 1f);
             // AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
         }

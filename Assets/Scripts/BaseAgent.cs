@@ -64,9 +64,10 @@ public abstract class BaseAgent : Agent
         bool postconditionReached = PostCondition != null && PostCondition.Func();
         if (postconditionReached)
         {
+            OnPCReached(PostCondition);
             AddReward(PC_REWARD);
-            Debug.Log(this + ": PostCondition " + PostCondition.Name + " met");
             evaluationManager.AddEvent(new PostConditionReachedEvent { postCondition = PostCondition.Name, localStep = actionCount });
+            Debug.Log(this + ": PostCondition " + PostCondition.Name + " reached");
         }
         return postconditionReached;
     }
@@ -79,7 +80,8 @@ public abstract class BaseAgent : Agent
             {
                 if (!acc.Func())
                 {
-                    OnACCViolation();
+                    OnACCViolation(acc);
+                    // only for the first violated acc should be reward given and event logged
                     if (!punished)
                     {
                         AddReward(ACC_REWARD);
@@ -101,7 +103,8 @@ public abstract class BaseAgent : Agent
             {
                 if (hpc.Func())
                 {
-                    OnACCViolation();
+                    OnHPCReached(hpc);
+                    // only for the first reached hpc should be reward given and event logged
                     if (!reached)
                     {
                         AddReward(HPC_REWARD);  // probably should not give reward
@@ -115,7 +118,9 @@ public abstract class BaseAgent : Agent
         return reached;
     }
 
-    protected abstract void OnACCViolation();
+    protected virtual void OnPCReached(Condition pc) { }
+    protected virtual void OnHPCReached(Condition hpc) { }
+    protected virtual void OnACCViolation(Condition acc) { }
     protected abstract void ApplyTaskSpecificReward();
     protected abstract void ApplyAction(ActionBuffers actions);
 

@@ -30,11 +30,6 @@ namespace Env5
 
         protected override void ApplyTaskSpecificReward()
         {
-            if (PostCondition != null && PostCondition.Func())
-            {
-                Debug.Log("Moved Over Bridge! PC: " + PostCondition.Name);
-            }
-
             AddReward(trigger2Button2DistanceRewarder.Reward() * 0.5f);
             AddReward(X3DistanceRewarder.Reward() * 0.5f);
         }
