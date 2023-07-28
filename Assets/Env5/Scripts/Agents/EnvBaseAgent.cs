@@ -29,13 +29,15 @@ namespace Env5
             sensor.AddObservation(distanceTobutton2Obs);
         }
 
+        private const float MAX_VELOCITY_PUNISHMENT = -0f;
+        private const float ALLOWED_VELOCITY_FRACTION = 0.3f;
         public PlayerController controller;
         private IEnvActuator actuator;
         public override int NumActions => actuator.NumActions;
 
         void Start()
         {
-            actuator = new EnvActuator25();
+            actuator = new EnvActuatorGrid5x5();
         }
         public Vector3 GetAcceleration(ActionBuffers actions)
         {
@@ -72,6 +74,22 @@ namespace Env5
         {
             this.controller.env.Reset();
         }
+
+        protected override void OnPCReached(Condition pc)
+        {
+            base.OnPCReached(pc);
+            ApplyVelocityPunishment();
+        }
+
+        protected void ApplyVelocityPunishment()
+        {
+            var velocityFraction = controller.rb.velocity.magnitude / controller.maxSpeed;
+            if (velocityFraction > ALLOWED_VELOCITY_FRACTION)
+            {
+                AddReward(MAX_VELOCITY_PUNISHMENT * (velocityFraction - ALLOWED_VELOCITY_FRACTION) / (1f - ALLOWED_VELOCITY_FRACTION));
+            }
+        }
+
     }
 
     public interface IEnvActuator
@@ -81,7 +99,7 @@ namespace Env5
         void Heuristic(in ActionBuffers actionsOut);
     }
 
-    public class EnvActuator25 : IEnvActuator
+    public class EnvActuatorGrid5x5 : IEnvActuator
     {
         public int NumActions => 25;
         public Vector3 GetAcceleration(ActionBuffers actions)
@@ -106,7 +124,7 @@ namespace Env5
             // Debug.Log(discreateActionsOut[0]);
         }
     }
-    public class EnvActuator9 : IEnvActuator
+    public class EnvActuatorGrid3x3 : IEnvActuator
     {
         public int NumActions => 9;
 
@@ -177,7 +195,7 @@ namespace Env5
             // Debug.Log(discreateActionsOut[0]);
         }
     }
-    public class EnvCircularActuator : IEnvActuator
+    public class EnvActuatorCircular : IEnvActuator
     {
         public int directions;
         public int strengths;

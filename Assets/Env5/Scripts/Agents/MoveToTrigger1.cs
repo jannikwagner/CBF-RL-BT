@@ -24,12 +24,6 @@ namespace Env5
             playerTrigger1DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
         }
 
-        protected override void OnPCReached(Condition pc)
-        {
-            base.OnPCReached(pc);
-            float velocityPunishment = -0.1f * controller.rb.velocity.magnitude / controller.maxSpeed;
-            AddReward(velocityPunishment);
-        }
         protected override void ApplyTaskSpecificReward()
         {
             AddReward(playerTrigger1DistanceRewarder.Reward() * 1f);

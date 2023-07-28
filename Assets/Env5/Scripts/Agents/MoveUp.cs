@@ -20,11 +20,6 @@ namespace Env5
             upDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerX1FromRight);
         }
 
-        protected override void OnPCReached(Condition pc)
-        {
-            base.OnPCReached(pc);
-            AddReward(-0.0f * controller.rb.velocity.magnitude / controller.maxSpeed);
-        }
         protected override void ApplyTaskSpecificReward()
         {
             AddReward(upDistanceRewarder.Reward() * 1f);

@@ -23,15 +23,9 @@ namespace Env5
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
+
             playerBridgeDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, new Vector3(controller.env.X1, controller.env.ElevatedGroundY, controller.env.bridgeDown.transform.localPosition.z)));
-
             playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
-        }
-
-        protected override void OnPCReached(Condition pc)
-        {
-            base.OnPCReached(pc);
-            AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
         }
 
         protected override void ApplyTaskSpecificReward()
