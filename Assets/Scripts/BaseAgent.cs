@@ -22,10 +22,10 @@ public abstract class BaseAgent : Agent
     private IEnumerable<Condition> higherPostConditions;
     private IEnumerable<CBFApplicator> cbfApplicators;
     protected CBFDiscreteInvalidActionMasker masker = new CBFDiscreteInvalidActionMasker();
+    internal AgentSwitchingAsserter swtichingAsserter;
 
     public int ActionCount { get => actionCount; }
     public int MaxActions { get => maxActions; }
-    // public int StepsPerDecision { get => stepsPerDecision; set => stepsPerDecision = value; }
     public Condition PostCondition { get => postCondition; set => postCondition = value; }
     public IEnumerable<Condition> ACCs { get => accs; set => accs = value; }
     public abstract int NumActions { get; }
@@ -37,9 +37,10 @@ public abstract class BaseAgent : Agent
     public virtual void ResetEnvGlobal() { }
     public override void OnEpisodeBegin()
     {
-        base.OnEpisodeBegin();
-        actionCount = 0;
+        // base.OnEpisodeBegin();
         Debug.Log(this + ": OnEpisodeBegin");
+        swtichingAsserter.log(this, AgentSwitchingAsserter.AgentEvents.EpisodeBegin);
+        actionCount = 0;
         evaluationManager.AddEvent(new ActionStartEvent { localStep = actionCount });
     }
 
@@ -127,7 +128,8 @@ public abstract class BaseAgent : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        base.OnActionReceived(actions);  // is this needed?
+        // base.OnActionReceived(actions);  // is this needed?
+        swtichingAsserter.log(this, AgentSwitchingAsserter.AgentEvents.OnActionReceived);
         ApplyAction(actions);
         actionCount++;
         // time penalty
@@ -147,6 +149,7 @@ public abstract class BaseAgent : Agent
             AddReward(LOCAL_RESET_REWARD);
             Debug.Log(this + "EpisodeShouldEnd, negative reward");
             evaluationManager.AddEvent(new LocalResetEvent { localStep = actionCount });
+            done = true;
         }
     }
 
