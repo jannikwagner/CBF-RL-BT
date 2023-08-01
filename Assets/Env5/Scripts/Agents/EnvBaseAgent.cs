@@ -240,7 +240,7 @@ namespace Env5
             var acceleration = agent.GetAcceleration(action);
             // apply acceleration before velocity! needed to be safe because of discretization of continuous system
             // note: applying all steps accels at once is safer than actually necessary, but also simpler.
-            // 0.5 is apparently also safe
+            // 0.5 is apparently also safe. 0.5 corresponds to proper integration!
             float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
             velocity = velocity + 0.5f * acceleration * deltaTime;
             var dxdt = new PosVelState { position = velocity, velocity = acceleration };

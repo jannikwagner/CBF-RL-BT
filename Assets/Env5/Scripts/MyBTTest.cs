@@ -35,7 +35,6 @@ namespace Env5
 
         private void Start()
         {
-            Debug.Log("MyBTTest Start");
             var agents = new EnvBaseAgent[] { moveToTrigger1, moveToButton1, moveUp, moveToTrigger2, moveToBridge, moveOverBridge, moveToButton2 };
             evaluationManager = new EvaluationManager();
             foreach (var agent in agents)
@@ -59,7 +58,6 @@ namespace Env5
             {
                 evaluationManager.Init(this, conditions, agents, actions, runId);
             }
-            Debug.Log("MyBTTest Start done");
         }
 
         private void InitTree()

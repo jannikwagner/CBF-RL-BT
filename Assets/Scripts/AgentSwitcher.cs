@@ -78,13 +78,13 @@ public class AgentSwitcher : IAgentSwitcher
 
     private void DeactivateAgent()
     {
-        Debug.Log("DeactivateAgent: " + currentAgent + ", reward: " + currentAgent.GetCumulativeReward());
+        Debug.Log(currentAgent + ": DeactivateAgent" + ", reward: " + currentAgent.GetCumulativeReward());
         asserter.log(currentAgent, AgentSwitchingAsserter.AgentEvents.Deactivation);
         currentAgent.gameObject.SetActive(false);
     }
     private void ActivateAgent(BaseAgent agent)
     {
-        Debug.Log("ActivateAgent " + agent);
+        Debug.Log(agent + ": ActivateAgent");
         asserter.log(agent, AgentSwitchingAsserter.AgentEvents.Activation);
         currentAgent = agent;
         currentAgent.gameObject.SetActive(true);
