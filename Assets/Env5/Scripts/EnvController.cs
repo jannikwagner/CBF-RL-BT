@@ -26,7 +26,6 @@ namespace Env5
         float buttonHeight = 0.0002f;
         float buttonScale = 4f;
         float margin = 1f;
-        float podiumBredth = 10f;
 
         float x0;
         float x1;
@@ -162,10 +161,10 @@ namespace Env5
 
             button1.localPosition = new Vector3(-12, buttonY, -2);
 
-            float buttonMaxX = -8;
-            float buttonTiltStartX = -20;
-            float buttonSmallMaxZ = -2;
-            float buttonSmallMinZ = -6;
+            // float buttonMaxX = -8;
+            // float buttonTiltStartX = -20;
+            // float buttonSmallMaxZ = -2;
+            // float buttonSmallMinZ = -6;
 
             button1.localPosition = new Vector3(Random.Range(x0 + buttonScale / 2, x1 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
             button2.localPosition = new Vector3(Random.Range(x3 + buttonScale / 2, x4 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));

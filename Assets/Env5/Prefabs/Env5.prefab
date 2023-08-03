@@ -57,7 +57,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: d09cbd8bea2714e93a98db9b34ad32c3, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToBridge
   TeamId: 0
   m_UseChildSensors: 1
@@ -138,7 +138,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: d801497dac53740a5bb3f00b3298433b, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveUp
   TeamId: 0
   m_UseChildSensors: 1
@@ -219,7 +219,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 73ea7d449d7b048da89490dcccce1318, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToButton2
   TeamId: 0
   m_UseChildSensors: 1
@@ -300,7 +300,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: f2321e80abf464e2fbfd0b2a02c33278, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToButton1
   TeamId: 0
   m_UseChildSensors: 1
@@ -509,7 +509,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: a6f1cd803276144298c1d2d79e2a90ae, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToTrigger1
   TeamId: 0
   m_UseChildSensors: 1
@@ -590,7 +590,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 01f8a246953c141b29e22784a81350aa, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveOverBridge
   TeamId: 0
   m_UseChildSensors: 1
@@ -671,7 +671,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 5b770d79aef4a4dc89120a6fb8e019fc, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToTrigger2
   TeamId: 0
   m_UseChildSensors: 1
