@@ -27,6 +27,7 @@ namespace Env5
             Vector3 button2Pos = controller.env.button2.localPosition;
             Vector3 distanceTobutton2Obs = (button2Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceTobutton2Obs);
+            sensor.AddObservation(controller.env.BridgeZ / controller.env.Width);
         }
 
         private const float MAX_VELOCITY_PUNISHMENT = -0f;

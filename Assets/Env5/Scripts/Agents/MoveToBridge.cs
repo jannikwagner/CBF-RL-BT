@@ -7,7 +7,6 @@ namespace Env5
     public class MoveToBridge : EnvBaseAgent
     {
         private IDistanceRewarder playerBridgeDistanceRewarder;
-        private IDistanceRewarder playerTrigger1DistancePunisher;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
@@ -18,6 +17,7 @@ namespace Env5
             Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToTrigger1Obs);  // should not collide
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
+            sensor.AddObservation(controller.env.BridgeZ / controller.env.Width);
         }
 
         public override void OnEpisodeBegin()
@@ -25,13 +25,11 @@ namespace Env5
             base.OnEpisodeBegin();
 
             playerBridgeDistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.player.localPosition, new Vector3(controller.env.X1, controller.env.ElevatedGroundY, controller.env.bridgeDown.transform.localPosition.z)));
-            playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
         }
 
         protected override void ApplyTaskSpecificReward()
         {
             AddReward(playerBridgeDistanceRewarder.Reward() * 1f);
-            // AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
         }
     }
 }

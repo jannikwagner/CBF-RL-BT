@@ -33,6 +33,7 @@ namespace Env5
         float x3;
         float x4;
         float height;
+        float bridgeZ;
 
         public float X3 => x3;
         public float X1 => x1;
@@ -41,6 +42,7 @@ namespace Env5
         public float BridgeWidth => bridgeWidth;
 
         public float PlayerScale { get => playerScale; }
+        public float BridgeZ => bridgeZ;
 
         void Awake()
         {
@@ -110,13 +112,13 @@ namespace Env5
         }
         public float DistancePlayerBridgeFromNorth()
         {
-            float bridgeNorthEdge = BridgeWidth / 2;
+            float bridgeNorthEdge = bridgeDown.transform.localPosition.z + BridgeWidth / 2;
             var distance = player.localPosition.z - bridgeNorthEdge - Utility.eps;
             return Mathf.Max(distance, 0);
         }
         public float DistancePlayerBridgeFromSouth()
         {
-            float bridgeSouthEdge = -BridgeWidth / 2;
+            float bridgeSouthEdge = bridgeDown.transform.localPosition.z - BridgeWidth / 2;
             var distance = bridgeSouthEdge - player.localPosition.z - Utility.eps;
             return Mathf.Max(distance, 0);
         }
@@ -172,6 +174,15 @@ namespace Env5
             player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
             trigger1.localPosition = new Vector3(Random.Range(minX, maxXTrigger1), playerY, Random.Range(minZ, maxZ));
             trigger2.localPosition = new Vector3(Random.Range(minX, maxXTrigger1), playerY, Random.Range(minZ, maxZ));
+
+            bridgeZ = Random.Range(z0 + bridgeWidth / 2, z1 - bridgeWidth / 2);
+            var bridgeDownY = 3.95f;
+            var bridgeUpY = 11.08f;
+            var bridgeUpX = 2.91f;
+            bridgeDown.transform.localPosition = new Vector3(x2, bridgeDownY, bridgeZ);
+            bridgeUp.transform.localPosition = new Vector3(bridgeUpX, bridgeUpY, bridgeZ);
+            // bridgeDown.transform.scale = new Vector3(x3 - x1, bridgeDown.transform.scale.y, bridgeWidth);
+            // bridgeUp.transform.scale = new Vector3(x3 - x1, bridgeUp.transform.scale.y, bridgeWidth);
 
             bridgeDown.SetActive(false);
             bridgeUp.SetActive(true);

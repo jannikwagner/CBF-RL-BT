@@ -27,10 +27,10 @@ from helpers import (
 
 run_id = "testRunId"
 
-file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF_new2.json"
+file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF_new3.json"
 eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
 
-file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF_new2.json"
+file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF_new3.json"
 eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
 
 file_paths = [file_path_wcbf, file_path_wocbf]

@@ -12,6 +12,7 @@ namespace Env5
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.Width * 2f);
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
+            sensor.AddObservation(controller.env.BridgeZ / controller.env.Width);
         }
 
         public override void OnEpisodeBegin()

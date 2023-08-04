@@ -7,7 +7,6 @@ namespace Env5
     public class MoveToTrigger2 : EnvBaseAgent
     {
         private IDistanceRewarder playerTrigger2DistanceRewarder;
-        private IDistanceRewarder playerTrigger1DistancePunisher;
         public override void CollectObservations(VectorSensor sensor)
         {
             Vector3 playerPos = controller.player.localPosition;
@@ -20,19 +19,18 @@ namespace Env5
             Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToTrigger1Obs);  // should not collide
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
+            sensor.AddObservation(controller.env.BridgeZ / controller.env.Width);
         }
 
         public override void OnEpisodeBegin()
         {
             base.OnEpisodeBegin();
             playerTrigger2DistanceRewarder = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger2);
-            playerTrigger1DistancePunisher = new OnlyImprovingDistanceRewarder(controller.DistanceToTrigger1);
         }
 
         protected override void ApplyTaskSpecificReward()
         {
             AddReward(playerTrigger2DistanceRewarder.Reward() * 1f);
-            // AddReward(-playerTrigger1DistancePunisher.Reward() * 1f);
         }
     }
 }

@@ -282,12 +282,12 @@ namespace Env5
             var rightOfX1CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(1, 0, 0), maxAcc, margin);
             var rightOfX3CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X3, controller.env.ElevatedGroundY, 0), new Vector3(1, 0, 0), maxAcc, margin);
             var buttonPressedCBF = new StaticPointCBF3D2ndOrderApproximation(maxAcc, controller.env.PlayerScale + margin);
-            var topEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), maxAcc, margin);
-            var bottomEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, -controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), maxAcc, margin);
-            var bridgeOpenLeftRightCBF = new MinCBF(new List<ICBF> { topEdgeBridgeCBF, bottomEdgeBridgeCBF });
+            var northEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeZ + controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), maxAcc, margin);
+            var southEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeZ - controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), maxAcc, margin);
+            var bridgeOpenLeftRightCBF = new MinCBF(new List<ICBF> { northEdgeBridgeCBF, southEdgeBridgeCBF });
             var upCBF = new MaxCBF(new List<ICBF> { leftOfX1CBF, rightOfX3CBF });
             var upBridgeCBF = new MaxCBF(new List<ICBF> { upCBF, bridgeOpenLeftRightCBF });
-            var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, topEdgeBridgeCBF, bottomEdgeBridgeCBF });
+            var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, northEdgeBridgeCBF, southEdgeBridgeCBF });
 
             var moveToButton1_posVelDynamics = new PlayerPosVelDynamics(moveToButton1);
             var moveToButton1_leftOfX1CBFApplicator = new DiscreteCBFApplicator(leftOfX1CBF, moveToButton1_posVelDynamics, deltaTime, debug: debugCBF);
@@ -331,6 +331,7 @@ namespace Env5
             _tree.Reset();
             agentSwitcher.Reset();
             controller.env.Reset();
+            InitCBFs();
             stepCount = 0;
             compositeEpisodeCount++;
         }

@@ -18,7 +18,6 @@ Possibly an alternative way to install Netwonsoft.Json: https://github.com/jille
 
 ### Training
 
-
 ```
 mlagents-learn configs/conf_wcbf.yaml --run-id=env5.wcbf.2 --env=builds/build_env5_wcbf
 ```
