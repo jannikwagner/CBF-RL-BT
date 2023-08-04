@@ -38,7 +38,7 @@ namespace Env5
 
         void Start()
         {
-            actuator = new EnvActuatorGrid5x5();
+            actuator = new EnvActuatorGrid5x5Norm();
         }
         public Vector3 GetAcceleration(ActionBuffers actions)
         {
@@ -100,6 +100,44 @@ namespace Env5
         void Heuristic(in ActionBuffers actionsOut);
     }
 
+    public class EnvActuatorGrid5x5Norm : IEnvActuator
+    {
+        public int NumActions => 25;
+        public Vector3 GetAcceleration(ActionBuffers actions)
+        {
+            var discreteActions = actions.DiscreteActions;
+            var action = discreteActions[0];
+
+            var i = action % 5;
+            var j = action / 5;
+            var x = i - 2;
+            var z = j - 2;
+
+            var acceleration = new Vector3(x, 0f, z) / 2.0f;
+            // full speed diagonal / half diagonal
+            if (acceleration.magnitude > 1f)
+            {
+                acceleration = acceleration.normalized;
+            }
+            // half speed diagonal
+            else if (Mathf.Abs(x) == 1 && Mathf.Abs(z) == 1)
+            {
+                acceleration = acceleration.normalized * 0.5f;
+            }
+            return acceleration;
+        }
+
+        public void Heuristic(in ActionBuffers actionsOut)
+        {
+            int factor = Input.GetKey(KeyCode.Space) ? 2 : 1;
+            var discreateActionsOut = actionsOut.DiscreteActions;
+
+            var i = factor * (int)Input.GetAxisRaw("Horizontal") + 2;
+            var j = factor * (int)Input.GetAxisRaw("Vertical") + 2;
+            discreateActionsOut[0] = i + 5 * j;
+        }
+    }
+
     public class EnvActuatorGrid5x5 : IEnvActuator
     {
         public int NumActions => 25;
@@ -122,7 +160,35 @@ namespace Env5
             var i = factor * (int)Input.GetAxisRaw("Horizontal") + 2;
             var j = factor * (int)Input.GetAxisRaw("Vertical") + 2;
             discreateActionsOut[0] = i + 5 * j;
-            // Debug.Log(discreateActionsOut[0]);
+        }
+    }
+    public class EnvActuatorGrid3x3Norm : IEnvActuator
+    {
+        public int NumActions => 9;
+
+        public Vector3 GetAcceleration(ActionBuffers actions)
+        {
+            var discreteActions = actions.DiscreteActions;
+            var action = discreteActions[0];
+
+            var i = action % 3;
+            var j = action / 3;
+            var acceleration = new Vector3(i - 1, 0f, j - 1);
+            // diagonal
+            if (acceleration.magnitude > 1f)
+            {
+                acceleration = acceleration.normalized;
+            }
+            return acceleration;
+        }
+
+        public void Heuristic(in ActionBuffers actionsOut)
+        {
+            var discreateActionsOut = actionsOut.DiscreteActions;
+
+            var i = (int)Input.GetAxisRaw("Horizontal") + 1;
+            var j = (int)Input.GetAxisRaw("Vertical") + 1;
+            discreateActionsOut[0] = i + 3 * j;
         }
     }
     public class EnvActuatorGrid3x3 : IEnvActuator
@@ -136,8 +202,8 @@ namespace Env5
 
             var i = action % 3;
             var j = action / 3;
-            var force = new Vector3(i - 1, 0f, j - 1);
-            return force;
+            var acceleration = new Vector3(i - 1, 0f, j - 1);
+            return acceleration;
         }
 
         public void Heuristic(in ActionBuffers actionsOut)
@@ -147,7 +213,6 @@ namespace Env5
             var i = (int)Input.GetAxisRaw("Horizontal") + 1;
             var j = (int)Input.GetAxisRaw("Vertical") + 1;
             discreateActionsOut[0] = i + 3 * j;
-            // Debug.Log(discreateActionsOut[0]);
         }
     }
     public class EnvActuator5 : IEnvActuator
