@@ -275,7 +275,7 @@ namespace Env5
             System.Func<float, float> alpha = ((float x) => x);
             float margin = Utility.eps + 0.2f;
             bool debugCBF = false;
-            float maxAccFactor = 1 / 1.5f;
+            float maxAccFactor = 1f / 1.75f;
             float maxAcc = controller.MaxAcc * maxAccFactor;
 
             var leftOfX1CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), maxAcc, margin);

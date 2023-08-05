@@ -333,7 +333,7 @@ namespace Env5
         {
             var trigger1Velocity = agent.controller.env.trigger1.GetComponentInParent<Rigidbody>().velocity;
             var velocity = agent.controller.rb.velocity - trigger1Velocity;
-            var acceleration = agent.GetAcceleration(action); // + 0.5f * trigger1Velocity; // not sure why I added this here            
+            var acceleration = agent.GetAcceleration(action); // + 0.5f * trigger1Velocity; // not sure why I added this here
             float deltaTime = Time.fixedDeltaTime * agent.ActionsPerDecision;
             velocity = velocity + 0.5f * acceleration * deltaTime;
             var dxdt = new PosVelState { position = velocity, velocity = acceleration };
