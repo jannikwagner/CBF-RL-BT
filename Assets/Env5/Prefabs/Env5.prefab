@@ -1713,8 +1713,8 @@ MonoBehaviour:
   moveToTrigger2: {fileID: 6230228090255894407}
   moveToButton2: {fileID: 3524731210142737004}
   controller: {fileID: 2350770349054637415}
-  useCBF: 1
-  evaluationActive: 1
+  useCBF: 0
+  evaluationActive: 0
 --- !u!114 &1685125455920507372
 MonoBehaviour:
   m_ObjectHideFlags: 0
