@@ -163,11 +163,6 @@ namespace Env5
 
             button1.localPosition = new Vector3(-12, buttonY, -2);
 
-            // float buttonMaxX = -8;
-            // float buttonTiltStartX = -20;
-            // float buttonSmallMaxZ = -2;
-            // float buttonSmallMinZ = -6;
-
             button1.localPosition = new Vector3(Random.Range(x0 + buttonScale / 2, x1 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
             button2.localPosition = new Vector3(Random.Range(x3 + buttonScale / 2, x4 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
 
@@ -181,8 +176,6 @@ namespace Env5
             var bridgeUpX = 2.91f;
             bridgeDown.transform.localPosition = new Vector3(x2, bridgeDownY, bridgeZ);
             bridgeUp.transform.localPosition = new Vector3(bridgeUpX, bridgeUpY, bridgeZ);
-            // bridgeDown.transform.scale = new Vector3(x3 - x1, bridgeDown.transform.scale.y, bridgeWidth);
-            // bridgeUp.transform.scale = new Vector3(x3 - x1, bridgeUp.transform.scale.y, bridgeWidth);
 
             bridgeDown.SetActive(false);
             bridgeUp.SetActive(true);
