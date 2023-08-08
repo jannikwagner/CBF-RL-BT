@@ -29,6 +29,7 @@ public interface IDynamicsProvider
 {
     public float[] x();
     public float[] dxdt(ActionBuffers action);
+    public float[] delta_x(ActionBuffers action, float delta_t);
 }
 
 public class CombinedDynamics : IDynamicsProvider
@@ -50,5 +51,9 @@ public class CombinedDynamics : IDynamicsProvider
     public float[] dxdt(ActionBuffers action)
     {
         return Utility.Concat(dynamics1.dxdt(action), dynamics2.dxdt(action));
+    }
+    public float[] delta_x(ActionBuffers action, float delta_t)
+    {
+        return Utility.Concat(dynamics1.delta_x(action, delta_t), dynamics2.delta_x(action, delta_t));
     }
 }

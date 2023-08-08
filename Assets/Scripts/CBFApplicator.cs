@@ -12,7 +12,7 @@ public interface ICBFApplicator
 
 public abstract class CBFApplicator : ICBFApplicator
 {
-    protected IDynamicsProvider controlledDynamics;
+    protected IDynamicsProvider dynamicsProvider;
     public ICBF cbf;
     public bool debug;
     public float deltaTime;
@@ -20,14 +20,14 @@ public abstract class CBFApplicator : ICBFApplicator
     public CBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, float deltaTime, bool debug = false)
     {
         this.cbf = cbf;
-        this.controlledDynamics = controlledDynamics;
+        this.dynamicsProvider = controlledDynamics;
         this.debug = debug;
         this.deltaTime = deltaTime;
     }
 
     public bool isSafe()
     {
-        return isSafe(controlledDynamics.x());
+        return isSafe(dynamicsProvider.x());
     }
 
     bool isSafe(float[] x)
@@ -37,12 +37,12 @@ public abstract class CBFApplicator : ICBFApplicator
 
     public float evaluate()
     {
-        return cbf.h(controlledDynamics.x());
+        return cbf.h(dynamicsProvider.x());
     }
 
     public float[] gradient()
     {
-        return cbf.dhdx(controlledDynamics.x());
+        return cbf.dhdx(dynamicsProvider.x());
     }
 
     public abstract bool isActionValid(ActionBuffers action);
@@ -62,17 +62,16 @@ public class ContinuousCBFApplicator : CBFApplicator
 
     public override bool isActionValid(ActionBuffers action)
     {
-        var x = controlledDynamics.x();
+        var x = dynamicsProvider.x();
         var gradient = cbf.dhdx(x);
-        var dxdt = controlledDynamics.dxdt(action);
-        bool debugLocal = debug;// && (action.DiscreteActions[0] == 14 || action.DiscreteActions[0] == 10);
-        if (debugLocal) Debug.Log("action: " + action.DiscreteActions[0]);
-        if (debugLocal) Debug.Log("dxdt: " + Utility.arrToStr(dxdt));
-        if (debugLocal) Debug.Log("dhdx: " + Utility.arrToStr(gradient));
-        if (debugLocal) Debug.Log("x: " + Utility.arrToStr(x));
-        float left = deltaTime * Utility.Dot(dxdt, gradient);
+        var dxdt = dynamicsProvider.dxdt(action);
+        bool debugLocal = debug;
+        var dhdt = Utility.Dot(dxdt, gradient);
+        // float delta_h = deltaTime * dhdt; // how it was previously done
+        var delta_x = dynamicsProvider.delta_x(action, deltaTime);
+        var delta_h = Utility.Dot(delta_x, gradient);
+        float left = delta_h;
         float right = -alpha.Invoke(cbf.h(x));
-        if (debugLocal) Debug.Log("left: " + left + ", right: " + right);
         return left >= right;
     }
 }
@@ -90,12 +89,14 @@ public class DiscreteCBFApplicator : CBFApplicator
 
     public override bool isActionValid(ActionBuffers action)
     {
-        var currentState = controlledDynamics.x();
-        var dynamics = controlledDynamics.dxdt(action);
-        var nextState = Utility.Add(currentState, Utility.Mult(dynamics, deltaTime));
-        var nextValue = cbf.h(nextState);
-        var currentValue = cbf.h(currentState);
-        var criterion = nextValue + (eta - 1) * currentValue;
+        var x1 = dynamicsProvider.x();
+        var dxdt = dynamicsProvider.dxdt(action);
+        // var delta_x = Utility.Mult(dxdt, deltaTime)  // how it was previously done
+        var delta_x = dynamicsProvider.delta_x(action, deltaTime);
+        var x2 = Utility.Add(x1, delta_x);
+        var h2 = cbf.h(x2);
+        var h1 = cbf.h(x1);
+        var criterion = h2 + (eta - 1) * h1;
         return criterion >= 0;
     }
 }

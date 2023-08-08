@@ -38,4 +38,8 @@ public class EnemyBehavior4 : MonoBehaviour, IDynamicsProvider
     {
         return Utility.vec3ToArr(_dynamics());
     }
+    public float[] delta_x(ActionBuffers action, float delta_t)
+    {
+        return Utility.vec3ToArr(_dynamics() * delta_t);
+    }
 }

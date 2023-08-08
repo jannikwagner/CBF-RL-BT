@@ -7,19 +7,21 @@ class Node:
 
 
 class ExecutionNode(Node):
+    pass
+
+
+@dataclass
+class Condition(ExecutionNode):
     name: str
     abbreviation: str
     description: str
 
 
 @dataclass
-class Condition(ExecutionNode):
-    pass
-
-
-@dataclass
 class Action(ExecutionNode):
-    pass
+    name: str
+    abbreviation: str
+    description: str
 
 
 @dataclass
@@ -186,7 +188,7 @@ def actions_to_latex(actions):
 def ppas_to_latex(ppas):
     return LATEX_SEPARATOR.join(
         [
-            f"{ppa.postcondition.abbreviation} & {','.join([pre.abbreviation for pre in ppa.preconditions])} & {ppa.action.abbreviation}"
+            f"{ppa.postcondition.abbreviation} & {', '.join([pre.abbreviation for pre in ppa.preconditions]) if ppa.preconditions else '-'} & {ppa.action.abbreviation}"
             for ppa in ppas
         ]
     )
@@ -195,7 +197,7 @@ def ppas_to_latex(ppas):
 def accs_to_latex(action_acc_preconditions):
     return LATEX_SEPARATOR.join(
         [
-            f"{action.abbreviation} & {','.join([acc.abbreviation for acc in accs])} & {','.join([pre.abbreviation for pre in preconditions])}"
+            f"{action.abbreviation} & {', '.join([acc.abbreviation for acc in accs]) if accs else '-'} & {','.join([pre.abbreviation for pre in preconditions]) if preconditions else '-'}"
             for action, accs, preconditions in action_acc_preconditions
         ]
     )
@@ -234,15 +236,29 @@ C_D = Condition("Done?", abbreviation="D", description="The game is done.")
 
 conditions = [C_B2, C_PB, C_OB, C_B1, C_U, C_T2, C_T1]
 
-A_MB2 = Action("MoveToButton2", abbreviation="MB2", description="Moves to button 2.")
-A_MB1 = Action("MoveToButton1", abbreviation="MB1", description="Moves to button 1.")
-A_MT2 = Action("MoveToTrigger2", abbreviation="MT2", description="Moves to trigger 2.")
-A_MT1 = Action("MoveToTrigger1", abbreviation="MT1", description="Moves to trigger 1.")
-A_MU = Action("MoveUp", abbreviation="MU", description="Moves to the elevated ground.")
-A_MOB = Action(
-    "MoveOverBridge", abbreviation="MOB", description="Moves over the bridge."
+A_MB2 = Action(
+    "MoveToButton2", abbreviation="MB2", description="The player moves to button 2."
 )
-A_MTB = Action("MoveToBridge", abbreviation="MTB", description="Moves to the bridge.")
+A_MB1 = Action(
+    "MoveToButton1", abbreviation="MB1", description="The player moves to button 1."
+)
+A_MT2 = Action(
+    "MoveToTrigger2", abbreviation="MT2", description="The player moves to trigger 2."
+)
+A_MT1 = Action(
+    "MoveToTrigger1", abbreviation="MT1", description="The player moves to trigger 1."
+)
+A_MU = Action(
+    "MoveUp", abbreviation="MU", description="The player moves to the elevated ground."
+)
+A_MOB = Action(
+    "MoveOverBridge",
+    abbreviation="MOB",
+    description="The player moves over the bridge.",
+)
+A_MTB = Action(
+    "MoveToBridge", abbreviation="MTB", description="The player moves to the bridge."
+)
 A_D = Action("Done!", abbreviation="D", description="The game is done.")
 
 actions = [A_MB2, A_MB1, A_MT2, A_MT1, A_MU, A_MOB, A_MTB]
@@ -383,8 +399,11 @@ for i, ppas in enumerate(alternative_ppas):
     print("")
 
 print(conditions_to_latex(conditions))
+print()
 print(actions_to_latex(actions))
+print()
 print(ppas_to_latex(ppas_multiple_goals))
+print()
 bt = build_tree(goal, ppas_multiple_goals)
 action_acc_preconditions = accs_bottom_up_loop(bt)
 print(accs_to_latex(action_acc_preconditions))
