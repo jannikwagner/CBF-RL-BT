@@ -15,14 +15,14 @@ public abstract class CBFApplicator : ICBFApplicator
     protected IDynamicsProvider dynamicsProvider;
     public ICBF cbf;
     public bool debug;
-    public float deltaTime;
+    public float delta_t;
 
-    public CBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, float deltaTime, bool debug = false)
+    public CBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, float delta_t, bool debug = false)
     {
         this.cbf = cbf;
         this.dynamicsProvider = controlledDynamics;
         this.debug = debug;
-        this.deltaTime = deltaTime;
+        this.delta_t = delta_t;
     }
 
     public bool isSafe()
@@ -52,7 +52,7 @@ public class ContinuousCBFApplicator : CBFApplicator
 {
     Func<float, float> alpha = (x) => x;
 
-    public ContinuousCBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, float deltaTime, Func<float, float> alpha = null, bool debug = false) : base(cbf, controlledDynamics, deltaTime, debug)
+    public ContinuousCBFApplicator(ICBF cbf, IDynamicsProvider dynamicsProvider, float delta_t, Func<float, float> alpha = null, bool debug = false) : base(cbf, dynamicsProvider, delta_t, debug)
     {
         if (alpha != null)
         {
@@ -63,13 +63,13 @@ public class ContinuousCBFApplicator : CBFApplicator
     public override bool isActionValid(ActionBuffers action)
     {
         var x = dynamicsProvider.x();
-        var gradient = cbf.dhdx(x);
-        var dxdt = dynamicsProvider.dxdt(action);
-        bool debugLocal = debug;
-        var dhdt = Utility.Dot(dxdt, gradient);
-        // float delta_h = deltaTime * dhdt; // how it was previously done
-        var delta_x = dynamicsProvider.delta_x(action, deltaTime);
-        var delta_h = Utility.Dot(delta_x, gradient);
+        var dhdx = cbf.dhdx(x);
+        // var dxdt = dynamicsProvider.dxdt(action);
+        // var dhdt = Utility.Dot(dxdt, gradient);
+        // float delta_h = deltaTime * dhdt; // how it was previously done, this assumes that the dynamics are first order and effectively sets alpha to 1/deltaTime
+        // var delta_x = Utility.Mult(dxdt, deltaTime)  // equivalent to how it was previously done, this assumes that the dynamics are first order
+        var delta_x = dynamicsProvider.delta_x(action, delta_t);  // better approximation of the change in state, allows for 2nd order dynamics
+        var delta_h = Utility.Dot(delta_x, dhdx);  // better approximation of the change in h
         float left = delta_h;
         float right = -alpha.Invoke(cbf.h(x));
         return left >= right;
@@ -78,7 +78,7 @@ public class ContinuousCBFApplicator : CBFApplicator
 public class DiscreteCBFApplicator : CBFApplicator
 {
     private float eta;
-    public DiscreteCBFApplicator(ICBF cbf, IDynamicsProvider controlledDynamics, float deltaTime, float eta = 1, bool debug = false) : base(cbf, controlledDynamics, deltaTime, debug)
+    public DiscreteCBFApplicator(ICBF cbf, IDynamicsProvider dynamicsProvider, float delta_t, float eta = 1, bool debug = false) : base(cbf, dynamicsProvider, delta_t, debug)
     /*
      * eta: How strongly the state should be pushed into the safe set
      * deltaTime: the time step
@@ -90,9 +90,9 @@ public class DiscreteCBFApplicator : CBFApplicator
     public override bool isActionValid(ActionBuffers action)
     {
         var x1 = dynamicsProvider.x();
-        var dxdt = dynamicsProvider.dxdt(action);
-        // var delta_x = Utility.Mult(dxdt, deltaTime)  // how it was previously done
-        var delta_x = dynamicsProvider.delta_x(action, deltaTime);
+        // var dxdt = dynamicsProvider.dxdt(action);
+        // var delta_x = Utility.Mult(dxdt, deltaTime)  // how it was previously done, this assumes that the dynamics are first order
+        var delta_x = dynamicsProvider.delta_x(action, delta_t);  // better approximation of the change in state, allows for 2nd order dynamics
         var x2 = Utility.Add(x1, delta_x);
         var h2 = cbf.h(x2);
         var h1 = cbf.h(x1);
