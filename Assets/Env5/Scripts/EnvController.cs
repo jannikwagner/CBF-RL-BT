@@ -12,6 +12,7 @@ namespace Env5
         public Transform button2;
         public GameObject bridgeDown;
         public GameObject bridgeUp;
+        public bool randomBridgeZ;
 
         private float groundY = 0f;
         private float elevatedGroundY = 4f;
@@ -62,7 +63,7 @@ namespace Env5
                 bridgeUp.SetActive(true);
             }
 
-            if (button2Pressed())
+            if (Button2Pressed())
             {
                 Debug.Log("You win!");
             }
@@ -73,7 +74,7 @@ namespace Env5
             return button1.gameObject.GetComponent<CollisionDetector>().Touching(trigger1.gameObject);
         }
 
-        public bool button2Pressed()
+        public bool Button2Pressed()
         {
             return button2.gameObject.GetComponent<CollisionDetector>().Touching(trigger2.gameObject);
         }
@@ -170,7 +171,7 @@ namespace Env5
             trigger1.localPosition = new Vector3(Random.Range(minX, maxXTrigger1), playerY, Random.Range(minZ, maxZ));
             trigger2.localPosition = new Vector3(Random.Range(minX, maxXTrigger1), playerY, Random.Range(minZ, maxZ));
 
-            bridgeZ = Random.Range(z0 + bridgeWidth / 2, z1 - bridgeWidth / 2);
+            bridgeZ = randomBridgeZ ? Random.Range(z0 + bridgeWidth / 2, z1 - bridgeWidth / 2) : 0f;
             var bridgeDownY = 3.95f;
             var bridgeUpY = 11.08f;
             var bridgeUpX = 2.91f;

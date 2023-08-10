@@ -13,6 +13,7 @@ namespace Env5
         private float closenessDistance = 3.0f;
         private float maxAcc = 10f;
         internal float maxSpeed = 10f;
+        public bool safelyPlaceTrigger;
 
         public float MaxAcc { get => maxAcc; }
 
@@ -56,7 +57,7 @@ namespace Env5
             }
             else if (collision.gameObject.tag == "GoalTrigger")
             {
-                if (env.Button1Pressed() && !env.button2Pressed())
+                if (env.Button1Pressed() && !env.Button2Pressed())
                 {
                     StartControlTrigger2();
                 }
@@ -84,8 +85,15 @@ namespace Env5
                 ControlOther controlOther = this.GetComponent<ControlOther>();
                 controlOther.enabled = false;
 
-                Vector2 safePoint = FindSafePoint(player.position, rb.velocity, env.button1.position);
-                env.trigger1.position = new Vector3(safePoint.x, env.button1.position.y + 0.5f, safePoint.y);
+                if (safelyPlaceTrigger)
+                {
+                    Vector2 safePoint = FindSafePoint(player.position, rb.velocity, env.button1.position);
+                    env.trigger1.position = new Vector3(safePoint.x, env.button1.position.y + 0.5f, safePoint.y);
+                }
+                else
+                {
+                    env.trigger1.position = new Vector3(env.button1.position.x, env.button1.position.y + 0.5f, env.button1.position.z);
+                }
                 env.trigger1.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
                 // The physics engine would be one FixedUpdate behind if we don't do this. This would lead to the BT executing MoveToT1 for one FixedUpdate.
                 if (press)
@@ -122,8 +130,15 @@ namespace Env5
                 ControlOther controlOther = this.GetComponent<ControlOther>();
                 controlOther.enabled = false;
 
-                var safePoint = FindSafePoint(player.position, rb.velocity, env.button2.position);
-                env.trigger2.position = new Vector3(safePoint.x, env.button2.position.y + 0.5f, safePoint.y);
+                if (safelyPlaceTrigger)
+                {
+                    var safePoint = FindSafePoint(player.position, rb.velocity, env.button2.position);
+                    env.trigger2.position = new Vector3(safePoint.x, env.button2.position.y + 0.5f, safePoint.y);
+                }
+                else
+                {
+                    env.trigger2.position = new Vector3(env.button2.position.x, env.button2.position.y + 0.5f, env.button2.position.z);
+                }
                 env.trigger2.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
                 // The physics engine would be one FixedUpdate behind if we don't do this. This would lead to the BT executing MoveToGoalTrigger for one FixedUpdate.
                 if (press)

@@ -67,7 +67,7 @@ namespace Env5
             var playerUp = new Condition("Up", controller.env.PlayerUp);
             var b1Pressed = new Condition("B1", controller.env.Button1Pressed);
             var isControllingT2 = new Condition("T2", controller.IsControllingT2);
-            var b2Pressed = new Condition("B2", controller.env.button2Pressed);
+            var b2Pressed = new Condition("B2", controller.env.Button2Pressed);
             var onBridge = new Condition("OnBridge", controller.env.PlayerOnBridge);
             var playerPastX3 = new Condition("PastBridge", controller.env.PlayerRightOfX3);
             conditions = new List<Condition> { isControllingT1, playerUp, b1Pressed, isControllingT2, b2Pressed, onBridge, playerPastX3 };
