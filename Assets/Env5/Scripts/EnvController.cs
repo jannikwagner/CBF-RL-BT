@@ -45,6 +45,8 @@ namespace Env5
         public float PlayerScale { get => playerScale; }
         public float BridgeZ => bridgeZ;
 
+        public Vector3 BridgeEntranceLeft => new Vector3(X1, ElevatedGroundY, BridgeZ);
+
         void Awake()
         {
             Initialize();

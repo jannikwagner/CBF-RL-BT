@@ -17,7 +17,8 @@ namespace Env5
             Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToTrigger1Obs);  // should not collide
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
-            sensor.AddObservation(controller.env.BridgeZ / controller.env.Width * 2f);
+            Vector3 distanceToBridgeObs = (controller.env.BridgeEntranceLeft - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceToBridgeObs);
         }
 
         public override void OnEpisodeBegin()
