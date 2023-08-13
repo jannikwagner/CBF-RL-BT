@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 15
+    VectorObservationSize: 12
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
@@ -57,7 +57,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 8884efe5ad9ce4341a9705854ded465c, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToBridge
   TeamId: 0
   m_UseChildSensors: 1
@@ -138,7 +138,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: f8677c76bae774ddcaad73b88e6882b2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveUp
   TeamId: 0
   m_UseChildSensors: 1
@@ -208,7 +208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 15
+    VectorObservationSize: 9
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
@@ -219,7 +219,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: dfdc2a7f31f8943b288d0df6d6c3b65e, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToButton2
   TeamId: 0
   m_UseChildSensors: 1
@@ -289,7 +289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 12
+    VectorObservationSize: 9
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
@@ -300,7 +300,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: f71d232d9a9bc4366a54ac29e28c6c3b, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToButton1
   TeamId: 0
   m_UseChildSensors: 1
@@ -509,7 +509,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 4a2fef10f8f58456a96f5d9995b45b63, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToTrigger1
   TeamId: 0
   m_UseChildSensors: 1
@@ -579,7 +579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 15
+    VectorObservationSize: 9
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
@@ -590,7 +590,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 04a61d7f339e445e6bb0d85e69fdf2a4, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveOverBridge
   TeamId: 0
   m_UseChildSensors: 1
@@ -671,7 +671,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: a77841a364b4b48b6b7ac5f45e69424b, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: MoveToTrigger2
   TeamId: 0
   m_UseChildSensors: 1

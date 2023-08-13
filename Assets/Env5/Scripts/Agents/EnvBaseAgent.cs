@@ -14,19 +14,25 @@ namespace Env5
             Vector3 playerPos = controller.player.localPosition;
             Vector3 playerPosObs = playerPos / controller.env.Width * 2f;
             sensor.AddObservation(playerPosObs);
+
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
+
             Vector3 trigger1Pos = controller.env.trigger1.localPosition;
             Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToTrigger1Obs);
-            Vector3 Trigger2Pos = controller.env.trigger2.localPosition;
-            Vector3 distanceToTrigger2Obs = (Trigger2Pos - playerPos) / controller.env.Width;
+
+            Vector3 trigger2Pos = controller.env.trigger2.localPosition;
+            Vector3 distanceToTrigger2Obs = (trigger2Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToTrigger2Obs);
+
             Vector3 button1Pos = controller.env.button1.localPosition;
             Vector3 distanceToButton1Obs = (button1Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToButton1Obs);
+
             Vector3 button2Pos = controller.env.button2.localPosition;
             Vector3 distanceTobutton2Obs = (button2Pos - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceTobutton2Obs);
+
             Vector3 distanceToBridgeObs = (controller.env.BridgeEntranceLeft - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToBridgeObs);
         }

@@ -11,7 +11,9 @@ namespace Env5
         {
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.Width * 2f);
+
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
+
             Vector3 distanceToBridgeObs = (controller.env.BridgeEntranceLeft - playerPos) / controller.env.Width;
             sensor.AddObservation(distanceToBridgeObs);
         }
