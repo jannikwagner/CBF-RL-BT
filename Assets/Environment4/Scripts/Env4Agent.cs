@@ -133,6 +133,10 @@ public class Env4Agent : Agent
         {
             return Utility.vec3ToArr(agent.controller.playerTransform.localPosition);
         }
+        public float[] delta_x(ActionBuffers action, float deltaTime)
+        {
+            return Utility.vec3ToArr(agent.actuatorComponent.GetMovement(action, agent.controller.speed) * deltaTime);
+        }
     }
 
     public class BatteryDynamics : IDynamicsProvider
@@ -153,6 +157,12 @@ public class Env4Agent : Agent
         public float[] x()
         {
             return Utility.Concat(Utility.vec3ToArr(agent.controller.playerTransform.localPosition), new float[] { agent.controller.battery });
+        }
+        public float[] delta_x(ActionBuffers action, float delta_t)
+        {
+            var movement = agent.actuatorComponent.GetMovement(action, agent.controller.speed);
+            var batteryChange = agent.controller.getBatteryChange(movement);
+            return Utility.Concat(Utility.vec3ToArr(movement * delta_t), new float[] { batteryChange * delta_t });
         }
     }
 }

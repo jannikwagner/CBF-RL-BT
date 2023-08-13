@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.MLAgents;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 /**
   * If an agent is in a `SimpleMultiAgentGroup` and its `gameObject` is deactivated, it will be removed from the group.
@@ -33,18 +34,21 @@ public class AgentSwitcher : IAgentSwitcher
     public List<BaseAgent> agents;
     protected BaseAgent currentAgent;
     protected AgentSwitcherStatus status;
+    private AgentSwitchingAsserter asserter;
 
     public BaseAgent Agent => currentAgent;
 
     public AgentSwitcher()
     {
         agents = new List<BaseAgent>();
+        asserter = new AgentSwitchingAsserter();
     }
 
     public void AddAgent(BaseAgent agent)
     {
         if (!agents.Contains(agent))
         {
+            agent.swtichingAsserter = asserter;
             agents.Add(agent);
             agent.gameObject.SetActive(false);
         }
@@ -74,12 +78,14 @@ public class AgentSwitcher : IAgentSwitcher
 
     private void DeactivateAgent()
     {
-        Debug.Log("DeactivateAgent: " + currentAgent + ", reward: " + currentAgent.GetCumulativeReward());
+        Debug.Log(currentAgent + ": DeactivateAgent" + ", reward: " + currentAgent.GetCumulativeReward());
+        asserter.log(currentAgent, AgentSwitchingAsserter.AgentEvents.Deactivation);
         currentAgent.gameObject.SetActive(false);
     }
     private void ActivateAgent(BaseAgent agent)
     {
-        Debug.Log("ActivateAgent " + agent);
+        Debug.Log(agent + ": ActivateAgent");
+        asserter.log(agent, AgentSwitchingAsserter.AgentEvents.Activation);
         currentAgent = agent;
         currentAgent.gameObject.SetActive(true);
     }
@@ -123,6 +129,57 @@ public class AgentSwitcher : IAgentSwitcher
     }
 }
 
+public class AgentSwitchingAsserter
+{
+    public enum AgentEvents
+    {
+        Activation,
+        EpisodeBegin,
+        OnActionReceived,
+        Deactivation,
+    }
+    private enum AgentStates
+    {
+        Inactive,
+        Active,
+        EpisodeBegun,
+        ActionReceived,
+    }
+    public BaseAgent currentAgent;
+    private AgentStates state;
+    public void log(BaseAgent agent, AgentEvents agentEvent)
+    {
+        Assert.IsTrue(agent != null);
+        switch (agentEvent)
+        {
+            case AgentEvents.Activation:
+                Assert.IsTrue(state == AgentStates.Inactive);
+                Assert.IsTrue(currentAgent == null);
+                state = AgentStates.Active;
+                currentAgent = agent;
+                break;
+            case AgentEvents.EpisodeBegin:
+                Assert.IsTrue(state == AgentStates.Active);
+                Assert.IsTrue(currentAgent == agent);
+                state = AgentStates.EpisodeBegun;
+                break;
+            case AgentEvents.OnActionReceived:
+                Assert.IsTrue(state == AgentStates.EpisodeBegun || state == AgentStates.ActionReceived);
+                Assert.IsTrue(currentAgent == agent);
+                state = AgentStates.ActionReceived;
+                break;
+            case AgentEvents.Deactivation:
+                Assert.IsTrue(state == AgentStates.ActionReceived);
+                Assert.IsTrue(currentAgent == agent);
+                state = AgentStates.Inactive;
+                currentAgent = null;
+                break;
+            default:
+                throw new Exception("Unknown AgentEvent");
+                break;
+        }
+    }
+}
 
 public class AgentSwitcherWithAgentGroup : IAgentSwitcher
 {

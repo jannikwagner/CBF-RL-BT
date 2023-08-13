@@ -11,7 +11,11 @@ namespace Env5
         {
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.Width * 2f);
+
             sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
+
+            Vector3 distanceToBridgeObs = (controller.env.BridgeEntranceLeft - playerPos) / controller.env.Width;
+            sensor.AddObservation(distanceToBridgeObs);
         }
 
         public override void OnEpisodeBegin()
@@ -20,11 +24,6 @@ namespace Env5
             upDistanceRewarder = new OnlyImprovingDistanceRewarder(controller.env.DistancePlayerX1FromRight);
         }
 
-        protected override void OnPCReached(Condition pc)
-        {
-            base.OnPCReached(pc);
-            AddReward(-0.0f * controller.rb.velocity.magnitude / controller.maxSpeed);
-        }
         protected override void ApplyTaskSpecificReward()
         {
             AddReward(upDistanceRewarder.Reward() * 1f);

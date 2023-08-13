@@ -21,6 +21,7 @@ public class CBFDiscreteInvalidActionMasker
         bool[] actionMasked = new bool[numActions];
         foreach (var cbfApplicator in cbfApplicators)
         {
+            // Debug.Log(cbfApplicator.cbf);
             bool[] actionMaskedNew = new bool[numActions];
             var allMasked = true;
             for (int i = 0; i < numActions; i++)
@@ -28,6 +29,7 @@ public class CBFDiscreteInvalidActionMasker
                 // if (cbfApplicator.debug) Debug.Log("Action: " + i);
                 var actions = new ActionBuffers(new float[] { }, new int[] { i });
                 var okay = cbfApplicator.isActionValid(actions);
+                // if (!okay) Debug.Log(i + " is not okay");
                 bool mask = !okay || actionMasked[i];
                 actionMaskedNew[i] = mask;
                 allMasked = allMasked && mask;

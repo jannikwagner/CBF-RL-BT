@@ -18,20 +18,19 @@ Possibly an alternative way to install Netwonsoft.Json: https://github.com/jille
 
 ### Training
 
-
 ```
-mlagents-learn configs/conf2.yaml --env=builds/build10 --run-id=env5.26 --initialize-from=env5.25
+mlagents-learn configs/conf_wcbf.yaml --run-id=env5.wcbf.2 --env=builds/build_env5_wcbf
 ```
 
 #### Resume
 ```
-mlagents-learn configs/conf2.yaml --env=builds/build10 --run-id=env5.26 --resume
+mlagents-learn configs/conf_wcbf.yaml --run-id=env5.wcbf.2 --env=builds/build_env5_wcbf --resume
 ```
 
 ### Evaluation
 
 ```
-mlagents-learn configs/conf2.yaml --run-id=env5.31 --resume --inference
+mlagents-learn configs/conf_wcbf.yaml --run-id=env5.wcbf.2 --resume --inference
 ```
 
 Currently, evaluation does only work in unity an not in built environments.

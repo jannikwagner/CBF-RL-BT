@@ -35,7 +35,6 @@ namespace Env5
 
         private void Start()
         {
-            Debug.Log("MyBTTest Start");
             var agents = new EnvBaseAgent[] { moveToTrigger1, moveToButton1, moveUp, moveToTrigger2, moveToBridge, moveOverBridge, moveToButton2 };
             evaluationManager = new EvaluationManager();
             foreach (var agent in agents)
@@ -59,7 +58,6 @@ namespace Env5
             {
                 evaluationManager.Init(this, conditions, agents, actions, runId);
             }
-            Debug.Log("MyBTTest Start done");
         }
 
         private void InitTree()
@@ -69,7 +67,7 @@ namespace Env5
             var playerUp = new Condition("Up", controller.env.PlayerUp);
             var b1Pressed = new Condition("B1", controller.env.Button1Pressed);
             var isControllingT2 = new Condition("T2", controller.IsControllingT2);
-            var b2Pressed = new Condition("B2", controller.env.button2Pressed);
+            var b2Pressed = new Condition("B2", controller.env.Button2Pressed);
             var onBridge = new Condition("OnBridge", controller.env.PlayerOnBridge);
             var playerPastX3 = new Condition("PastBridge", controller.env.PlayerRightOfX3);
             conditions = new List<Condition> { isControllingT1, playerUp, b1Pressed, isControllingT2, b2Pressed, onBridge, playerPastX3 };
@@ -275,35 +273,35 @@ namespace Env5
             float deltaTime = Time.fixedDeltaTime * (steps);
             float eta = 1f;
             System.Func<float, float> alpha = ((float x) => x);
-            float margin = Utility.eps + 0.2f;
+            float margin = Utility.eps + 0.0f;
             bool debugCBF = false;
-            float maxAccFactor = 1 / 1.5f;
+            float maxAccFactor = 1f / 2f;
             float maxAcc = controller.MaxAcc * maxAccFactor;
 
             var leftOfX1CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), maxAcc, margin);
             var rightOfX1CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(1, 0, 0), maxAcc, margin);
             var rightOfX3CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X3, controller.env.ElevatedGroundY, 0), new Vector3(1, 0, 0), maxAcc, margin);
-            var buttonPressedCBF = new StaticPointCBF3D2ndOrderApproximation(maxAcc, controller.env.PlayerScale + margin);
-            var topEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), maxAcc, margin);
-            var bottomEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, -controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), maxAcc, margin);
-            var bridgeOpenLeftRightCBF = new MinCBF(new List<ICBF> { topEdgeBridgeCBF, bottomEdgeBridgeCBF });
+            var button1PressedCBF = new StaticPointCBF3D2ndOrderApproximation(maxAcc, controller.env.PlayerScale + margin);
+            var northEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeZ + controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), maxAcc, margin);
+            var southEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeZ - controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), maxAcc, margin);
+            var bridgeOpenLeftRightCBF = new MinCBF(new List<ICBF> { northEdgeBridgeCBF, southEdgeBridgeCBF });
             var upCBF = new MaxCBF(new List<ICBF> { leftOfX1CBF, rightOfX3CBF });
             var upBridgeCBF = new MaxCBF(new List<ICBF> { upCBF, bridgeOpenLeftRightCBF });
-            var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, topEdgeBridgeCBF, bottomEdgeBridgeCBF });
+            var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, northEdgeBridgeCBF, southEdgeBridgeCBF });
 
             var moveToButton1_posVelDynamics = new PlayerPosVelDynamics(moveToButton1);
             var moveToButton1_leftOfX1CBFApplicator = new DiscreteCBFApplicator(leftOfX1CBF, moveToButton1_posVelDynamics, deltaTime, debug: debugCBF);
             moveToButton1.CBFApplicators = new List<CBFApplicator> { moveToButton1_leftOfX1CBFApplicator };
 
             var moveToTrigger2_playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToTrigger2);
-            var moveToTrigger2_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToTrigger2_playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
-            moveToTrigger2.CBFApplicators = new List<CBFApplicator> { moveToTrigger2_buttonPressedCBFApplicator };
+            var moveToTrigger2_button1PressedCBFApplicator = new DiscreteCBFApplicator(button1PressedCBF, moveToTrigger2_playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
+            moveToTrigger2.CBFApplicators = new List<CBFApplicator> { moveToTrigger2_button1PressedCBFApplicator };
 
             var moveToBridge_posVelDynamics = new PlayerPosVelDynamics(moveToBridge);
             var moveToBridge_playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(moveToBridge);
             var moveToBridge_upBridgeCBFApplicator = new DiscreteCBFApplicator(upBridgeCBF, moveToBridge_posVelDynamics, deltaTime, debug: debugCBF);
-            var moveToBridge_buttonPressedCBFApplicator = new DiscreteCBFApplicator(buttonPressedCBF, moveToBridge_playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
-            moveToBridge.CBFApplicators = new List<CBFApplicator> { moveToBridge_buttonPressedCBFApplicator, moveToBridge_upBridgeCBFApplicator };
+            var moveToBridge_button1PressedCBFApplicator = new DiscreteCBFApplicator(button1PressedCBF, moveToBridge_playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
+            moveToBridge.CBFApplicators = new List<CBFApplicator> { moveToBridge_button1PressedCBFApplicator, moveToBridge_upBridgeCBFApplicator };
 
             var moveOverBridge_posVelDynamics = new PlayerPosVelDynamics(moveOverBridge);
             var moveOverBridge_bridgeOpenRightCBFApplicator = new DiscreteCBFApplicator(bridgeOpenRightCBF, moveOverBridge_posVelDynamics, deltaTime, debug: debugCBF);
@@ -312,6 +310,8 @@ namespace Env5
             var moveToButton2_posVelDynamics = new PlayerPosVelDynamics(moveToButton2);
             var moveToButton2_pastBridgeCBFApplicator = new DiscreteCBFApplicator(rightOfX3CBF, moveToButton2_posVelDynamics, deltaTime, debug: debugCBF);
             moveToButton2.CBFApplicators = new List<CBFApplicator> { moveToButton2_pastBridgeCBFApplicator };
+
+            // moveUp.CBFApplicators = new List<CBFApplicator> { moveToBridge_button1PressedCBFApplicator };
         }
 
         void FixedUpdate()
@@ -333,6 +333,7 @@ namespace Env5
             _tree.Reset();
             agentSwitcher.Reset();
             controller.env.Reset();
+            InitCBFs();
             stepCount = 0;
             compositeEpisodeCount++;
         }

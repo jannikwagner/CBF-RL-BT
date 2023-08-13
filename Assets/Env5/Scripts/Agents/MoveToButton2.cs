@@ -11,12 +11,11 @@ namespace Env5
         {
             Vector3 playerPos = controller.player.localPosition;
             sensor.AddObservation(playerPos / controller.env.Width * 2f);
+
+            sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
+
             Vector3 button2Pos = controller.env.button2.localPosition;
             sensor.AddObservation((button2Pos - playerPos) / controller.env.Width);
-            Vector3 trigger1Pos = controller.env.trigger1.localPosition;
-            Vector3 distanceToTrigger1Obs = (trigger1Pos - playerPos) / controller.env.Width;
-            sensor.AddObservation(distanceToTrigger1Obs);  // should not collide
-            sensor.AddObservation(controller.rb.velocity / controller.maxSpeed);
         }
 
         public override void OnEpisodeBegin()
@@ -25,11 +24,6 @@ namespace Env5
             trigger2Button2DistanceRewarder = new OnlyImprovingDistanceRewarder(() => Vector3.Distance(controller.env.trigger2.localPosition, controller.env.button2.localPosition));
         }
 
-        protected override void OnPCReached(Condition pc)
-        {
-            base.OnPCReached(pc);
-            AddReward(-1f * controller.rb.velocity.magnitude / controller.maxSpeed);
-        }
         protected override void ApplyTaskSpecificReward()
         {
             AddReward(trigger2Button2DistanceRewarder.Reward() * 1f);

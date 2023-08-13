@@ -12,6 +12,7 @@ namespace Env5
         public Transform button2;
         public GameObject bridgeDown;
         public GameObject bridgeUp;
+        public bool randomBridgeZ;
 
         private float groundY = 0f;
         private float elevatedGroundY = 4f;
@@ -26,7 +27,6 @@ namespace Env5
         float buttonHeight = 0.0002f;
         float buttonScale = 4f;
         float margin = 1f;
-        float podiumBredth = 10f;
 
         float x0;
         float x1;
@@ -34,6 +34,7 @@ namespace Env5
         float x3;
         float x4;
         float height;
+        float bridgeZ;
 
         public float X3 => x3;
         public float X1 => x1;
@@ -42,6 +43,9 @@ namespace Env5
         public float BridgeWidth => bridgeWidth;
 
         public float PlayerScale { get => playerScale; }
+        public float BridgeZ => bridgeZ;
+
+        public Vector3 BridgeEntranceLeft => new Vector3(X1, ElevatedGroundY, BridgeZ);
 
         void Awake()
         {
@@ -61,7 +65,7 @@ namespace Env5
                 bridgeUp.SetActive(true);
             }
 
-            if (button2Pressed())
+            if (Button2Pressed())
             {
                 Debug.Log("You win!");
             }
@@ -72,7 +76,7 @@ namespace Env5
             return button1.gameObject.GetComponent<CollisionDetector>().Touching(trigger1.gameObject);
         }
 
-        public bool button2Pressed()
+        public bool Button2Pressed()
         {
             return button2.gameObject.GetComponent<CollisionDetector>().Touching(trigger2.gameObject);
         }
@@ -111,13 +115,13 @@ namespace Env5
         }
         public float DistancePlayerBridgeFromNorth()
         {
-            float bridgeNorthEdge = BridgeWidth / 2;
+            float bridgeNorthEdge = bridgeDown.transform.localPosition.z + BridgeWidth / 2;
             var distance = player.localPosition.z - bridgeNorthEdge - Utility.eps;
             return Mathf.Max(distance, 0);
         }
         public float DistancePlayerBridgeFromSouth()
         {
-            float bridgeSouthEdge = -BridgeWidth / 2;
+            float bridgeSouthEdge = bridgeDown.transform.localPosition.z - BridgeWidth / 2;
             var distance = bridgeSouthEdge - player.localPosition.z - Utility.eps;
             return Mathf.Max(distance, 0);
         }
@@ -162,17 +166,19 @@ namespace Env5
 
             button1.localPosition = new Vector3(-12, buttonY, -2);
 
-            float buttonMaxX = -8;
-            float buttonTiltStartX = -20;
-            float buttonSmallMaxZ = -2;
-            float buttonSmallMinZ = -6;
-
             button1.localPosition = new Vector3(Random.Range(x0 + buttonScale / 2, x1 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
             button2.localPosition = new Vector3(Random.Range(x3 + buttonScale / 2, x4 - buttonScale / 2), buttonY, Random.Range(z0 + buttonScale / 2, z1 - buttonScale / 2));
 
             player.localPosition = new Vector3(Random.Range(minX, maxX), playerY, Random.Range(minZ, maxZ));
             trigger1.localPosition = new Vector3(Random.Range(minX, maxXTrigger1), playerY, Random.Range(minZ, maxZ));
             trigger2.localPosition = new Vector3(Random.Range(minX, maxXTrigger1), playerY, Random.Range(minZ, maxZ));
+
+            bridgeZ = randomBridgeZ ? Random.Range(z0 + bridgeWidth / 2, z1 - bridgeWidth / 2) : 0f;
+            var bridgeDownY = 3.95f;
+            var bridgeUpY = 11.08f;
+            var bridgeUpX = 2.91f;
+            bridgeDown.transform.localPosition = new Vector3(x2, bridgeDownY, bridgeZ);
+            bridgeUp.transform.localPosition = new Vector3(bridgeUpX, bridgeUpY, bridgeZ);
 
             bridgeDown.SetActive(false);
             bridgeUp.SetActive(true);
