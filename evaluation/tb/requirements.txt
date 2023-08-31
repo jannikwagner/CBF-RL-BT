@@ -1,0 +1,15 @@
+numpy==1.24.2
+matplotlib==3.5.0
+pandas==1.5.3
+seaborn~=0.11.2
+jsonpickle~=3.0.1
+simplejson~=3.18.3
+scipy==1.10.1
+tensorflow
+tbparse~=0.0.7
+onnx
+torch
+tf2onnx
+skl2onnx
+onnxruntime
+onnxruntime-gpu

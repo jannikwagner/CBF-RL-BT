@@ -2,12 +2,14 @@ import dataclasses
 import json
 from typing import Sequence, Tuple
 from enum import Enum
+import os
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
+PLOT_FOLDER = "evaluation/stats/plots"
 
 COLORS = list(mcolors.TABLEAU_COLORS.values())
 
@@ -140,6 +142,7 @@ def plot_per_group(
     values: Sequence,
     ylabel: str,
     title: str,
+    show=False,
 ):
     x = np.arange(len(groups))  # the label locations
     width = 1 / (len(values) + 1)  # the width of the bars
@@ -160,7 +163,18 @@ def plot_per_group(
     ax.legend(loc="upper right", ncols=3)
     # ax.set_ylim(0, 1)
 
-    plt.show()
+    store(title, show)
+
+
+def store(title, show):
+    if show:
+        plt.show()
+    else:
+        os.makedirs(PLOT_FOLDER, exist_ok=True)
+        path = os.path.join(PLOT_FOLDER, f"{title}.pdf")
+        plt.savefig(path)
+        plt.cla()
+        plt.close()
 
 
 def boxplot_per_acc(
@@ -193,6 +207,7 @@ def boxplot_per_group(
     datas: Sequence,
     ylabel: str,
     title: str,
+    show=False,
 ):
     x = np.arange(len(groups))  # the label locations
     width = 1 / (len(datas) + 1)  # the width of the bars
@@ -220,10 +235,16 @@ def boxplot_per_group(
     ax.set_xticks(x + width / 2 * (len(datas) - 1), groups, rotation=45, fontsize=8)
     ax.legend([bps["boxes"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
 
-    plt.show()
+    store(title, show)
 
 
-def global_boxplot(labels: Sequence[str], data: Sequence, ylabel: str, title: str):
+def global_boxplot(
+    labels: Sequence[str],
+    data: Sequence,
+    ylabel: str,
+    title: str,
+    show=False,
+):
     x = np.arange(len(labels))  # the label locations
     width = 0.5  # the width of the bars
 
@@ -242,7 +263,7 @@ def global_boxplot(labels: Sequence[str], data: Sequence, ylabel: str, title: st
     ax.set_title(title)
     ax.set_xticks(x, labels, rotation=45, fontsize=8)
 
-    plt.show()
+    store(title, show)
 
 
 def gather_statistics(comp_eps_df):
