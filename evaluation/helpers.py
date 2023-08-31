@@ -8,8 +8,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import seaborn as sns
 
-PLOT_FOLDER = "evaluation/stats/plots"
+PLOT_FOLDER = "evaluation/plots/testRunId"
 
 COLORS = list(mcolors.TABLEAU_COLORS.values())
 

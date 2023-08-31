@@ -12,4 +12,3 @@ torch
 tf2onnx
 skl2onnx
 onnxruntime
-onnxruntime-gpu
