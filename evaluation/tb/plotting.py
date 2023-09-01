@@ -1,4 +1,5 @@
 import csv
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -101,6 +102,7 @@ def plot_multi_series(
     title="Mean reward for last experience buffer",
     x_axis="Timestep",
     y_axis="Mean Reward",
+    store=None,
 ):
     # Make a data frame
 
@@ -130,7 +132,13 @@ def plot_multi_series(
     # plt.legend(handles=handles, fontsize=17)
     plt.title(title, loc="left", fontsize=16, fontweight=0)
     plt.tight_layout()
-    plt.show()
+    if store:
+        folder = "evaluation/tb/plots"
+        os.makedirs(folder, exist_ok=True)
+        path = f"{folder}/{store}.pdf"
+        plt.savefig(path)
+    else:
+        plt.show()
 
 
 def plot_histogram(

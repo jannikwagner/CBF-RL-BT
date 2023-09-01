@@ -10,10 +10,12 @@ import numpy as np
 import os
 
 results_path = "results"
-run_id = "env5.wcbf.fixedbridge.safeplace"
-run_ids = ["env5.wcbf.fixedbridge.safeplace", "env5.wocbf.fixedbridge.safeplace"]
-run_ids = ["env5.wcbf.notfixedbridge.safeplace"]
-run_path = os.path.join(results_path, run_id)
+w_f_s = "env5.wcbf.fixedbridge.safeplace"
+wo_f_s = "env5.wocbf.fixedbridge.safeplace"
+w_f_ns = "env5.wcbf.fixedbridge.notsafeplace"
+wo_f_ns = "env5.wocbf.fixedbridge.notsafeplace"
+w_nf_s = "env5.wcbf.notfixedbridge.safeplace"
+wo_nf_s = "env5.wocbf.notfixedbridge.safeplace"
 behaviors = [
     "MoveToTrigger1",
     "MoveToButton2",
@@ -49,17 +51,25 @@ def get_scalar_data(results_path, run_ids, behaviors):
     return data
 
 
-data = get_scalar_data(results_path, run_ids, behaviors)
-print(data.keys())
+done_run_ids = [w_f_s, wo_f_s, w_f_ns, w_nf_s]
+
+
+def time_series_all_behaviors(results_path, run_id, behaviors):
+    data = get_scalar_data(results_path, [run_id], behaviors)
+    plot_multi_series(data, (12, 7), title=run_id, store=run_id)
+
+
+for run_id in done_run_ids:
+    time_series_all_behaviors(results_path, run_id, behaviors)
+
 behavior_path = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/"
 event_path = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/events.out.tfevents.1692266249.DESKTOP-EIN0CD2.33384.1"
 event_path2 = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/events.out.tfevents.1693384384.MBP-von-Ambient.3110.0"
 
-plot_multi_series(data, (12, 7), title="")
 
-hist_df = get_hist_dataframe_from_tb_files([event_path, event_path2])
-num_steps = 10
-steps = np.linspace(0, len(hist_df) - 1, num_steps, dtype=int)
-print(steps)
-print(hist_df)
-plot_histogram(hist_df, steps, "")
+# hist_df = get_hist_dataframe_from_tb_files([event_path, event_path2])
+# num_steps = 10
+# steps = np.linspace(0, len(hist_df) - 1, num_steps, dtype=int)
+# print(steps)
+# print(hist_df)
+# plot_histogram(hist_df, steps, "")
