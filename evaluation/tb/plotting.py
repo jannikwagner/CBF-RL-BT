@@ -136,7 +136,7 @@ def plot_multi_series(
         path = f"evaluation/tb/plots/{store}.pdf"
         folder = os.path.dirname(path)
         os.makedirs(folder, exist_ok=True)
-        plt.savefig(path)
+        plt.savefig(path, bbox_inches="tight")
         plt.cla()
         plt.close()
     else:

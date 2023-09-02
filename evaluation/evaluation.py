@@ -16,9 +16,9 @@ from helpers import (
     get_local_steps_per_action,
     get_termination_cause_rates,
     global_boxplot,
+    global_hist,
     plot_per_group,
     plot_per_acc,
-    global_boxplot,
     boxplot_per_group,
     boxplot_per_acc,
     ActionTerminationCause,
@@ -76,9 +76,13 @@ print(stats)
 
 global_steps = [comp_eps_df.globalSteps for comp_eps_df in comp_eps_dfs]
 global_boxplot(labels, global_steps, "steps", "Composite Episode Length")
+global_hist(labels, global_steps, "steps", "Composite Episode Length")
 
 local_episodes_count = [comp_eps_df.localEpisodesCount for comp_eps_df in comp_eps_dfs]
 global_boxplot(
+    labels, local_episodes_count, "episodes", "Local Episodes per Composite Episode"
+)
+global_hist(
     labels, local_episodes_count, "episodes", "Local Episodes per Composite Episode"
 )
 
@@ -106,6 +110,7 @@ for action in actions:
 steps_to_recover = [get_acc_steps_to_recover(eps_df) for eps_df in eps_dfs]
 print(steps_to_recover)
 global_boxplot(labels, steps_to_recover, "steps", "Steps to Recover")
+global_hist(labels, steps_to_recover, "steps", "Steps to Recover")
 
 steps_to_recover_per_action = [
     get_acc_steps_to_recover_per_action(eps_df, actions) for eps_df in eps_dfs
@@ -202,6 +207,7 @@ boxplot_per_group(
 
 local_steps = [eps_df.localSteps for eps_df in eps_dfs]
 global_boxplot(labels, local_steps, "steps", "Local Episode Length")
+global_hist(labels, local_steps, "steps", "Local Episode Length")
 
 local_steps_per_action = [
     get_local_steps_per_action(eps_df, actions) for eps_df in eps_dfs
@@ -220,6 +226,12 @@ eps_not_reaching_pc_dfs = [eps_df.query("terminationCause != 0") for eps_df in e
 local_steps_reaching_pc = [eps_df.localSteps for eps_df in eps_reaching_pc_dfs]
 local_steps_not_reaching_pc = [eps_df.localSteps for eps_df in eps_not_reaching_pc_dfs]
 global_boxplot(
+    labels,
+    local_steps_not_reaching_pc,
+    "steps",
+    "Length of Local Episodes not Reaching PC",
+)
+global_hist(
     labels,
     local_steps_not_reaching_pc,
     "steps",
@@ -248,6 +260,7 @@ for i in range(len(labels)):
     pc_labels = ["reaching pc", "not reaching pc"]
     data = [reaching_pc, not_reaching_pc]
     global_boxplot(pc_labels, data, "steps", f"Local Episode Length - {label}")
+    global_hist(pc_labels, data, "steps", f"Local Episode Length - {label}")
 
 # compare local steps for episodes reaching PC and episodes not reaching PCfor i in range(labels):
 for i in range(len(labels)):

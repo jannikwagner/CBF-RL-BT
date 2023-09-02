@@ -173,7 +173,7 @@ def store(title, show):
     else:
         os.makedirs(PLOT_FOLDER, exist_ok=True)
         path = os.path.join(PLOT_FOLDER, f"{title}.pdf")
-        plt.savefig(path)
+        plt.savefig(path, bbox_inches="tight")
         plt.cla()
         plt.close()
 
@@ -264,7 +264,25 @@ def global_boxplot(
     ax.set_title(title)
     ax.set_xticks(x, labels, rotation=45, fontsize=8)
 
-    store(title, show)
+    store(f"bp.{title}", show)
+
+
+def global_hist(
+    labels: Sequence[str],
+    data: Sequence,
+    ylabel: str,
+    title: str,
+    show=False,
+):
+    sns.histplot(dict(zip(labels, data)), color=COLORS, kde=True, label=ylabel)
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    # sns(ylabel)
+    # sns.
+    plt.title(title)
+    # plt.set_xticks(x, labels, rotation=45, fontsize=8)
+
+    store(f"hist.{title}", show)
 
 
 def gather_statistics(comp_eps_df):
