@@ -133,10 +133,12 @@ def plot_multi_series(
     plt.title(title, loc="left", fontsize=16, fontweight=0)
     plt.tight_layout()
     if store:
-        folder = "evaluation/tb/plots"
+        path = f"evaluation/tb/plots/{store}.pdf"
+        folder = os.path.dirname(path)
         os.makedirs(folder, exist_ok=True)
-        path = f"{folder}/{store}.pdf"
         plt.savefig(path)
+        plt.cla()
+        plt.close()
     else:
         plt.show()
 

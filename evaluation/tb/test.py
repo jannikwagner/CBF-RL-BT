@@ -8,6 +8,21 @@ from plotting import (
 )
 import numpy as np
 import os
+import seaborn as sns
+
+font_family = "PT Mono"
+background_color = "#F8F1F1"
+text_color = "#040303"
+
+sns.set_style(
+    {
+        "axes.facecolor": background_color,
+        "figure.facecolor": background_color,
+        "font.family": font_family,
+        "text.color": text_color,
+    }
+)
+
 
 results_path = "results"
 w_f_s = "env5.wcbf.fixedbridge.safeplace"
@@ -40,18 +55,26 @@ def get_scalar_data_all_behaviors(run_path):
     return data
 
 
-def get_scalar_data(results_path, run_ids, behaviors):
+def get_scalar_data(results_path, run_ids, behaviors, labels=None):
     data = {}
+    i = 0
     for run_id in run_ids:
         for behavior in behaviors:
             behavior_path = os.path.join(results_path, run_id, behavior)
-            name = behavior if len(run_ids) == 1 else f"{run_id}/{behavior}"
+            name = (
+                behavior
+                if len(run_ids) == 1
+                else (run_id if len(behaviors) == 1 else f"{run_id}/{behavior}")
+            )
+            if labels is not None:
+                name = labels[i]
+                i += 1
             df = get_scalar_dataframe_from_tb_files([behavior_path])
             data[name] = df
     return data
 
 
-done_run_ids = [w_f_s, wo_f_s, w_f_ns, w_nf_s]
+done_run_ids = [w_f_s, wo_f_s, w_f_ns, w_nf_s, wo_f_ns]
 
 
 def time_series_all_behaviors(results_path, run_id, behaviors):
@@ -59,12 +82,47 @@ def time_series_all_behaviors(results_path, run_id, behaviors):
     plot_multi_series(data, (12, 7), title=run_id, store=run_id)
 
 
+def time_series_one_behavior(results_path, run_ids, behavior, title, labels):
+    data = get_scalar_data(results_path, run_ids, [behavior], labels)
+    plot_multi_series(data, (5, 3), title=title, store=title)
+
+
 for run_id in done_run_ids:
     time_series_all_behaviors(results_path, run_id, behaviors)
 
-behavior_path = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/"
-event_path = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/events.out.tfevents.1692266249.DESKTOP-EIN0CD2.33384.1"
-event_path2 = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/events.out.tfevents.1693384384.MBP-von-Ambient.3110.0"
+f_s = (w_f_s, wo_f_s)
+labels = ("CBF", "No CBF")
+for behavior in behaviors:
+    time_series_one_behavior(
+        results_path, f_s, behavior, f"fixedbridge.safeplace/{behavior}", labels
+    )
+
+
+f_ns = (w_f_ns, wo_f_ns)
+labels = ("CBF", "No CBF")
+for behavior in behaviors:
+    time_series_one_behavior(
+        results_path, f_ns, behavior, f"fixedbridge.notsafeplace/{behavior}", labels
+    )
+
+
+w_f = (w_f_s, w_f_ns)
+labels = ("safeplace", "notsafeplace")
+for behavior in behaviors:
+    time_series_one_behavior(
+        results_path, w_f, behavior, f"wcbf.fixedbridge/{behavior}", labels
+    )
+
+w_s = (w_f_s, w_nf_s)
+labels = ("fixedbridge", "notfixedbridge")
+for behavior in behaviors:
+    time_series_one_behavior(
+        results_path, w_s, behavior, f"wcbf.safeplace/{behavior}", labels
+    )
+
+# behavior_path = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/"
+# event_path = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/events.out.tfevents.1692266249.DESKTOP-EIN0CD2.33384.1"
+# event_path2 = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/events.out.tfevents.1693384384.MBP-von-Ambient.3110.0"
 
 
 # hist_df = get_hist_dataframe_from_tb_files([event_path, event_path2])

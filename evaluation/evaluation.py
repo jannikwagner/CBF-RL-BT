@@ -25,6 +25,21 @@ from helpers import (
     action_termination_causes,
 )
 
+import seaborn as sns
+
+font_family = "PT Mono"
+background_color = "#F8F1F1"
+text_color = "#040303"
+
+sns.set_style(
+    {
+        "axes.facecolor": background_color,
+        "figure.facecolor": background_color,
+        "font.family": font_family,
+        "text.color": text_color,
+    }
+)
+
 LENGTH = 5000
 
 run_id = "testRunId"
