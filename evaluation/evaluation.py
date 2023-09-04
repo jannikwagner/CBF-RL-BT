@@ -24,10 +24,12 @@ from helpers import (
     ActionTerminationCause,
     action_termination_causes,
 )
+import dataclasses
 
 import seaborn as sns
+import pandas as pd
 
-font_family = "PT Mono"
+# font_family = "PT Mono"
 background_color = "#F8F1F1"
 text_color = "#040303"
 
@@ -35,11 +37,10 @@ sns.set_style(
     {
         "axes.facecolor": background_color,
         "figure.facecolor": background_color,
-        "font.family": font_family,
+        # "font.family": font_family,
         "text.color": text_color,
     }
 )
-
 LENGTH = 5000
 
 run_id = "testRunId"
@@ -52,11 +53,11 @@ file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in fil
 
 eps_dfs = [load_repr1_to_eps(file_path) for file_path in file_paths]
 for df in eps_dfs:
-    print(df.compositeEpisodeNumber.max())
+    print("max compositeEpisodeNumber:", df.compositeEpisodeNumber.max())
     assert (df.compositeEpisodeNumber.max()) >= LENGTH - 1
 eps_dfs = [df.query("compositeEpisodeNumber < @LENGTH") for df in eps_dfs]
 for df in eps_dfs:
-    print(df.compositeEpisodeNumber.max())
+    print("max compositeEpisodeNumber:", df.compositeEpisodeNumber.max())
     assert (df.compositeEpisodeNumber.max()) >= LENGTH - 1
 eps_df_wocbf = eps_dfs[1]
 
@@ -66,13 +67,17 @@ actions = eps_df_wocbf.action.unique()
 accs = eps_df_wocbf.query("terminationCause == 1").groupby("action").accName.unique()
 acc_dict = dict(accs)
 action_acc_tuples = [(action, acc) for action in acc_dict for acc in acc_dict[action]]
-for df in eps_dfs:
-    print("compositeEpisodeNumber:", df.compositeEpisodeNumber.max() + 1)
 
 comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
 
-stats = [gather_statistics(comp_eps_df) for comp_eps_df in comp_eps_dfs]
-print(stats)
+stats = [
+    gather_statistics(comp_eps_df, eps_df)
+    for comp_eps_df, eps_df in zip(comp_eps_dfs, eps_dfs)
+]
+print("global_stats:")
+stats_df = pd.concat(stats).round(4)
+print(stats_df.to_dict())
+print(stats_df.round(4).to_latex())
 
 global_steps = [comp_eps_df.globalSteps for comp_eps_df in comp_eps_dfs]
 global_boxplot(labels, global_steps, "steps", "Composite Episode Length")
@@ -108,7 +113,7 @@ for action in actions:
 
 
 steps_to_recover = [get_acc_steps_to_recover(eps_df) for eps_df in eps_dfs]
-print(steps_to_recover)
+print("steps_to_recover:", steps_to_recover)
 global_boxplot(labels, steps_to_recover, "steps", "Steps to Recover")
 global_hist(labels, steps_to_recover, "steps", "Steps to Recover")
 
@@ -136,7 +141,7 @@ boxplot_per_acc(
 
 
 acc_violation_rates = [get_acc_violation_rate(eps_df) for eps_df in eps_dfs]
-print(acc_violation_rates)
+print("acc_violation_rates:", acc_violation_rates)
 
 acc_violation_rates_per_action = [
     get_acc_violation_rate_per_action(eps_df, actions) for eps_df in eps_dfs

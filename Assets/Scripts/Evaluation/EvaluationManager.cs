@@ -33,7 +33,7 @@ public class EvaluationManager : IEvaluationManager
         this.actions = actions;
         this.runId = runId;
         folderPath = $@"evaluation/stats/{runId}";
-        storageManager = new StorageManager(folderPath, 100);
+        storageManager = new StorageManager(folderPath, 5000);
         isActive = true;
     }
 

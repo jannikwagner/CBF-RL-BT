@@ -1,6 +1,6 @@
 import dataclasses
 import json
-from typing import Sequence, Tuple
+from typing import Mapping, Sequence, Tuple
 from enum import Enum
 import os
 
@@ -34,12 +34,23 @@ class Statistics:
     max_global_steps: int
     mean_global_steps: float
     std_global_steps: float
+    min_local_episodes: int
+    max_local_episodes: int
+    mean_local_episodes: float
+    std_local_episodes: float
+    termination_cause_rates: Mapping[str, float]
+
+    def to_latex(self):
+        return self.to_df().to_latex()
+
+    def to_df(self):
+        df = pd.DataFrame(dataclasses.asdict(self))
+        return df
 
 
 def load_repr1_to_eps(file_path):
     with open(file_path, "r") as f:
         data = json.load(f)
-    # print(data)
 
     comp_ep_df = pd.DataFrame(data)
 
@@ -106,8 +117,26 @@ def get_comp_eps_df(eps_df):
         "compositeEpisodeNumber"
     ).terminationCause.count()
 
+    acc_violation_count = (
+        eps_df.query("terminationCause == 1")
+        .groupby("compositeEpisodeNumber")
+        .terminationCause.count()
+    )
+
+    pc_reached_count = (
+        eps_df.query("terminationCause == 0")
+        .groupby("compositeEpisodeNumber")
+        .terminationCause.count()
+    )
+
     comp_eps_df["localStepsSum"] = local_step_sum
     comp_eps_df["localEpisodesCount"] = local_episodes_count
+    comp_eps_df["accViolationCount"] = 0
+    comp_eps_df.loc[
+        acc_violation_count.index, "accViolationCount"
+    ] = acc_violation_count
+    comp_eps_df["pcReachedCount"] = 0
+    comp_eps_df.loc[pc_reached_count.index, "pcReachedCount"] = pc_reached_count
 
     return comp_eps_df
 
@@ -274,7 +303,9 @@ def global_hist(
     title: str,
     show=False,
 ):
-    sns.histplot(dict(zip(labels, data)), color=COLORS, kde=True, label=ylabel)
+    sns.histplot(
+        dict(zip(labels, data)), color=COLORS, kde=True, label=ylabel, stat="density"
+    )
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     # sns(ylabel)
@@ -285,16 +316,22 @@ def global_hist(
     store(f"hist.{title}", show)
 
 
-def gather_statistics(comp_eps_df):
-    stats = Statistics(
-        comp_eps_df.globalSuccess.mean(),
-        comp_eps_df.globalSteps.min(),
-        comp_eps_df.globalSteps.max(),
-        comp_eps_df.globalSteps.mean(),
-        comp_eps_df.globalSteps.std(),
+def gather_statistics(comp_eps_df, eps_df):
+    termination_cause_rates = get_termination_cause_rates(eps_df)
+    stats = dict(
+        success_rate=comp_eps_df.globalSuccess.mean(),
+        min_global_steps=comp_eps_df.globalSteps.min(),
+        max_global_steps=comp_eps_df.globalSteps.max(),
+        mean_global_steps=comp_eps_df.globalSteps.mean(),
+        std_global_steps=comp_eps_df.globalSteps.std(),
+        min_local_episodes=comp_eps_df.localEpisodesCount.min(),
+        max_local_episodes=comp_eps_df.localEpisodesCount.max(),
+        mean_local_episodes=comp_eps_df.localEpisodesCount.mean(),
+        std_local_episodes=comp_eps_df.localEpisodesCount.std(),
+        **dict(zip(action_termination_causes, termination_cause_rates)),
     )
-
-    return stats
+    df = pd.DataFrame([stats])
+    return df
 
 
 def get_acc_violation_rate(eps_df: pd.DataFrame):
