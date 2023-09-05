@@ -161,9 +161,13 @@ def plot_per_acc(
     values: Sequence,
     ylabel: str,
     title: str,
+    show=False,
+    figsize=(6, 4),
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
-    plot_per_group(action_accs, labels, values, ylabel, title)
+    plot_per_group(
+        action_accs, labels, values, ylabel, title, show=show, figsize=figsize
+    )
 
 
 def plot_per_group(
@@ -173,12 +177,15 @@ def plot_per_group(
     ylabel: str,
     title: str,
     show=False,
+    figsize=(6, 4),
 ):
     x = np.arange(len(groups))  # the label locations
     width = 1 / (len(values) + 1)  # the width of the bars
     multiplier = 0
 
     fig, ax = plt.subplots(layout="constrained")
+    fig.set_figwidth(figsize[0])
+    fig.set_figheight(figsize[1])
 
     for label, data in zip(labels, values):
         offset = width * multiplier
@@ -193,18 +200,18 @@ def plot_per_group(
     ax.legend(loc="upper right", ncols=3)
     # ax.set_ylim(0, 1)
 
-    store(title, show)
+    display(f"gplot.{title}", show)
 
 
-def store(title, show):
+def display(title, show):
     if show:
         plt.show()
     else:
         os.makedirs(PLOT_FOLDER, exist_ok=True)
         path = os.path.join(PLOT_FOLDER, f"{title}.pdf")
         plt.savefig(path, bbox_inches="tight")
-        plt.cla()
-        plt.close()
+    plt.cla()
+    plt.close()
 
 
 def boxplot_per_acc(
@@ -213,9 +220,13 @@ def boxplot_per_acc(
     data: Sequence,
     ylabel: str,
     title: str,
+    show=False,
+    figsize=(6, 4),
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
-    boxplot_per_group(action_accs, labels, data, ylabel, title)
+    boxplot_per_group(
+        action_accs, labels, data, ylabel, title, show=show, figsize=figsize
+    )
 
 
 BOXPLOT_SETTINGS = dict(
@@ -238,6 +249,7 @@ def boxplot_per_group(
     ylabel: str,
     title: str,
     show=False,
+    figsize=(6, 4),
 ):
     x = np.arange(len(groups))  # the label locations
     width = 1 / (len(datas) + 1)  # the width of the bars
@@ -245,6 +257,8 @@ def boxplot_per_group(
     bps_list = []
 
     fig, ax = plt.subplots(layout="constrained")
+    fig.set_figwidth(figsize[0])
+    fig.set_figheight(figsize[1])
 
     for i, data in enumerate(datas):
         offset = width * multiplier
@@ -265,7 +279,7 @@ def boxplot_per_group(
     ax.set_xticks(x + width / 2 * (len(datas) - 1), groups, rotation=45, fontsize=8)
     ax.legend([bps["boxes"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
 
-    store(title, show)
+    display(f"gbp.{title}", show)
 
 
 def global_boxplot(
@@ -274,11 +288,14 @@ def global_boxplot(
     ylabel: str,
     title: str,
     show=False,
+    figsize=(3, 3),
 ):
     x = np.arange(len(labels))  # the label locations
     width = 0.5  # the width of the bars
 
     fig, ax = plt.subplots(layout="constrained")
+    fig.set_figwidth(figsize[0])
+    fig.set_figheight(figsize[1])
 
     bps = ax.boxplot(
         data,
@@ -293,7 +310,7 @@ def global_boxplot(
     ax.set_title(title)
     ax.set_xticks(x, labels, rotation=45, fontsize=8)
 
-    store(f"bp.{title}", show)
+    display(f"bp.{title}", show)
 
 
 def global_hist(
@@ -313,7 +330,7 @@ def global_hist(
     plt.title(title)
     # plt.set_xticks(x, labels, rotation=45, fontsize=8)
 
-    store(f"hist.{title}", show)
+    display(f"hist.{title}", show)
 
 
 def gather_statistics(comp_eps_df, eps_df):
@@ -328,7 +345,7 @@ def gather_statistics(comp_eps_df, eps_df):
         max_local_episodes=comp_eps_df.localEpisodesCount.max(),
         mean_local_episodes=comp_eps_df.localEpisodesCount.mean(),
         std_local_episodes=comp_eps_df.localEpisodesCount.std(),
-        **dict(zip(action_termination_causes, termination_cause_rates)),
+        # **dict(zip(action_termination_causes, termination_cause_rates)),
     )
     df = pd.DataFrame([stats])
     return df

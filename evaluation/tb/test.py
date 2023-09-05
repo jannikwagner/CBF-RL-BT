@@ -74,7 +74,7 @@ def get_scalar_data(results_path, run_ids, behaviors, labels=None):
     return data
 
 
-done_run_ids = [w_f_s, wo_f_s, w_f_ns, w_nf_s, wo_f_ns]
+done_run_ids = [w_f_s, wo_f_s, w_f_ns, wo_f_ns, w_nf_s, wo_nf_s]
 
 
 def time_series_all_behaviors(results_path, run_id, behaviors):
@@ -105,6 +105,12 @@ for behavior in behaviors:
         results_path, f_ns, behavior, f"fixedbridge.notsafeplace/{behavior}", labels
     )
 
+nf_s = (w_nf_s, wo_nf_s)
+labels = ("CBF", "No CBF")
+for behavior in behaviors:
+    time_series_one_behavior(
+        results_path, f_ns, behavior, f"notfixedbridge.safeplace/{behavior}", labels
+    )
 
 w_f = (w_f_s, w_f_ns)
 labels = ("safeplace", "notsafeplace")
@@ -119,15 +125,3 @@ for behavior in behaviors:
     time_series_one_behavior(
         results_path, w_s, behavior, f"wcbf.safeplace/{behavior}", labels
     )
-
-# behavior_path = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/"
-# event_path = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/events.out.tfevents.1692266249.DESKTOP-EIN0CD2.33384.1"
-# event_path2 = "results/env5.wcbf.fixedbridge.safeplace/MoveToTrigger2/events.out.tfevents.1693384384.MBP-von-Ambient.3110.0"
-
-
-# hist_df = get_hist_dataframe_from_tb_files([event_path, event_path2])
-# num_steps = 10
-# steps = np.linspace(0, len(hist_df) - 1, num_steps, dtype=int)
-# print(steps)
-# print(hist_df)
-# plot_histogram(hist_df, steps, "")
