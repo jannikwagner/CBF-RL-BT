@@ -15,7 +15,8 @@ public abstract class BaseAgent : Agent
     [HideInInspector]
     public bool useCBF = true;
     private int actionCount;
-    private int maxActions = 5000;
+    [HideInInspector]
+    public int maxActions;
     private int actionsPerDecision = 5;
     private Condition postCondition;
     private IEnumerable<Condition> accs;

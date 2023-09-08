@@ -19,7 +19,8 @@ namespace Env5
         public MoveToButton2 moveToButton2;
         public PlayerController controller;
         public bool useCBF;
-        private int maxSteps = 10000;
+        public int maxSteps;
+        public int maxStepsPerLocalEpisode;
         private int stepCount;
         private int compositeEpisodeCount;
         private IEvaluationManager evaluationManager;
@@ -41,6 +42,7 @@ namespace Env5
             {
                 agent.useCBF = useCBF;
                 agent.evaluationManager = evaluationManager;
+                agent.maxActions = maxStepsPerLocalEpisode;
             }
             agentSwitcher = new AgentSwitcher();
             agentSwitcher.AddAgents(agents);
