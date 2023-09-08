@@ -29,6 +29,8 @@ from helpers import (
     plot_per_acc,
     acc_steps_recovered_sanity_check,
     global_plot,
+    get_hpc_counts,
+    get_hpc_after_acc_violation_rate,
 )
 
 import seaborn as sns
@@ -39,8 +41,8 @@ show = True
 
 run_id = "testRunId"
 
-file_name_wcbf = "env5.wcbf.fixedbridge.safeplace"
-file_name_wocbf = "env5.wocbf.fixedbridge.safeplace"
+file_name_wcbf = "env5.wcbf.fixedbridge.notsafeplace"
+file_name_wocbf = "env5.wocbf.fixedbridge.notsafeplace"
 file_names = [file_name_wcbf, file_name_wocbf]
 
 file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in file_names]
@@ -64,11 +66,13 @@ action_acc_tuples = [(action, acc) for action in acc_dict for acc in acc_dict[ac
 
 comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
 
-local_steps = [eps_df.localSteps for eps_df in eps_dfs]
-print("local steps")
-print([len(x) for x in local_steps])
-global_plot(labels, local_steps, "steps", "Local Episode Length", show=show)
-
 df = eps_dfs[1]
 
-acc_steps_recovered_sanity_check(df)
+
+hpc_counts = get_hpc_counts(df)
+
+after_acc_violation_rate = get_hpc_after_acc_violation_rate(df)
+
+print(dict(hpc_counts))
+print(hpc_counts)
+print(after_acc_violation_rate)

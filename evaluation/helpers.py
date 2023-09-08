@@ -725,3 +725,25 @@ def acc_sanity_check(eps_df, action_acc_tuples):
             )
             print(weird_eps)
             # assert len(weird_eps) == 0
+
+
+def get_hpc_counts(df):
+    hpc = df.query("terminationCause == 4")
+    hpc_counts = hpc.groupby("postCondition").count().terminationCause
+    return hpc_counts
+
+
+def get_hpc_after_acc_violation_rate(df):
+    hpc_counts = get_hpc_counts(df)
+    hpc_count = sum(hpc_counts)
+    hpc = df.query("terminationCause == 4")
+    after_acc_violation_count = 0
+    for hpc_ep in hpc.iloc:
+        num = hpc_ep.compositeEpisodeNumber
+        comp_ep = df.query("compositeEpisodeNumber == @num")
+        prev_loc_num = hpc_ep.localEpisodeNumber - 1
+        if prev_loc_num >= 0:
+            prev_ep = comp_ep.query("localEpisodeNumber == @prev_loc_num").iloc[0]
+            if prev_ep.terminationCause == 1:
+                after_acc_violation_count += 1
+    return after_acc_violation_count / hpc_count
