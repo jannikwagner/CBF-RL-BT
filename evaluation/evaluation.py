@@ -15,13 +15,9 @@ from helpers import (
     get_acc_steps_to_recover_per_acc,
     get_local_steps_per_action,
     get_termination_cause_rates,
-    global_violinplot,
-    violinplot_per_group,
-    violinplot_per_acc,
     plot_per_acc,
     plot_per_group,
     global_plot,
-    # global_hist,
     bars_per_group,
     bars_per_acc,
     ActionTerminationCause,
@@ -32,12 +28,12 @@ import seaborn as sns
 import pandas as pd
 
 NUM_EPISODES = 5000
-show = True
+show = False
 
 run_id = "testRunId"
 
-file_name_wcbf = "env5.wcbf.fixedbridge.safeplace.fewsteps"
-file_name_wocbf = "env5.wocbf.fixedbridge.safeplace.fewsteps"
+file_name_wcbf = "env5.wcbf.fixedbridge.safeplace"
+file_name_wocbf = "env5.wocbf.fixedbridge.safeplace"
 file_names = [file_name_wcbf, file_name_wocbf]
 
 file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in file_names]

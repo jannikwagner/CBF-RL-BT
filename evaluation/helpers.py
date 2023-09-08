@@ -14,6 +14,10 @@ PLOT_FOLDER = "evaluation/plots/testRunId"
 
 COLORS = list(mcolors.TABLEAU_COLORS.values())
 
+VIOLINPLOT_AXIS_PERCENTILES = (0, 95)
+VIOLINPLOT_AXLIM_MARGIN = 0.04
+VIOLINPLOT_QUANTILE_LINES = [0.25, 0.75]
+
 action_termination_causes = [
     "PostConditionReached",
     "ACCViolated",
@@ -349,6 +353,9 @@ def violinplot_per_group(
     for i, data in enumerate(datas):
         nonempty_xs = np.array([x for x, d in zip(xs, data) if len(d) > 0])
         nonempty_data = [d for d in data if len(d) > 0]
+        # nonempty_data = [
+        #     within_percentiles(d, VIOLINPLOT_PERCENTILES) for d in nonempty_data
+        # ]
 
         offset = width * multiplier
 
@@ -356,31 +363,54 @@ def violinplot_per_group(
             nonempty_data,
             positions=nonempty_xs + offset,
             widths=width * 0.9,
-            showmeans=False,
+            showmeans=True,
             showmedians=True,
-            quantiles=[[0.1, 0.9]] * len(nonempty_xs),
+            quantiles=[VIOLINPLOT_QUANTILE_LINES] * len(nonempty_xs),
         )
 
-        for key in bps.keys():
-            if key == "bodies":
-                for pc in bps[key]:
-                    pc.set_facecolor(COLORS[i])
-                    pc.set_edgecolor(COLORS[i])
-                    pc.set_alpha(0.5)
-            else:
-                bps[key].set_color(COLORS[i])
+        color_violinplot(i, bps)
 
         bps_list.append(bps)
         multiplier += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     # plt.yscale('log')
+
+    ymin = min(
+        np.percentile(d, VIOLINPLOT_AXIS_PERCENTILES[0])
+        for data in datas
+        for d in data
+        if len(d) > 0
+    )
+    ymax = max(
+        np.percentile(d, VIOLINPLOT_AXIS_PERCENTILES[1])
+        for data in datas
+        for d in data
+        if len(d) > 0
+    )
+    diff = ymax - ymin
+    margin = VIOLINPLOT_AXLIM_MARGIN * diff
+    ax.set_ylim(ymin - margin, ymax + margin)
+
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     ax.set_xticks(xs + width / 2 * (len(datas) - 1), groups, rotation=45, fontsize=8)
     ax.legend([bps["bodies"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
 
     display(f"gviolin.{title}", show)
+
+
+def color_violinplot(i, bps):
+    for key in bps.keys():
+        if key == "bodies":
+            for pc in bps[key]:
+                pc.set_facecolor(COLORS[i])
+                pc.set_edgecolor(COLORS[i])
+                pc.set_alpha(0.5)
+        elif key == "cmeans":
+            bps[key].set_color("black")
+        else:
+            bps[key].set_color(COLORS[i])
 
 
 def global_plot(
@@ -445,12 +475,23 @@ def global_violinplot(
         data,
         positions=x,
         widths=width,
-        showmeans=False,
+        showmeans=True,
         showmedians=True,
-        quantiles=[[0.1, 0.9]] * len(data),
+        quantiles=[VIOLINPLOT_QUANTILE_LINES] * len(data),
     )
+    color_violinplot(0, bps)
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
+    ymin = min(
+        np.percentile(d, VIOLINPLOT_AXIS_PERCENTILES[0]) for d in data if len(d) > 0
+    )
+    ymax = max(
+        np.percentile(d, VIOLINPLOT_AXIS_PERCENTILES[1]) for d in data if len(d) > 0
+    )
+    diff = ymax - ymin
+    margin = VIOLINPLOT_AXLIM_MARGIN * diff
+    ax.set_ylim(ymin - margin, ymax + margin)
+
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     ax.set_xticks(x, labels, rotation=45, fontsize=8)
@@ -608,3 +649,10 @@ def get_termination_cause_rates(df):
         if cause not in rates:
             rates[cause] = 0
     return [rates[cause] for cause in action_termination_causes_dict.values()]
+
+
+def within_percentiles(data, percentiles):
+    p1, p2 = percentiles
+    v1, v2 = np.percentile(data, [p1, p2])
+    print(v1, v2)
+    return data[np.logical_and(data >= v1, data <= v2)]
