@@ -93,6 +93,8 @@ def load_repr1_to_eps(file_path):
         by=["compositeEpisodeNumber", "localEpisodeNumber"], inplace=True
     )
 
+    eps_df.index = eps_df.index.sort_values()
+
     assert (
         eps_df.query("terminationCause == 1").empty
         or eps_df.query("terminationCause == 1")[
@@ -705,3 +707,21 @@ def acc_steps_recovered_sanity_check(df):
                 violated[loc_ep.action] = (loc_ep, steps)
         for loc_ep, _ in violated.values():
             assert not loc_ep.accRecovered
+
+
+def acc_sanity_check(eps_df, action_acc_tuples):
+    actions_data = list(eps_df.action.unique())
+    accs_data = eps_df.query("terminationCause == 1").groupby("action").accName.unique()
+    acc_dict_data = {key: list(value) for key, value in dict(accs_data).items()}
+    action_acc_tuples_data = [
+        (action, acc) for action in acc_dict_data for acc in acc_dict_data[action]
+    ]
+    for tuple in action_acc_tuples_data:
+        if tuple not in action_acc_tuples:
+            print("untracked acc:", tuple)
+            action, acc = tuple
+            weird_eps = eps_df.query(
+                "terminationCause == 1 & action == @action & accName == @acc"
+            )
+            print(weird_eps)
+            # assert len(weird_eps) == 0

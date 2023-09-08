@@ -23,6 +23,8 @@ from helpers import (
     get_local_steps_of_eps_violating_acc_per_acc,
     ActionTerminationCause,
     action_termination_causes,
+    acc_sanity_check,
+    acc_steps_recovered_sanity_check,
 )
 
 import seaborn as sns
@@ -33,8 +35,8 @@ show = False
 
 run_id = "testRunId"
 
-file_name_wcbf = "env5.wcbf.fixedbridge.safeplace"
-file_name_wocbf = "env5.wocbf.fixedbridge.safeplace"
+file_name_wcbf = "env5.wcbf.notfixedbridge.safeplace"
+file_name_wocbf = "env5.wocbf.notfixedbridge.safeplace"
 file_names = [file_name_wcbf, file_name_wocbf]
 
 file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in file_names]
@@ -51,10 +53,32 @@ eps_df_wocbf = eps_dfs[1]
 
 labels = ["wcbf", "wocbf"]
 
-actions = eps_df_wocbf.action.unique()
-accs = eps_df_wocbf.query("terminationCause == 1").groupby("action").accName.unique()
-acc_dict = dict(accs)
+actions = [
+    "MoveToT1",
+    "MoveUp",
+    "MoveUp2",
+    "MoveToB1",
+    "MoveToT2",
+    "MoveToBridge",
+    "MoveOverBridge",
+    "MoveToB2",
+]
+acc_dict = {
+    "MoveToT1": [],
+    "MoveUp": [],
+    "MoveUp2": [],
+    "MoveToB1": ["Up"],
+    "MoveToT2": ["B1"],
+    "MoveToBridge": ["B1", "Up"],
+    "MoveOverBridge": ["OnBridge"],
+    "MoveToB2": ["PastBridge"],
+}
 action_acc_tuples = [(action, acc) for action in acc_dict for acc in acc_dict[action]]
+
+
+for df in eps_dfs:
+    acc_steps_recovered_sanity_check(df)
+    acc_sanity_check(df, action_acc_tuples)
 
 comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
 
