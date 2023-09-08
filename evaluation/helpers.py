@@ -155,7 +155,7 @@ def print_action_summary(eps_df, action):
     print()
 
 
-def plot_per_acc(
+def bars_per_acc(
     action_acc_tuples: Sequence[Tuple[str, str]],
     labels: Sequence[str],
     values: Sequence,
@@ -165,12 +165,12 @@ def plot_per_acc(
     figsize=(6, 4),
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
-    plot_per_group(
+    bars_per_group(
         action_accs, labels, values, ylabel, title, show=show, figsize=figsize
     )
 
 
-def plot_per_group(
+def bars_per_group(
     groups: Sequence[str],
     labels: Sequence[str],
     values: Sequence,
@@ -229,6 +229,39 @@ def boxplot_per_acc(
     )
 
 
+def violinplot_per_acc(
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    labels: Sequence[str],
+    data: Sequence,
+    ylabel: str,
+    title: str,
+    show=False,
+    figsize=(6, 4),
+):
+    action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
+    violinplot_per_group(
+        action_accs, labels, data, ylabel, title, show=show, figsize=figsize
+    )
+
+
+def plot_per_acc(
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    labels: Sequence[str],
+    data: Sequence,
+    ylabel: str,
+    title: str,
+    show=False,
+    figsize=(6, 4),
+):
+    action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
+    boxplot_per_group(
+        action_accs, labels, data, ylabel, title, show=show, figsize=figsize
+    )
+    violinplot_per_group(
+        action_accs, labels, data, ylabel, title, show=show, figsize=figsize
+    )
+
+
 BOXPLOT_SETTINGS = dict(
     patch_artist=True,
     medianprops=dict(color="black"),
@@ -240,6 +273,19 @@ BOXPLOT_SETTINGS = dict(
     # notch=True,
     # bootstrap=1000,
 )
+
+
+def plot_per_group(
+    groups: Sequence[str],
+    labels: Sequence[str],
+    datas: Sequence,
+    ylabel: str,
+    title: str,
+    show=False,
+    figsize=(6, 4),
+):
+    boxplot_per_group(groups, labels, datas, ylabel, title, show, figsize)
+    violinplot_per_group(groups, labels, datas, ylabel, title, show, figsize)
 
 
 def boxplot_per_group(
@@ -282,6 +328,73 @@ def boxplot_per_group(
     display(f"gbp.{title}", show)
 
 
+def violinplot_per_group(
+    groups: Sequence[str],
+    labels: Sequence[str],
+    datas: Sequence,
+    ylabel: str,
+    title: str,
+    show=False,
+    figsize=(6, 4),
+):
+    xs = np.arange(len(groups))  # the label locations
+    width = 1 / (len(datas))  # the width of the bars
+    multiplier = 0
+    bps_list = []
+
+    fig, ax = plt.subplots(layout="constrained")
+    fig.set_figwidth(figsize[0])
+    fig.set_figheight(figsize[1])
+
+    for i, data in enumerate(datas):
+        nonempty_xs = np.array([x for x, d in zip(xs, data) if len(d) > 0])
+        nonempty_data = [d for d in data if len(d) > 0]
+
+        offset = width * multiplier
+
+        bps = ax.violinplot(
+            nonempty_data,
+            positions=nonempty_xs + offset,
+            widths=width * 0.9,
+            showmeans=False,
+            showmedians=True,
+            quantiles=[[0.1, 0.9]] * len(nonempty_xs),
+        )
+
+        for key in bps.keys():
+            if key == "bodies":
+                for pc in bps[key]:
+                    pc.set_facecolor(COLORS[i])
+                    pc.set_edgecolor(COLORS[i])
+                    pc.set_alpha(0.5)
+            else:
+                bps[key].set_color(COLORS[i])
+
+        bps_list.append(bps)
+        multiplier += 1
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    # plt.yscale('log')
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xticks(xs + width / 2 * (len(datas) - 1), groups, rotation=45, fontsize=8)
+    ax.legend([bps["bodies"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
+
+    display(f"gviolin.{title}", show)
+
+
+def global_plot(
+    labels: Sequence[str],
+    data: Sequence,
+    ylabel: str,
+    title: str,
+    show=False,
+    figsize=(3, 3),
+):
+    global_boxplot(labels, data, ylabel, title, show, figsize)
+    global_violinplot(labels, data, ylabel, title, show, figsize)
+
+
 def global_boxplot(
     labels: Sequence[str],
     data: Sequence,
@@ -311,6 +424,38 @@ def global_boxplot(
     ax.set_xticks(x, labels, rotation=45, fontsize=8)
 
     display(f"bp.{title}", show)
+
+
+def global_violinplot(
+    labels: Sequence[str],
+    data: Sequence,
+    ylabel: str,
+    title: str,
+    show=False,
+    figsize=(3, 3),
+):
+    x = np.arange(len(labels))  # the label locations
+    width = 1  # the width of the bars
+
+    fig, ax = plt.subplots(layout="constrained")
+    fig.set_figwidth(figsize[0])
+    fig.set_figheight(figsize[1])
+
+    bps = ax.violinplot(
+        data,
+        positions=x,
+        widths=width,
+        showmeans=False,
+        showmedians=True,
+        quantiles=[[0.1, 0.9]] * len(data),
+    )
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xticks(x, labels, rotation=45, fontsize=8)
+
+    display(f"violin.{title}", show)
 
 
 def global_hist(

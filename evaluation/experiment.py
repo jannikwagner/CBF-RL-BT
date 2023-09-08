@@ -1,58 +1,89 @@
 from helpers import (
-    boxplot_per_acc,
-    get_acc_steps_to_recover_per_acc,
     load_repr1_to_eps,
     gather_statistics,
     print_action_summary,
     get_comp_eps_df,
+    get_acc_violation_rate,
     get_acc_violation_rate_per_action,
+    get_acc_violation_rate_per_acc,
     get_num_eps_per_action,
     get_avg_num_eps_per_action,
     get_total_steps_per_action,
     get_avg_total_steps_per_action,
     get_acc_steps_to_recover,
     get_acc_steps_to_recover_per_action,
+    get_acc_steps_to_recover_per_acc,
     get_local_steps_per_action,
     get_termination_cause_rates,
     global_boxplot,
-    plot_per_group,
+    # global_hist,
+    global_violinplot,
+    violinplot_per_group,
+    bars_per_group,
+    bars_per_acc,
     boxplot_per_group,
+    boxplot_per_acc,
     ActionTerminationCause,
     action_termination_causes,
 )
 
+import seaborn as sns
+import pandas as pd
+
+NUM_EPISODES = 5000
+show = True
 
 run_id = "testRunId"
 
-file_path_wcbf = f"evaluation/stats/{run_id}/statisticsWCBF.json"
-eps_df_wcbf = load_repr1_to_eps(file_path_wcbf)
-print(eps_df_wcbf)
-file_path_wocbf = f"evaluation/stats/{run_id}/statisticsWOCBF.json"
-eps_df_wocbf = load_repr1_to_eps(file_path_wocbf)
-print(eps_df_wocbf)
-print(len(eps_df_wocbf.query("terminationCause == 4")), len(eps_df_wocbf))
+file_name_wcbf = "env5.wcbf.fixedbridge.safeplace.fewsteps"
+file_name_wocbf = "env5.wocbf.fixedbridge.safeplace.fewsteps"
+file_names = [file_name_wcbf, file_name_wocbf]
+
+file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in file_names]
+
+eps_dfs = [load_repr1_to_eps(file_path) for file_path in file_paths]
+for df in eps_dfs:
+    print("max compositeEpisodeNumber:", df.compositeEpisodeNumber.max())
+    assert (df.compositeEpisodeNumber.max()) >= NUM_EPISODES - 1
+eps_dfs = [df.query("compositeEpisodeNumber < @NUM_EPISODES") for df in eps_dfs]
+for df in eps_dfs:
+    print("max compositeEpisodeNumber:", df.compositeEpisodeNumber.max())
+    assert (df.compositeEpisodeNumber.max()) >= NUM_EPISODES - 1
+eps_df_wocbf = eps_dfs[1]
+
+labels = ["WCBF", "WOCBF"]
+
 actions = eps_df_wocbf.action.unique()
-cause = ActionTerminationCause.ACCViolated
-accs = (
-    eps_df_wocbf.query("terminationCause == @cause").groupby("action").accName.unique()
-)
+accs = eps_df_wocbf.query("terminationCause == 1").groupby("action").accName.unique()
 acc_dict = dict(accs)
 action_acc_tuples = [(action, acc) for action in acc_dict for acc in acc_dict[action]]
 
+comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
 
-rates1 = get_termination_cause_rates(eps_df_wcbf)
-rates2 = get_termination_cause_rates(eps_df_wocbf)
-plot_per_group(
-    action_termination_causes,
-    ["WCBF", "WOCBF"],
-    [rates1, rates2],
-    "Termination rates",
-    "Termination cause rates",
+
+steps_to_recover_per_action = [
+    get_acc_steps_to_recover_per_action(eps_df, actions) for eps_df in eps_dfs
+]
+violinplot_per_group(
+    actions,
+    labels,
+    steps_to_recover_per_action,
+    "steps",
+    "Steps to Recover grouped by Action",
+    show=show,
 )
-# print("compositeEpisodeNumber:", eps_df.compositeEpisodeNumber.max() + 1)
 
-comp_eps_df_wcbf = get_comp_eps_df(eps_df_wcbf)
-comp_eps_df_wocbf = get_comp_eps_df(eps_df_wocbf)
+boxplot_per_group(
+    actions,
+    labels,
+    steps_to_recover_per_action,
+    "steps",
+    "Steps to Recover grouped by Action",
+    show=show,
+)
 
-stats_wcbf = gather_statistics(comp_eps_df_wcbf)
-stats_wocbf = gather_statistics(comp_eps_df_wocbf)
+
+global_steps = [comp_eps_df.globalSteps for comp_eps_df in comp_eps_dfs]
+global_boxplot(labels, global_steps, "steps", "Composite Episode Length", show=show)
+global_violinplot(labels, global_steps, "steps", "Composite Episode Length", show=show)
+# global_hist(labels, global_steps, "steps", "Composite Episode Length", show=show)
