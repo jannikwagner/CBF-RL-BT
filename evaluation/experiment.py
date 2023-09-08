@@ -37,7 +37,7 @@ import seaborn as sns
 import pandas as pd
 
 NUM_EPISODES = 5000
-show = True
+store_folder = "test"
 
 run_id = "testRunId"
 
@@ -76,3 +76,11 @@ after_acc_violation_rate = get_hpc_after_acc_violation_rate(df)
 print(dict(hpc_counts))
 print(hpc_counts)
 print(after_acc_violation_rate)
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+d1 = np.random.randn(1000) - 1
+d2 = np.random.randn(100000) / 2
+plt.violinplot([d1, d2])
+plt.show()

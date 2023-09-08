@@ -31,7 +31,7 @@ import seaborn as sns
 import pandas as pd
 
 NUM_EPISODES = 5000
-show = False
+store_folder = "notfixedbridge.safeplace"
 
 run_id = "testRunId"
 
@@ -102,15 +102,18 @@ action_termination_cause_df.index = labels
 print(action_termination_cause_df.to_dict())
 print(action_termination_cause_df.to_latex())
 global_steps = [comp_eps_df.globalSteps for comp_eps_df in comp_eps_dfs]
-global_plot(labels, global_steps, "steps", "Composite Episode Length", show=show)
+global_plot(
+    labels, global_steps, "steps", "Composite Episode Length", store_folder=store_folder
+)
 
 local_episodes_count = [comp_eps_df.localEpisodesCount for comp_eps_df in comp_eps_dfs]
+# print("local episode counts unique", [x.unique() for x in local_episodes_count])
 global_plot(
     labels,
     local_episodes_count,
     "episodes",
     "Local Episodes per Composite Episode",
-    show=show,
+    store_folder=store_folder,
 )
 
 termination_cause_rates = [get_termination_cause_rates(df) for df in eps_dfs]
@@ -120,7 +123,7 @@ bars_per_group(
     termination_cause_rates,
     "termination cause rate",
     "Termination Cause Rates",
-    show=show,
+    store_folder=store_folder,
 )
 
 for action in actions:
@@ -132,13 +135,15 @@ for action in actions:
         termination_cause_rates,
         "termination cause rate",
         f"Termination Cause Rates for Action {action}",
-        show=show,
+        store_folder=store_folder,
     )
 
 
 steps_to_recover = [get_acc_steps_to_recover(eps_df) for eps_df in eps_dfs]
-print("steps_to_recover:", steps_to_recover)
-global_plot(labels, steps_to_recover, "steps", "Steps to Recover", show=show)
+# print("steps_to_recover:", steps_to_recover)
+global_plot(
+    labels, steps_to_recover, "steps", "Steps to Recover", store_folder=store_folder
+)
 
 steps_to_recover_per_action = [
     get_acc_steps_to_recover_per_action(eps_df, actions) for eps_df in eps_dfs
@@ -149,7 +154,7 @@ plot_per_group(
     steps_to_recover_per_action,
     "steps",
     "Steps to Recover grouped by Action",
-    show=show,
+    store_folder=store_folder,
 )
 
 steps_to_recover_per_acc = [
@@ -161,11 +166,11 @@ plot_per_acc(
     steps_to_recover_per_acc,
     "steps",
     "Steps to Recover grouped by ACC",
-    show=show,
+    store_folder=store_folder,
 )
 
 acc_violation_rates = [get_acc_violation_rate(eps_df) for eps_df in eps_dfs]
-print("acc_violation_rates:", acc_violation_rates)
+# print("acc_violation_rates:", acc_violation_rates)
 
 acc_violation_rates_per_action = [
     get_acc_violation_rate_per_action(eps_df, actions) for eps_df in eps_dfs
@@ -176,7 +181,7 @@ bars_per_group(
     acc_violation_rates_per_action,
     "ACC violation rate",
     "ACC Violation Rates grouped by Action",
-    show=show,
+    store_folder=store_folder,
 )
 
 acc_violation_rates_per_acc = [
@@ -188,7 +193,7 @@ bars_per_acc(
     acc_violation_rates_per_acc,
     "ACC violation rate",
     "ACC Violation Rates grouped by ACC",
-    show=show,
+    store_folder=store_folder,
 )
 
 
@@ -201,7 +206,7 @@ bars_per_group(
     avg_num_eps_per_action,
     "episodes",
     "Average Local Episodes per Composite Episode grouped by Action",
-    show=show,
+    store_folder=store_folder,
 )
 
 num_eps_per_action = [get_num_eps_per_action(eps_df, actions) for eps_df in eps_dfs]
@@ -211,7 +216,7 @@ plot_per_group(
     num_eps_per_action,
     "episodes",
     "Local Episodes per Composite Episode grouped by Action",
-    show=show,
+    store_folder=store_folder,
 )
 
 avg_total_steps_per_action = [
@@ -223,7 +228,7 @@ bars_per_group(
     avg_total_steps_per_action,
     "steps",
     "Average Total Steps per Composite Episode grouped by Action",
-    show=show,
+    store_folder=store_folder,
 )
 
 total_steps_per_action = [
@@ -235,11 +240,13 @@ plot_per_group(
     total_steps_per_action,
     "steps",
     "Total Steps per Composite Episode grouped by Action",
-    show=show,
+    store_folder=store_folder,
 )
 
 local_steps = [eps_df.localSteps for eps_df in eps_dfs]
-global_plot(labels, local_steps, "steps", "Local Episode Length", show=show)
+global_plot(
+    labels, local_steps, "steps", "Local Episode Length", store_folder=store_folder
+)
 
 local_steps_per_action = [
     get_local_steps_per_action(eps_df, actions) for eps_df in eps_dfs
@@ -250,7 +257,7 @@ plot_per_group(
     local_steps_per_action,
     "steps",
     "Local Episode Length grouped by Action",
-    show=show,
+    store_folder=store_folder,
 )
 
 eps_reaching_pc_dfs = [eps_df.query("terminationCause == 0") for eps_df in eps_dfs]
@@ -264,7 +271,7 @@ global_plot(
     local_steps_violating_acc,
     "steps",
     "Length of Local Episodes Violating ACCs",
-    show=show,
+    store_folder=store_folder,
 )
 
 local_steps_reaching_pc_per_action = [
@@ -279,7 +286,7 @@ plot_per_group(
     local_steps_violating_acc_per_action,
     "steps",
     "Length of Local Episodes violating ACC grouped by Action",
-    show=show,
+    store_folder=store_folder,
 )
 
 local_steps_violating_acc_per_acc = [
@@ -292,7 +299,7 @@ plot_per_acc(
     local_steps_violating_acc_per_acc,
     "steps",
     "Length of Local Episodes violating ACC grouped by ACC",
-    show=show,
+    store_folder=store_folder,
 )
 
 # compare local steps for episodes reaching PC and episodes not reaching PC
@@ -302,7 +309,13 @@ for i in range(len(labels)):
     violating_acc = local_steps_violating_acc[i]
     pc_labels = ["reaching pc", "violating acc"]
     data = [reaching_pc, violating_acc]
-    global_plot(pc_labels, data, "steps", f"Local Episode Length - {label}", show=show)
+    global_plot(
+        pc_labels,
+        data,
+        "steps",
+        f"Local Episode Length - {label}",
+        store_folder=store_folder,
+    )
 
 # compare local steps for episodes reaching PC and episodes not reaching PCfor i in range(labels):
 for i in range(len(labels)):
@@ -317,5 +330,5 @@ for i in range(len(labels)):
         data,
         "steps",
         f"Local Episode Length grouped by Action - {label}",
-        show=show,
+        store_folder=store_folder,
     )

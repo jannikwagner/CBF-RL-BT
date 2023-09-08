@@ -11,11 +11,11 @@ import matplotlib.colors as mcolors
 import scipy.stats as st
 import seaborn as sns
 
-PLOT_FOLDER = "evaluation/plots/testRunId"
+PLOT_FOLDER = "evaluation/plots/"
 
 COLORS = list(mcolors.TABLEAU_COLORS.values())
 
-VIOLINPLOT_AXIS_PERCENTILES = (0, 95)
+VIOLINPLOT_AXIS_PERCENTILES = (0, 90)
 VIOLINPLOT_AXLIM_MARGIN = 0.04
 VIOLINPLOT_QUANTILE_LINES = [0.25, 0.75]
 
@@ -168,12 +168,18 @@ def bars_per_acc(
     values: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(6, 4),
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
     bars_per_group(
-        action_accs, labels, values, ylabel, title, show=show, figsize=figsize
+        action_accs,
+        labels,
+        values,
+        ylabel,
+        title,
+        store_folder=store_folder,
+        figsize=figsize,
     )
 
 
@@ -183,7 +189,7 @@ def bars_per_group(
     values: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(6, 4),
 ):
     x = np.arange(len(groups))  # the label locations
@@ -207,16 +213,16 @@ def bars_per_group(
     ax.legend(loc="upper right", ncols=3)
     # ax.set_ylim(0, 1)
 
-    display(f"gplot.{title}", show)
+    display(f"gplot.{title}", store_folder)
 
 
-def display(title, show):
-    if show:
+def display(title, store_folder=None):
+    if not store_folder:
         plt.show()
     else:
-        os.makedirs(PLOT_FOLDER, exist_ok=True)
-        path = os.path.join(PLOT_FOLDER, f"{title}.pdf")
-        plt.savefig(path, bbox_inches="tight")
+        file_path = os.path.join(PLOT_FOLDER, store_folder, f"{title}.pdf")
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        plt.savefig(file_path, bbox_inches="tight")
     plt.cla()
     plt.close()
 
@@ -227,12 +233,18 @@ def boxplot_per_acc(
     data: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(6, 4),
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
     boxplot_per_group(
-        action_accs, labels, data, ylabel, title, show=show, figsize=figsize
+        action_accs,
+        labels,
+        data,
+        ylabel,
+        title,
+        store_folder=store_folder,
+        figsize=figsize,
     )
 
 
@@ -242,12 +254,18 @@ def violinplot_per_acc(
     data: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(6, 4),
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
     violinplot_per_group(
-        action_accs, labels, data, ylabel, title, show=show, figsize=figsize
+        action_accs,
+        labels,
+        data,
+        ylabel,
+        title,
+        store_folder=store_folder,
+        figsize=figsize,
     )
 
 
@@ -257,15 +275,27 @@ def plot_per_acc(
     data: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(6, 4),
 ):
     action_accs = [f"{action}.{acc}" for (action, acc) in action_acc_tuples]
     boxplot_per_group(
-        action_accs, labels, data, ylabel, title, show=show, figsize=figsize
+        action_accs,
+        labels,
+        data,
+        ylabel,
+        title,
+        store_folder=store_folder,
+        figsize=figsize,
     )
     violinplot_per_group(
-        action_accs, labels, data, ylabel, title, show=show, figsize=figsize
+        action_accs,
+        labels,
+        data,
+        ylabel,
+        title,
+        store_folder=store_folder,
+        figsize=figsize,
     )
 
 
@@ -288,11 +318,11 @@ def plot_per_group(
     datas: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(6, 4),
 ):
-    boxplot_per_group(groups, labels, datas, ylabel, title, show, figsize)
-    violinplot_per_group(groups, labels, datas, ylabel, title, show, figsize)
+    boxplot_per_group(groups, labels, datas, ylabel, title, store_folder, figsize)
+    violinplot_per_group(groups, labels, datas, ylabel, title, store_folder, figsize)
 
 
 def boxplot_per_group(
@@ -301,7 +331,7 @@ def boxplot_per_group(
     datas: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(6, 4),
 ):
     x = np.arange(len(groups))  # the label locations
@@ -332,7 +362,7 @@ def boxplot_per_group(
     ax.set_xticks(x + width / 2 * (len(datas) - 1), groups, rotation=45, fontsize=8)
     ax.legend([bps["boxes"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
 
-    display(f"gbp.{title}", show)
+    display(f"gbp.{title}", store_folder)
 
 
 def violinplot_per_group(
@@ -341,7 +371,7 @@ def violinplot_per_group(
     datas: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(6, 4),
 ):
     xs = np.arange(len(groups))  # the label locations
@@ -400,7 +430,7 @@ def violinplot_per_group(
     ax.set_xticks(xs + width / 2 * (len(datas) - 1), groups, rotation=45, fontsize=8)
     ax.legend([bps["bodies"][0] for bps in bps_list], labels, loc="upper left", ncols=3)
 
-    display(f"gviolin.{title}", show)
+    display(f"gviolin.{title}", store_folder)
 
 
 def color_violinplot(i, bps):
@@ -421,11 +451,11 @@ def global_plot(
     data: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(3, 3),
 ):
-    global_boxplot(labels, data, ylabel, title, show, figsize)
-    global_violinplot(labels, data, ylabel, title, show, figsize)
+    global_boxplot(labels, data, ylabel, title, store_folder, figsize)
+    global_violinplot(labels, data, ylabel, title, store_folder, figsize)
 
 
 def global_boxplot(
@@ -433,7 +463,7 @@ def global_boxplot(
     data: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(3, 3),
 ):
     x = np.arange(len(labels))  # the label locations
@@ -456,7 +486,7 @@ def global_boxplot(
     ax.set_title(title)
     ax.set_xticks(x, labels, rotation=45, fontsize=8)
 
-    display(f"bp.{title}", show)
+    display(f"bp.{title}", store_folder)
 
 
 def global_violinplot(
@@ -464,7 +494,7 @@ def global_violinplot(
     data: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
     figsize=(3, 3),
 ):
     x = np.arange(len(labels))  # the label locations
@@ -499,7 +529,7 @@ def global_violinplot(
     ax.set_title(title)
     ax.set_xticks(x, labels, rotation=45, fontsize=8)
 
-    display(f"violin.{title}", show)
+    display(f"violin.{title}", store_folder)
 
 
 def global_hist(
@@ -507,7 +537,7 @@ def global_hist(
     data: Sequence,
     ylabel: str,
     title: str,
-    show=False,
+    store_folder=None,
 ):
     sns.histplot(
         dict(zip(labels, data)), color=COLORS, kde=True, label=ylabel, stat="density"
@@ -519,21 +549,26 @@ def global_hist(
     plt.title(title)
     # plt.set_xticks(x, labels, rotation=45, fontsize=8)
 
-    display(f"hist.{title}", show)
+    display(f"hist.{title}", store_folder)
 
 
 def gather_statistics(comp_eps_df, eps_df):
     eps_df.localSteps
     stats = dict(
         success_rate=comp_eps_df.globalSuccess.mean(),
-        min_global_steps=comp_eps_df.globalSteps.min(),
-        max_global_steps=comp_eps_df.globalSteps.max(),
         mean_global_steps=comp_eps_df.globalSteps.mean(),
-        std_global_steps=comp_eps_df.globalSteps.std(),
-        min_local_episodes=comp_eps_df.localEpisodesCount.min(),
-        max_local_episodes=comp_eps_df.localEpisodesCount.max(),
+        # std_global_steps=comp_eps_df.globalSteps.std(),
+        # min_global_steps=comp_eps_df.globalSteps.min(),
+        # max_global_steps=comp_eps_df.globalSteps.max(),
         mean_local_episodes=comp_eps_df.localEpisodesCount.mean(),
-        std_local_episodes=comp_eps_df.localEpisodesCount.std(),
+        # std_local_episodes=comp_eps_df.localEpisodesCount.std(),
+        # min_local_episodes=comp_eps_df.localEpisodesCount.min(),
+        # max_local_episodes=comp_eps_df.localEpisodesCount.max(),
+        mean_local_episode_length=eps_df.localSteps.mean(),
+        mean_steps_to_recover=eps_df.query(
+            "terminationCause == 1"
+        ).accStepsToRecover.mean(),
+        acc_recovery_rate=eps_df.query("terminationCause == 1").accRecovered.mean(),
     )
     df = pd.DataFrame([stats])
     return df
