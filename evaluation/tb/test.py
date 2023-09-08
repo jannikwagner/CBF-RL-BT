@@ -9,6 +9,7 @@ from plotting import (
 import numpy as np
 import os
 import seaborn as sns
+import pandas as pd
 
 font_family = "PT Mono"
 background_color = "#F8F1F1"
@@ -76,6 +77,18 @@ def get_scalar_data(results_path, run_ids, behaviors, labels=None):
 
 done_run_ids = [w_f_s, wo_f_s, w_f_ns, wo_f_ns, w_nf_s, wo_nf_s]
 
+steps = {}
+for run_id in done_run_ids:
+    data = get_scalar_data(results_path, [run_id], behaviors)
+    temp = {label: min(5000000, d["Timestep"].max()) for label, d in data.items()}
+    temp["sum"] = sum(temp.values())
+    steps[run_id] = temp
+
+steps_df = pd.DataFrame(steps).transpose()
+print(steps)
+print(steps_df)
+print(steps_df.to_latex())
+
 
 def time_series_all_behaviors(results_path, run_id, behaviors):
     data = get_scalar_data(results_path, [run_id], behaviors)
@@ -97,7 +110,6 @@ for behavior in behaviors:
         results_path, f_s, behavior, f"fixedbridge.safeplace/{behavior}", labels
     )
 
-
 f_ns = (w_f_ns, wo_f_ns)
 labels = ("CBF", "No CBF")
 for behavior in behaviors:
@@ -109,7 +121,7 @@ nf_s = (w_nf_s, wo_nf_s)
 labels = ("CBF", "No CBF")
 for behavior in behaviors:
     time_series_one_behavior(
-        results_path, f_ns, behavior, f"notfixedbridge.safeplace/{behavior}", labels
+        results_path, nf_s, behavior, f"notfixedbridge.safeplace/{behavior}", labels
     )
 
 w_f = (w_f_s, w_f_ns)
