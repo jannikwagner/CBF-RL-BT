@@ -25,6 +25,10 @@ from helpers import (
     boxplot_per_acc,
     ActionTerminationCause,
     action_termination_causes,
+    get_local_steps_of_eps_violating_acc_per_acc,
+    plot_per_acc,
+    acc_steps_recovered_sanity_check,
+    global_plot,
 )
 
 import seaborn as sns
@@ -35,8 +39,8 @@ show = True
 
 run_id = "testRunId"
 
-file_name_wcbf = "env5.wcbf.fixedbridge.safeplace.fewsteps"
-file_name_wocbf = "env5.wocbf.fixedbridge.safeplace.fewsteps"
+file_name_wcbf = "env5.wcbf.fixedbridge.safeplace"
+file_name_wocbf = "env5.wocbf.fixedbridge.safeplace"
 file_names = [file_name_wcbf, file_name_wocbf]
 
 file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in file_names]
@@ -60,30 +64,11 @@ action_acc_tuples = [(action, acc) for action in acc_dict for acc in acc_dict[ac
 
 comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
 
+local_steps = [eps_df.localSteps for eps_df in eps_dfs]
+print("local steps")
+print([len(x) for x in local_steps])
+global_plot(labels, local_steps, "steps", "Local Episode Length", show=show)
 
-steps_to_recover_per_action = [
-    get_acc_steps_to_recover_per_action(eps_df, actions) for eps_df in eps_dfs
-]
-violinplot_per_group(
-    actions,
-    labels,
-    steps_to_recover_per_action,
-    "steps",
-    "Steps to Recover grouped by Action",
-    show=show,
-)
+df = eps_dfs[1]
 
-boxplot_per_group(
-    actions,
-    labels,
-    steps_to_recover_per_action,
-    "steps",
-    "Steps to Recover grouped by Action",
-    show=show,
-)
-
-
-global_steps = [comp_eps_df.globalSteps for comp_eps_df in comp_eps_dfs]
-global_boxplot(labels, global_steps, "steps", "Composite Episode Length", show=show)
-global_violinplot(labels, global_steps, "steps", "Composite Episode Length", show=show)
-# global_hist(labels, global_steps, "steps", "Composite Episode Length", show=show)
+acc_steps_recovered_sanity_check(df)

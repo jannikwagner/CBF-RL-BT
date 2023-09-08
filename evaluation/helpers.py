@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import scipy.stats as st
 import seaborn as sns
 
 PLOT_FOLDER = "evaluation/plots/testRunId"
@@ -520,7 +521,7 @@ def global_hist(
 
 
 def gather_statistics(comp_eps_df, eps_df):
-    termination_cause_rates = get_termination_cause_rates(eps_df)
+    eps_df.localSteps
     stats = dict(
         success_rate=comp_eps_df.globalSuccess.mean(),
         min_global_steps=comp_eps_df.globalSteps.min(),
@@ -531,7 +532,6 @@ def gather_statistics(comp_eps_df, eps_df):
         max_local_episodes=comp_eps_df.localEpisodesCount.max(),
         mean_local_episodes=comp_eps_df.localEpisodesCount.mean(),
         std_local_episodes=comp_eps_df.localEpisodesCount.std(),
-        # **dict(zip(action_termination_causes, termination_cause_rates)),
     )
     df = pd.DataFrame([stats])
     return df
@@ -581,6 +581,22 @@ def get_acc_steps_to_recover_per_acc(
         steps_list.append(acc_steps_to_recover)
 
     return steps_list
+
+
+def get_local_steps_of_eps_violating_acc_per_acc(
+    eps_df: pd.DataFrame,
+    action_acc_tuples: Sequence[Tuple[str, str]],
+    threshold=ACC_STEPS_TO_RECOVER_THRESHOLD,
+):
+    res = []
+    for action, acc in action_acc_tuples:
+        acc_df = eps_df.query(
+            "action == @action & terminationCause == 1 & accName == @acc"
+        )
+        local_steps = acc_df.localSteps
+        res.append(local_steps)
+
+    return res
 
 
 def get_acc_steps_to_recover_per_action(
@@ -656,3 +672,36 @@ def within_percentiles(data, percentiles):
     v1, v2 = np.percentile(data, [p1, p2])
     print(v1, v2)
     return data[np.logical_and(data >= v1, data <= v2)]
+
+
+def condifence_interval(a, confidence=0.95):
+    return st.t.interval(confidence, len(a) - 1, loc=np.mean(a), scale=st.sem(a))
+
+
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0 * np.array(data)
+    n = len(a)
+    m, se = np.mean(a), st.sem(a)
+    h = se * st.t.ppf((1 + confidence) / 2.0, n - 1)
+    return m, h, m - h, m + h
+
+
+def acc_steps_recovered_sanity_check(df):
+    grouped_df = df.groupby("compositeEpisodeNumber")
+    for group in grouped_df.groups:
+        comp_ep = grouped_df.get_group(group)
+        steps = 0
+        violated = {}
+        for loc_ep in comp_ep.iloc:
+            if loc_ep.action in violated:
+                old_loc_ep, old_steps = violated.pop(loc_ep.action)
+                steps_to_recover = steps - old_steps
+                shouldbe = old_loc_ep.accStepsToRecover
+                if abs(steps_to_recover - shouldbe) > 2 or not old_loc_ep.accRecovered:
+                    print(group, shouldbe, steps_to_recover, old_loc_ep.accRecovered)
+
+            steps += loc_ep.localSteps
+            if loc_ep.terminationCause == 1:
+                violated[loc_ep.action] = (loc_ep, steps)
+        for loc_ep, _ in violated.values():
+            assert not loc_ep.accRecovered

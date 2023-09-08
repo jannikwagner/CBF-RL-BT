@@ -20,6 +20,7 @@ from helpers import (
     global_plot,
     bars_per_group,
     bars_per_acc,
+    get_local_steps_of_eps_violating_acc_per_acc,
     ActionTerminationCause,
     action_termination_causes,
 )
@@ -257,6 +258,19 @@ plot_per_group(
     show=show,
 )
 
+local_steps_violating_acc_per_acc = [
+    get_local_steps_of_eps_violating_acc_per_acc(eps_df, action_acc_tuples)
+    for eps_df in eps_dfs
+]
+plot_per_acc(
+    action_acc_tuples,
+    labels,
+    local_steps_violating_acc_per_acc,
+    "steps",
+    "Length of Local Episodes violating ACC grouped by ACC",
+    show=show,
+)
+
 # compare local steps for episodes reaching PC and episodes not reaching PC
 for i in range(len(labels)):
     label = labels[i]
@@ -265,7 +279,6 @@ for i in range(len(labels)):
     pc_labels = ["reaching pc", "violating acc"]
     data = [reaching_pc, violating_acc]
     global_plot(pc_labels, data, "steps", f"Local Episode Length - {label}", show=show)
-    # global_hist(pc_labels, data, "steps", f"Local Episode Length - {label}", show=show)
 
 # compare local steps for episodes reaching PC and episodes not reaching PCfor i in range(labels):
 for i in range(len(labels)):
