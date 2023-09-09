@@ -15,7 +15,7 @@ PLOT_FOLDER = "evaluation/plots/"
 
 COLORS = list(mcolors.TABLEAU_COLORS.values())
 
-VIOLINPLOT_AXIS_PERCENTILES = (0, 90)
+VIOLINPLOT_AXIS_PERCENTILES = (0, 95)
 VIOLINPLOT_AXLIM_MARGIN = 0.04
 VIOLINPLOT_QUANTILE_LINES = [0.25, 0.75]
 
@@ -711,8 +711,14 @@ def within_percentiles(data, percentiles):
     return data[np.logical_and(data >= v1, data <= v2)]
 
 
+"""https://stackoverflow.com/questions/15033511/compute-a-confidence-interval-from-sample-data"""
+
+
 def condifence_interval(a, confidence=0.95):
     return st.t.interval(confidence, len(a) - 1, loc=np.mean(a), scale=st.sem(a))
+
+
+"""https://stackoverflow.com/questions/15033511/compute-a-confidence-interval-from-sample-data"""
 
 
 def mean_confidence_interval(data, confidence=0.95):

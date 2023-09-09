@@ -1722,8 +1722,8 @@ MonoBehaviour:
   moveToButton2: {fileID: 3524731210142737004}
   controller: {fileID: 2350770349054637415}
   useCBF: 0
-  maxSteps: 3000
-  maxStepsPerLocalEpisode: 500
+  maxSteps: 10000
+  maxStepsPerLocalEpisode: 5000
   evaluationActive: 1
 --- !u!114 &1685125455920507372
 MonoBehaviour:
