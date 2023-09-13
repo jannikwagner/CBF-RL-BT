@@ -31,13 +31,22 @@ import seaborn as sns
 import pandas as pd
 
 NUM_EPISODES = 5000
-store_folder = "test"
+store_folder = "notfixedbridge.safeplace"
 
 run_id = "testRunId"
 
-file_name_wcbf = "env5.wcbf.fixedbridge.notsafeplace"
-file_name_wocbf = "env5.wocbf.fixedbridge.notsafeplace"
-file_names = [file_name_wcbf, file_name_wocbf]
+w_f_s = "env5.wcbf.fixedbridge.safeplace"
+wo_f_s = "env5.wocbf.fixedbridge.safeplace"
+w_f_ns = "env5.wcbf.fixedbridge.notsafeplace"
+wo_f_ns = "env5.wocbf.fixedbridge.notsafeplace"
+w_nf_s = "env5.wcbf.notfixedbridge.safeplace"
+wo_nf_s = "env5.wocbf.notfixedbridge.safeplace"
+
+f_s = w_f_s, wo_f_s
+f_ns = w_f_ns, wo_f_ns
+nf_s = w_nf_s, wo_nf_s
+
+file_names = nf_s
 
 file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in file_names]
 
@@ -81,26 +90,6 @@ for df in eps_dfs:
     acc_sanity_check(df, skill_acc_tuples)
 
 comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
-
-stats = [
-    gather_statistics(comp_eps_df, eps_df)
-    for comp_eps_df, eps_df in zip(comp_eps_dfs, eps_dfs)
-]
-print("global_stats:")
-stats_df = pd.concat(stats)
-stats_df.index = labels
-print(stats_df.to_dict())
-print(stats_df.to_latex())
-
-skill_termination_cause_df = pd.DataFrame(
-    [
-        dict(zip(skill_termination_causes, get_termination_cause_rates(df)))
-        for df in eps_dfs
-    ]
-)
-skill_termination_cause_df.index = labels
-print(skill_termination_cause_df.to_dict())
-print(skill_termination_cause_df.to_latex())
 
 
 global_steps = [comp_eps_df.globalSteps for comp_eps_df in comp_eps_dfs]
