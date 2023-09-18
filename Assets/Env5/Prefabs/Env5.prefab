@@ -57,7 +57,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 8884efe5ad9ce4341a9705854ded465c, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: MoveToBridge
   TeamId: 0
   m_UseChildSensors: 1
@@ -80,6 +80,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   useCBF: 1
+  maxActions: 5000
   controller: {fileID: 2350770349054637415}
 --- !u!1 &2371368536829670593
 GameObject:
@@ -138,7 +139,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: f8677c76bae774ddcaad73b88e6882b2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: MoveUp
   TeamId: 0
   m_UseChildSensors: 1
@@ -161,6 +162,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   useCBF: 1
+  maxActions: 5000
   controller: {fileID: 2350770349054637415}
 --- !u!1 &3192776031380586719
 GameObject:
@@ -219,7 +221,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: dfdc2a7f31f8943b288d0df6d6c3b65e, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: MoveToButton2
   TeamId: 0
   m_UseChildSensors: 1
@@ -242,6 +244,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   useCBF: 1
+  maxActions: 5000
   controller: {fileID: 2350770349054637415}
 --- !u!1 &3311066542544235104
 GameObject:
@@ -300,7 +303,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: f71d232d9a9bc4366a54ac29e28c6c3b, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: MoveToButton1
   TeamId: 0
   m_UseChildSensors: 1
@@ -323,6 +326,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   useCBF: 1
+  maxActions: 5000
   controller: {fileID: 2350770349054637415}
 --- !u!1 &4514409696925509296
 GameObject:
@@ -509,7 +513,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 4a2fef10f8f58456a96f5d9995b45b63, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: MoveToTrigger1
   TeamId: 0
   m_UseChildSensors: 1
@@ -532,6 +536,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   useCBF: 1
+  maxActions: 5000
   controller: {fileID: 2350770349054637415}
 --- !u!1 &6278103709046438299
 GameObject:
@@ -590,7 +595,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 04a61d7f339e445e6bb0d85e69fdf2a4, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: MoveOverBridge
   TeamId: 0
   m_UseChildSensors: 1
@@ -613,6 +618,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   useCBF: 1
+  maxActions: 5000
   controller: {fileID: 2350770349054637415}
 --- !u!1 &7185519472462761156
 GameObject:
@@ -671,7 +677,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: a77841a364b4b48b6b7ac5f45e69424b, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: MoveToTrigger2
   TeamId: 0
   m_UseChildSensors: 1
@@ -694,6 +700,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   useCBF: 1
+  maxActions: 5000
   controller: {fileID: 2350770349054637415}
 --- !u!1 &7457848245877172335
 GameObject:
@@ -1715,7 +1722,9 @@ MonoBehaviour:
   moveToButton2: {fileID: 3524731210142737004}
   controller: {fileID: 2350770349054637415}
   useCBF: 0
-  evaluationActive: 0
+  maxSteps: 10000
+  maxStepsPerLocalEpisode: 5000
+  evaluationActive: 1
 --- !u!114 &1685125455920507372
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1814,7 +1823,7 @@ MonoBehaviour:
   button2: {fileID: 7481095166641309692}
   bridgeDown: {fileID: 7481095165390883636}
   bridgeUp: {fileID: 7481095165469514434}
-  randomBridgeZ: 1
+  randomBridgeZ: 0
 --- !u!1 &7481095166394033187
 GameObject:
   m_ObjectHideFlags: 0
