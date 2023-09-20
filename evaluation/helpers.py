@@ -554,23 +554,26 @@ def global_hist(
 
 
 def gather_statistics(comp_eps_df, eps_df):
-    eps_df.localSteps
-    stats = dict(
-        success_rate=comp_eps_df.globalSuccess.mean(),
-        mean_global_steps=comp_eps_df.globalSteps.mean(),
-        std_global_steps=comp_eps_df.globalSteps.std(),
-        # min_global_steps=comp_eps_df.globalSteps.min(),
-        # max_global_steps=comp_eps_df.globalSteps.max(),
-        mean_local_episodes=comp_eps_df.localEpisodesCount.mean(),
-        # std_local_episodes=comp_eps_df.localEpisodesCount.std(),
-        # min_local_episodes=comp_eps_df.localEpisodesCount.min(),
-        # max_local_episodes=comp_eps_df.localEpisodesCount.max(),
-        mean_local_episode_length=eps_df.localSteps.mean(),
-        mean_steps_to_recover=eps_df.query(
-            "terminationCause == 1"
-        ).accStepsToRecover.mean(),
-        acc_recovery_rate=eps_df.query("terminationCause == 1").accRecovered.mean(),
-    )
+    acc_steps_to_recover = eps_df.query(
+        "terminationCause == 1 & accRecovered"
+    ).accStepsToRecover
+
+    stats = {
+        "R": comp_eps_df.globalSuccess.mean(),
+        "\\mu_T": comp_eps_df.globalSteps.mean(),
+        "\\sigma_T": comp_eps_df.globalSteps.std(),
+        # u"min_global_steps":comp_eps_df.globalSteps.min(),
+        # u"max_global_steps":comp_eps_df.globalSteps.max(),
+        "\\mu_E": comp_eps_df.localEpisodesCount.mean(),
+        "\\sigma_E": comp_eps_df.localEpisodesCount.std(),
+        # u"min_local_episodes":comp_eps_df.localEpisodesCount.min(),
+        # u"max_local_episodes":comp_eps_df.localEpisodesCount.max(),
+        "\\mu_{T_{loc}}": eps_df.localSteps.mean(),
+        "\\sigma_{T_{loc}}": eps_df.localSteps.std(),
+        "\\mu_{T_{rec}}": acc_steps_to_recover.mean(),
+        "\\sigma_{T_{rec}}": acc_steps_to_recover.std(),
+        # u"acc_recovery_rate":eps_df.query("terminationCause == 1").accRecovered.mean(),
+    }
     df = pd.DataFrame([stats])
     return df
 
@@ -650,7 +653,6 @@ def get_acc_steps_to_recover_per_skill(
 
 def get_acc_steps_to_recover(eps_df, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD):
     # threshold is a hack to ignore erroneous acc violations
-    # TODO: fix bug that causes erroneous acc violations
     acc_steps_to_recover = eps_df.query(
         "terminationCause == 1 & accRecovered & accStepsToRecover >= @threshold"
     ).accStepsToRecover
