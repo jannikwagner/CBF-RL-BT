@@ -25,24 +25,6 @@ sns.set_style(
 )
 
 
-results_path = "results"
-w_f_s = "env5.wcbf.fixedbridge.safeplace"
-wo_f_s = "env5.wocbf.fixedbridge.safeplace"
-w_f_ns = "env5.wcbf.fixedbridge.notsafeplace"
-wo_f_ns = "env5.wocbf.fixedbridge.notsafeplace"
-w_nf_s = "env5.wcbf.notfixedbridge.safeplace"
-wo_nf_s = "env5.wocbf.notfixedbridge.safeplace"
-skills = [
-    "MoveToTrigger1",
-    "MoveToButton2",
-    "MoveUp",
-    "MoveToBridge",
-    "MoveToTrigger2",
-    "MoveToButton1",
-    "MoveOverBridge",
-]
-
-
 def get_scalar_data_all_skills(run_path):
     run_logs = "run_logs"
     data = {}
@@ -75,24 +57,23 @@ def get_scalar_data(results_path, run_ids, skills, labels=None):
     return data
 
 
-done_run_ids = [w_f_s, wo_f_s, w_f_ns, wo_f_ns, w_nf_s, wo_nf_s]
+def print_total_steps(results_path, skills, get_scalar_data, done_run_ids):
+    steps = {}
+    for run_id in done_run_ids:
+        data = get_scalar_data(results_path, [run_id], skills)
+        temp = {label: min(5000000, d["Timestep"].max()) for label, d in data.items()}
+        temp["sum"] = sum(temp.values())
+        steps[run_id] = temp
 
-steps = {}
-for run_id in done_run_ids:
+    steps_df = pd.DataFrame(steps).transpose()
+    print(steps)
+    print(steps_df)
+    print(steps_df.to_latex())
+
+
+def time_series_all_skills(results_path, run_id, skills, figsize=(12, 7), path=""):
     data = get_scalar_data(results_path, [run_id], skills)
-    temp = {label: min(5000000, d["Timestep"].max()) for label, d in data.items()}
-    temp["sum"] = sum(temp.values())
-    steps[run_id] = temp
-
-steps_df = pd.DataFrame(steps).transpose()
-print(steps)
-print(steps_df)
-print(steps_df.to_latex())
-
-
-def time_series_all_skills(results_path, run_id, skills):
-    data = get_scalar_data(results_path, [run_id], skills)
-    plot_multi_series(data, (12, 7), title=run_id, store=run_id)
+    plot_multi_series(data, figsize, title=run_id, store=os.path.join(path, run_id))
 
 
 def time_series_one_skill(results_path, run_ids, skill, title, labels):
@@ -100,8 +81,33 @@ def time_series_one_skill(results_path, run_ids, skill, title, labels):
     plot_multi_series(data, (5, 3), title=title, store=title)
 
 
+results_path = "results"
+w_f_s = "env5.wcbf.fixedbridge.safeplace"
+wo_f_s = "env5.wocbf.fixedbridge.safeplace"
+w_f_ns = "env5.wcbf.fixedbridge.notsafeplace"
+wo_f_ns = "env5.wocbf.fixedbridge.notsafeplace"
+w_nf_s = "env5.wcbf.notfixedbridge.safeplace"
+wo_nf_s = "env5.wocbf.notfixedbridge.safeplace"
+skills = [
+    "MoveToTrigger1",
+    "MoveToButton2",
+    "MoveUp",
+    "MoveToBridge",
+    "MoveToTrigger2",
+    "MoveToButton1",
+    "MoveOverBridge",
+]
+
+done_run_ids = [w_f_s, wo_f_s, w_f_ns, wo_f_ns, w_nf_s, wo_nf_s]
+
+
 for run_id in done_run_ids:
-    time_series_all_skills(results_path, run_id, skills)
+    time_series_all_skills(results_path, run_id, skills, (7, 5), "mean_small")
+
+print_total_steps(results_path, skills, get_scalar_data, done_run_ids)
+
+for run_id in done_run_ids:
+    time_series_all_skills(results_path, run_id, skills, (12, 7))
 
 f_s = (w_f_s, wo_f_s)
 labels = ("wcbf", "wocbf")
