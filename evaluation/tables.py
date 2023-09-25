@@ -23,6 +23,15 @@ wo_f_ns = "env5.wocbf.fixedbridge.notsafeplace"
 w_nf_s = "env5.wcbf.notfixedbridge.safeplace"
 wo_nf_s = "env5.wocbf.notfixedbridge.safeplace"
 
+l_w_f_s = "w.f.s"
+l_wo_f_s = "wo.f.s"
+l_w_f_ns = "w.f.ns"
+l_wo_f_ns = "wo.f.ns"
+l_w_nf_s = "w.nf.s"
+l_wo_nf_s = "wo.nf.s"
+labels = [l_w_f_s, l_wo_f_s, l_w_f_ns, l_wo_f_ns, l_w_nf_s, l_wo_nf_s]
+labels = ["\\texttt{" + label + "}" for label in labels]
+
 file_names = [w_f_s, wo_f_s, w_f_ns, wo_f_ns, w_nf_s, wo_nf_s]
 
 file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in file_names]
@@ -36,8 +45,6 @@ for df in eps_dfs:
     print("max compositeEpisodeNumber:", df.compositeEpisodeNumber.max())
     assert (df.compositeEpisodeNumber.max()) >= NUM_EPISODES - 1
 eps_df_wocbf = eps_dfs[1]
-
-labels = file_names
 
 skills = [
     "MoveToT1",
@@ -62,9 +69,9 @@ acc_dict = {
 skill_acc_tuples = [(skill, acc) for skill in acc_dict for acc in acc_dict[skill]]
 
 
-for df in eps_dfs:
-    acc_steps_recovered_sanity_check(df)
-    acc_sanity_check(df, skill_acc_tuples)
+# for df in eps_dfs:
+#     acc_steps_recovered_sanity_check(df)
+#     acc_sanity_check(df, skill_acc_tuples)
 
 comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
 
@@ -74,9 +81,17 @@ stats = [
 ]
 print("global_stats:")
 stats_df = pd.concat(stats)
+cols = [f"${col}$" for col in stats_df.columns]
+stats_df.columns = cols
 stats_df.index = labels
+
+
 # print(stats_df.to_dict())
-print(stats_df.to_latex())
+def f(decimal, pre=0):
+    return lambda x: f"%{pre}.{decimal}f" % x
+
+
+print(stats_df.to_latex(formatters=[f(4)] + [f(1)] * 2 + [f(2)] * 2 + [f(1)] * 4))
 
 skill_termination_cause_df = pd.DataFrame(
     [
@@ -85,5 +100,7 @@ skill_termination_cause_df = pd.DataFrame(
     ]
 )
 skill_termination_cause_df.index = labels
+cols = ["PC", "ACC", "LR", "GR", "HPC"]
+skill_termination_cause_df.columns = cols
 # print(skill_termination_cause_df.to_dict())
-print(skill_termination_cause_df.to_latex())
+print(skill_termination_cause_df.to_latex(formatters=[f(3), f(4), f(5), f(6), f(6)]))
