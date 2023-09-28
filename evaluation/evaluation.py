@@ -31,7 +31,66 @@ import seaborn as sns
 import pandas as pd
 
 NUM_EPISODES = 5000
-store_folder = "notfixedbridge.safeplace"
+
+skills = [
+    "MTrigger1",
+    "MUp",
+    "MUp2",
+    "MButton1",
+    "MTrigger2",
+    "MTBridge",
+    "MOBridge",
+    "MButton2",
+]
+old_skills = [
+    "MoveToT1",
+    "MoveUp",
+    "MoveUp2",
+    "MoveToB1",
+    "MoveToT2",
+    "MoveToBridge",
+    "MoveOverBridge",
+    "MoveToB2",
+]
+acc_dict = {
+    "MTrigger1": [],
+    "MUp": [],
+    "MUp2": [],
+    "MButton1": ["Up"],
+    "MTrigger2": ["Button1"],
+    "MTBridge": ["Button1", "Up2"],
+    "MOBridge": ["OnBridge"],
+    "MButton2": ["PastBridge"],
+}
+old_acc_dict = {
+    "MoveToT1": [],
+    "MoveUp": [],
+    "MoveUp2": [],
+    "MoveToB1": ["Up"],
+    "MoveToT2": ["B1"],
+    "MoveToBridge": ["B1", "Up"],
+    "MoveOverBridge": ["OnBridge"],
+    "MoveToB2": ["PastBridge"],
+}
+
+
+def get_skill_acc_tuples(acc_dict):
+    skill_acc_tuples = [(skill, acc) for skill in acc_dict for acc in acc_dict[skill]]
+    return skill_acc_tuples
+
+
+skill_acc_tuples = get_skill_acc_tuples(acc_dict)
+old_skill_acc_tuples = get_skill_acc_tuples(old_acc_dict)
+
+
+def rename_skills_and_accs(df, skill_acc_tuples, old_skill_acc_tuples):
+    for (s1, a1), (s2, a2) in zip(old_skill_acc_tuples, skill_acc_tuples):
+        print((s1, a1), (s2, a2))
+        index = df.query("action == @s1").index
+        df.loc[index, ["action"]] = s2
+        index = df.query("action == @s2 & terminationCause == 1 & accName == @a1").index
+        df.loc[index, "accName"] = a2
+
 
 run_id = "testRunId"
 
@@ -46,7 +105,9 @@ f_s = w_f_s, wo_f_s
 f_ns = w_f_ns, wo_f_ns
 nf_s = w_nf_s, wo_nf_s
 
-file_names = nf_s
+store_folder = "fixedbridge.notsafeplace"
+
+file_names = f_ns
 
 file_paths = [f"evaluation/stats/{run_id}/{file_name}.json" for file_name in file_names]
 
@@ -62,30 +123,9 @@ eps_df_wocbf = eps_dfs[1]
 
 labels = ["wcbf", "wocbf"]
 
-skills = [
-    "MoveToT1",
-    "MoveUp",
-    "MoveUp2",
-    "MoveToB1",
-    "MoveToT2",
-    "MoveToBridge",
-    "MoveOverBridge",
-    "MoveToB2",
-]
-acc_dict = {
-    "MoveToT1": [],
-    "MoveUp": [],
-    "MoveUp2": [],
-    "MoveToB1": ["Up"],
-    "MoveToT2": ["B1"],
-    "MoveToBridge": ["B1", "Up"],
-    "MoveOverBridge": ["OnBridge"],
-    "MoveToB2": ["PastBridge"],
-}
-skill_acc_tuples = [(skill, acc) for skill in acc_dict for acc in acc_dict[skill]]
-
 
 for df in eps_dfs:
+    rename_skills_and_accs(df, skill_acc_tuples, old_skill_acc_tuples)
     acc_steps_recovered_sanity_check(df)
     acc_sanity_check(df, skill_acc_tuples)
 
