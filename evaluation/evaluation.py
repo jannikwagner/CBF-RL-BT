@@ -85,13 +85,18 @@ behavior_acc_tuples = get_behavior_acc_tuples(acc_dict)
 old_behavior_acc_tuples = get_behavior_acc_tuples(old_acc_dict)
 
 
-def rename_behaviors_and_accs(df, behavior_acc_tuples, old_behavior_acc_tuples):
+def rename_behaviors_and_accs(
+    df, behavior_acc_tuples, old_behavior_acc_tuples, behaviors, old_behaviors
+):
     for (s1, a1), (s2, a2) in zip(old_behavior_acc_tuples, behavior_acc_tuples):
-        print((s1, a1), (s2, a2))
+        # print((s1, a1), (s2, a2))
         index = df.query("action == @s1").index
         df.loc[index, ["action"]] = s2
         index = df.query("action == @s2 & terminationCause == 1 & accName == @a1").index
         df.loc[index, "accName"] = a2
+    for s1, s2 in zip(old_behaviors, behaviors):
+        index = df.query("action == @s1").index
+        df.loc[index, ["action"]] = s2
 
 
 run_id = "testRunId"
@@ -127,7 +132,9 @@ labels = ["wcbf", "wocbf"]
 
 
 for df in eps_dfs:
-    rename_behaviors_and_accs(df, behavior_acc_tuples, old_behavior_acc_tuples)
+    rename_behaviors_and_accs(
+        df, behavior_acc_tuples, old_behavior_acc_tuples, behaviors, old_behaviors
+    )
     acc_steps_recovered_sanity_check(df)
     acc_sanity_check(df, behavior_acc_tuples)
 
