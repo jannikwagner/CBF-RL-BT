@@ -3,7 +3,7 @@ from helpers import (
     gather_statistics,
     get_comp_eps_df,
     get_termination_cause_rates,
-    skill_termination_causes,
+    behavior_termination_causes,
     acc_sanity_check,
     acc_steps_recovered_sanity_check,
 )
@@ -46,7 +46,7 @@ for df in eps_dfs:
     assert (df.compositeEpisodeNumber.max()) >= NUM_EPISODES - 1
 eps_df_wocbf = eps_dfs[1]
 
-skills = [
+behaviors = [
     "MoveToT1",
     "MoveUp",
     "MoveUp2",
@@ -66,12 +66,14 @@ acc_dict = {
     "MoveOverBridge": ["OnBridge"],
     "MoveToB2": ["PastBridge"],
 }
-skill_acc_tuples = [(skill, acc) for skill in acc_dict for acc in acc_dict[skill]]
+behavior_acc_tuples = [
+    (behavior, acc) for behavior in acc_dict for acc in acc_dict[behavior]
+]
 
 
 # for df in eps_dfs:
 #     acc_steps_recovered_sanity_check(df)
-#     acc_sanity_check(df, skill_acc_tuples)
+#     acc_sanity_check(df, behavior_acc_tuples)
 
 comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
 
@@ -93,14 +95,14 @@ def f(decimal, pre=0):
 
 print(stats_df.to_latex(formatters=[f(4)] + [f(1)] * 2 + [f(2)] * 2 + [f(1)] * 4))
 
-skill_termination_cause_df = pd.DataFrame(
+behavior_termination_cause_df = pd.DataFrame(
     [
-        dict(zip(skill_termination_causes, get_termination_cause_rates(df)))
+        dict(zip(behavior_termination_causes, get_termination_cause_rates(df)))
         for df in eps_dfs
     ]
 )
-skill_termination_cause_df.index = labels
+behavior_termination_cause_df.index = labels
 cols = ["PC", "ACC", "LR", "GR", "HPC"]
-skill_termination_cause_df.columns = cols
-# print(skill_termination_cause_df.to_dict())
-print(skill_termination_cause_df.to_latex(formatters=[f(3), f(4), f(5), f(6), f(6)]))
+behavior_termination_cause_df.columns = cols
+# print(behavior_termination_cause_df.to_dict())
+print(behavior_termination_cause_df.to_latex(formatters=[f(3), f(4), f(5), f(6), f(6)]))
