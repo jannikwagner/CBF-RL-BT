@@ -292,3 +292,20 @@ public class MaxCBF : ICBF
         return cbfs.MaxBy<ICBF>(cbf => cbf.h(x)).dhdx(x);
     }
 }
+
+public class CBFInitWrapper : ICBF
+// init cbf based on factory method in case something changes
+{
+    public System.Func<ICBF> factory;
+    public CBFInitWrapper(System.Func<ICBF> factory) { this.factory = factory; }
+
+    public float h(float[] x)
+    {
+        return factory.Invoke().h(x);
+    }
+
+    public float[] dhdx(float[] x)
+    {
+        return factory.Invoke().dhdx(x);
+    }
+}

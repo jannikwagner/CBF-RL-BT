@@ -50,9 +50,8 @@ namespace Env5
             stepCount = 0;
             compositeEpisodeCount = 0;
 
-            InitCBFs();
             InitTree();
-            var actions = _tree.FindNodes<LearningActionAgentSwitcher>();
+            var actions = _tree.FindNodes<SwitchedLearningAction>();
 
             var runId = "testRunId";
 
@@ -74,132 +73,47 @@ namespace Env5
             var playerPastX3 = new Condition("PastBridge", controller.env.PlayerRightOfX3);
             conditions = new List<Condition> { isControllingT1, playerUp, b1Pressed, isControllingT2, b2Pressed, onBridge, playerPastX3 };
 
-            // original tree, tree missing hpcs
-            _tree = new BT(
-                new Sequence("Root", new Node[] {
-                    new Selector("Selector", new Node[] {
-                        new PredicateCondition("B2", b2Pressed),
-                        new Sequence("Sequence", new Node[]{
 
-                            new Selector("Selector", new Node[] {
-                                new PredicateCondition("B1", b1Pressed),
-                                new Sequence("Sequence", new Node[]{
+            int steps = moveToTrigger1.ActionsPerDecision;
+            float deltaTime = Time.fixedDeltaTime * steps;
+            // float eta = 1f;
+            System.Func<float, float> alpha = (float x) => x;
+            float margin = Utility.eps + 0.0f;
+            bool debugCBF = false;
+            float maxAccFactor = 1f / 2f;
+            float maxAcc = controller.MaxAcc * maxAccFactor;
 
-                                    new Selector("Selector", new Node[]{
-                                        new PredicateCondition("T1", isControllingT1),
-                                        new LearningActionAgentSwitcher("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1),
-                                    } ),
+            // CBFs
+            var leftOfX1CBF = new CBFInitWrapper(() => new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), maxAcc, margin));
+            var rightOfX1CBF = new CBFInitWrapper(() => new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(1, 0, 0), maxAcc, margin));
+            var rightOfX3CBF = new CBFInitWrapper(() => new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X3, controller.env.ElevatedGroundY, 0), new Vector3(1, 0, 0), maxAcc, margin));
+            var button1PressedCBF = new CBFInitWrapper(() => new StaticPointCBF3D2ndOrderApproximation(maxAcc, controller.env.PlayerScale + margin));
+            var northEdgeBridgeCBF = new CBFInitWrapper(() => new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeZ + controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), maxAcc, margin));
+            var southEdgeBridgeCBF = new CBFInitWrapper(() => new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeZ - controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), maxAcc, margin));
+            var bridgeOpenLeftRightCBF = new MinCBF(new List<ICBF> { northEdgeBridgeCBF, southEdgeBridgeCBF });
+            var upCBF = new MaxCBF(new List<ICBF> { leftOfX1CBF, rightOfX3CBF });
+            var upBridgeCBF = new MaxCBF(new List<ICBF> { upCBF, bridgeOpenLeftRightCBF });
+            var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, northEdgeBridgeCBF, southEdgeBridgeCBF });
 
-                                    new Selector("Selector", new Node[]{
-                                        new PredicateCondition("Up", playerUp),
-                                        new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
-                                    } ),
+            // Dynamics Providers
+            var posVelDynamics = new PlayerPosVelDynamics(this);
+            var playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(this);
 
-                                    new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp}) // isControllingT1
-                                }),
-                            }),
+            // CBF Applicators
+            var leftOfX1CBFApplicator = new DiscreteCBFApplicator(leftOfX1CBF, posVelDynamics, deltaTime, debug: debugCBF);
+            var button1PressedCBFApplicator = new DiscreteCBFApplicator(button1PressedCBF, playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
+            var upBridgeCBFApplicator = new DiscreteCBFApplicator(upBridgeCBF, posVelDynamics, deltaTime, debug: debugCBF);
+            var bridgeOpenRightCBFApplicator = new DiscreteCBFApplicator(bridgeOpenRightCBF, posVelDynamics, deltaTime, debug: debugCBF);
+            var pastBridgeCBFApplicator = new DiscreteCBFApplicator(rightOfX3CBF, posVelDynamics, deltaTime, debug: debugCBF);
 
-                            new Selector("Selector", new Node[]{
-                                new PredicateCondition("T2", isControllingT2),
-                                new LearningActionAgentSwitcher("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}),
-                            }),
+            // CBF registration
+            // moveToButton1.CBFApplicators = new List<CBFApplicator> { leftOfX1CBFApplicator };
+            // moveToTrigger2.CBFApplicators = new List<CBFApplicator> { button1PressedCBFApplicator };
+            // moveToBridge.CBFApplicators = new List<CBFApplicator> { button1PressedCBFApplicator, upBridgeCBFApplicator };
+            // moveOverBridge.CBFApplicators = new List<CBFApplicator> { bridgeOpenRightCBFApplicator };
+            // moveToButton2.CBFApplicators = new List<CBFApplicator> { pastBridgeCBFApplicator };
 
-                            new Selector("Selector", new Node[]{
-                                new PredicateCondition("Up2", playerUp),
-                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed, isControllingT2}),
-                            }),
-
-                            new Selector("Selector", new Node[]{
-                                new PredicateCondition("PastBridge", playerPastX3),
-                                new Sequence("Sequence", new Node[]{
-
-                                    new Selector("Selector", new Node[]{
-                                        new PredicateCondition("OnBridge", onBridge),
-                                        new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp})
-                                    }),
-
-                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, playerUp, onBridge})
-                                })
-                            }),
-
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, b2Pressed, new List<Condition> {b1Pressed, playerUp, playerPastX3}) // isControllingT2
-                        }),
-                    }),
-
-                    new Do("Success", () =>
-                    {
-                        Debug.Log("Success Reset!");
-                        evaluationManager.AddEvent(new GlobalSuccessEvent());
-                        NextEpisode();
-                        return TaskStatus.Success;
-                    })
-                })
-            );
-
-            // alternative ppas, tree missing hpcs
-            _tree = new BT(
-                new Sequence("Root", new Node[] {
-                    new Selector("Selector", new Node[] {
-                        new PredicateCondition("B2", b2Pressed),
-                        new Sequence("Sequence", new Node[]{
-
-                            new Selector("Selector", new Node[] {
-                                new PredicateCondition("B1", b1Pressed),
-                                new Sequence("Sequence", new Node[]{
-
-                                    new Selector("Selector", new Node[]{
-                                        new PredicateCondition("T1", isControllingT1),
-                                        new LearningActionAgentSwitcher("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1),
-                                    } ),
-
-                                    new Selector("Selector", new Node[]{
-                                        new PredicateCondition("Up", playerUp),
-                                        new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}),
-                                    } ),
-
-                                    new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp}) // isControllingT1
-                                }),
-                            }),
-
-                            new Selector("Selector", new Node[]{
-                                new PredicateCondition("T2", isControllingT2),
-                                new LearningActionAgentSwitcher("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}),
-                            }),
-
-                            new Selector("Selector", new Node[]{
-                                new PredicateCondition("PastBridge", playerPastX3),
-                                new Sequence("Sequence", new Node[]{
-
-                                    new Selector("Selector", new Node[]{
-                                        new PredicateCondition("OnBridge", onBridge),
-
-                                        new Sequence("Sequence",new Node[]{
-                                            new Selector("Selector", new Node[]{
-                                                new PredicateCondition("Up2", playerUp),
-                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed, isControllingT2}),
-                                            }),
-
-                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp})
-                                        }),
-                                    }),
-
-                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, onBridge})
-                                })
-                            }),
-
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, b2Pressed, new List<Condition> {b1Pressed, playerPastX3}) // isControllingT2
-                        }),
-                    }),
-
-                    new Do("Success", () =>
-                    {
-                        Debug.Log("Success Reset!");
-                        evaluationManager.AddEvent(new GlobalSuccessEvent());
-                        NextEpisode();
-                        return TaskStatus.Success;
-                    })
-                })
-            );
+            // moveUp.CBFApplicators = new List<CBFApplicator> { button1PressedCBFApplicator };
 
             // multi goal
             _tree = new BT(
@@ -210,15 +124,15 @@ namespace Env5
 
                             new Selector("Selector", new Node[]{
                                 new PredicateCondition("T1", isControllingT1),
-                                new LearningActionAgentSwitcher("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1, null, new List<Condition> {b1Pressed}),
+                                new SwitchedLearningAction("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1, null, new List<Condition> {b1Pressed}),
                             } ),
 
                             new Selector("Selector", new Node[]{
                                 new PredicateCondition("Up", playerUp),
-                                new LearningActionAgentSwitcher("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}, new List<Condition> {b1Pressed}),
+                                new SwitchedLearningAction("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}, new List<Condition> {b1Pressed}),
                             } ),
 
-                            new LearningActionAgentSwitcher("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp})  // isControllingT1
+                            new SwitchedLearningAction("MoveToB1", moveToButton1, agentSwitcher, b1Pressed, new List<Condition> {playerUp}, null, new List<CBFApplicator>{leftOfX1CBFApplicator})  // isControllingT1
                         }),
                     }),
 
@@ -228,7 +142,7 @@ namespace Env5
 
                             new Selector("Selector", new Node[]{
                                 new PredicateCondition("T2", isControllingT2),
-                                new LearningActionAgentSwitcher("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}, new List<Condition> {b2Pressed}),
+                                new SwitchedLearningAction("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}, new List<Condition> {b2Pressed}, new List<CBFApplicator>{button1PressedCBFApplicator}),
                             }),
 
                             new Selector("Selector", new Node[]{
@@ -241,18 +155,18 @@ namespace Env5
                                         new Sequence("Sequence",new Node[]{
                                             new Selector("Selector", new Node[]{
                                                 new PredicateCondition("Up2", playerUp),
-                                                new LearningActionAgentSwitcher("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}, new List<Condition> {b2Pressed, playerPastX3, onBridge}),
+                                                new SwitchedLearningAction("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}, new List<Condition> {b2Pressed, playerPastX3, onBridge}, new List<CBFApplicator> { button1PressedCBFApplicator }),
                                             }),
 
-                                            new LearningActionAgentSwitcher("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp}, new List<Condition> {b2Pressed, playerPastX3})
+                                            new SwitchedLearningAction("MoveToBridge", moveToBridge, agentSwitcher, onBridge, new List<Condition> {b1Pressed, isControllingT2, playerUp}, new List<Condition> {b2Pressed, playerPastX3}, new List<CBFApplicator> { button1PressedCBFApplicator, upBridgeCBFApplicator })
                                         }),
                                     }),
 
-                                    new LearningActionAgentSwitcher("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, onBridge}, new List<Condition> {b2Pressed})
+                                    new SwitchedLearningAction("MoveOverBridge", moveOverBridge, agentSwitcher, playerPastX3, new List<Condition> {b1Pressed, isControllingT2, onBridge}, new List<Condition> {b2Pressed}, new List<CBFApplicator> { bridgeOpenRightCBFApplicator })
                                 })
                             }),
 
-                            new LearningActionAgentSwitcher("MoveToB2", moveToButton2, agentSwitcher, b2Pressed, new List<Condition> {b1Pressed, playerPastX3})  // isControllingT2
+                            new SwitchedLearningAction("MoveToB2", moveToButton2, agentSwitcher, b2Pressed, new List<Condition> {b1Pressed, playerPastX3}, null, new List<CBFApplicator> { pastBridgeCBFApplicator })  // isControllingT2
                         }),
                     }),
 
@@ -266,47 +180,6 @@ namespace Env5
                 })
             );
             Debug.Log(_tree.printTree());
-        }
-
-        // TODO: move CBFs to learning action nodes instead of agents to be able to use the same agent with different CBFs
-        private void InitCBFs()
-        {
-            int steps = moveToTrigger1.ActionsPerDecision;
-            float deltaTime = Time.fixedDeltaTime * (steps);
-            // float eta = 1f;
-            System.Func<float, float> alpha = ((float x) => x);
-            float margin = Utility.eps + 0.0f;
-            bool debugCBF = false;
-            float maxAccFactor = 1f / 2f;
-            float maxAcc = controller.MaxAcc * maxAccFactor;
-
-            var leftOfX1CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(-1, 0, 0), maxAcc, margin);
-            var rightOfX1CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X1, controller.env.ElevatedGroundY, 0), new Vector3(1, 0, 0), maxAcc, margin);
-            var rightOfX3CBF = new StaticWallCBF3D2ndOrder(new Vector3(controller.env.X3, controller.env.ElevatedGroundY, 0), new Vector3(1, 0, 0), maxAcc, margin);
-            var button1PressedCBF = new StaticPointCBF3D2ndOrderApproximation(maxAcc, controller.env.PlayerScale + margin);
-            var northEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeZ + controller.env.BridgeWidth / 2), new Vector3(0, 0, -1), maxAcc, margin);
-            var southEdgeBridgeCBF = new StaticWallCBF3D2ndOrder(new Vector3(0, controller.env.ElevatedGroundY, controller.env.BridgeZ - controller.env.BridgeWidth / 2), new Vector3(0, 0, 1), maxAcc, margin);
-            var bridgeOpenLeftRightCBF = new MinCBF(new List<ICBF> { northEdgeBridgeCBF, southEdgeBridgeCBF });
-            var upCBF = new MaxCBF(new List<ICBF> { leftOfX1CBF, rightOfX3CBF });
-            var upBridgeCBF = new MaxCBF(new List<ICBF> { upCBF, bridgeOpenLeftRightCBF });
-            var bridgeOpenRightCBF = new MinCBF(new List<ICBF> { rightOfX1CBF, northEdgeBridgeCBF, southEdgeBridgeCBF });
-
-            var posVelDynamics = new PlayerPosVelDynamics(this);
-            var playerTrigger1PosVelDynamics = new PlayerTrigger1PosVelDynamics(this);
-
-            var leftOfX1CBFApplicator = new DiscreteCBFApplicator(leftOfX1CBF, posVelDynamics, deltaTime, debug: debugCBF);
-            var button1PressedCBFApplicator = new DiscreteCBFApplicator(button1PressedCBF, playerTrigger1PosVelDynamics, deltaTime, debug: debugCBF);
-            var upBridgeCBFApplicator = new DiscreteCBFApplicator(upBridgeCBF, posVelDynamics, deltaTime, debug: debugCBF);
-            var bridgeOpenRightCBFApplicator = new DiscreteCBFApplicator(bridgeOpenRightCBF, posVelDynamics, deltaTime, debug: debugCBF);
-            var pastBridgeCBFApplicator = new DiscreteCBFApplicator(rightOfX3CBF, posVelDynamics, deltaTime, debug: debugCBF);
-
-            moveToButton1.CBFApplicators = new List<CBFApplicator> { leftOfX1CBFApplicator };
-            moveToTrigger2.CBFApplicators = new List<CBFApplicator> { button1PressedCBFApplicator };
-            moveToBridge.CBFApplicators = new List<CBFApplicator> { button1PressedCBFApplicator, upBridgeCBFApplicator };
-            moveOverBridge.CBFApplicators = new List<CBFApplicator> { bridgeOpenRightCBFApplicator };
-            moveToButton2.CBFApplicators = new List<CBFApplicator> { pastBridgeCBFApplicator };
-
-            moveUp.CBFApplicators = new List<CBFApplicator> { button1PressedCBFApplicator };
         }
 
         void FixedUpdate()
@@ -328,7 +201,6 @@ namespace Env5
             _tree.Reset();
             agentSwitcher.Reset();
             controller.env.Reset();
-            InitCBFs();
             stepCount = 0;
             compositeEpisodeCount++;
         }

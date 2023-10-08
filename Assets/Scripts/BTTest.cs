@@ -304,17 +304,15 @@ namespace BTTest
             return cbfApplicator.isSafe() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
-    public class LearningActionAgentSwitcher : Action
+    public class SwitchedLearningAction : Action
     {
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher) : base(name) { this.agent = agent; this.switcher = switcher; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition) : this(name, agent, switcher) { this.postCondition = postCondition; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, IEnumerable<Condition> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, IEnumerable<Condition> accs, IEnumerable<Condition> higherPostConditions) : this(name, agent, switcher, postCondition, accs) { this.higherPostConditions = higherPostConditions; }
+        public SwitchedLearningAction(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition = null, IEnumerable<Condition> accs = null, IEnumerable<Condition> higherPostConditions = null, IEnumerable<CBFApplicator> cbfApplicators = null) : base(name) { this.agent = agent; this.switcher = switcher; this.postCondition = postCondition; this.accs = accs; this.higherPostConditions = higherPostConditions; this.cbfApplicators = cbfApplicators; }
         protected BaseAgent agent;
         protected IAgentSwitcher switcher;
         public Condition postCondition;
         public IEnumerable<Condition> accs;
         public IEnumerable<Condition> higherPostConditions;
+        public IEnumerable<CBFApplicator> cbfApplicators;
 
         public override TaskStatus OnUpdate()
         {
@@ -322,6 +320,7 @@ namespace BTTest
             agent.PostCondition = postCondition;
             agent.ACCs = accs;
             agent.HigherPostConditions = higherPostConditions;
+            agent.CBFApplicators = cbfApplicators;
             switcher.Act(agent);
             return TaskStatus.Running;
         }

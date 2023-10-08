@@ -48,7 +48,7 @@ public class AgentSwitcher : IAgentSwitcher
     {
         if (!agents.Contains(agent))
         {
-            agent.swtichingAsserter = asserter;
+            agent.switchingAsserter = asserter;
             agents.Add(agent);
             agent.gameObject.SetActive(false);
         }

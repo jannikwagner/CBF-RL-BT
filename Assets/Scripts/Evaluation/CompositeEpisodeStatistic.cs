@@ -11,9 +11,9 @@ public class CompositeEpisodeStatistic
     public int localResetCount = 0;
     public Dictionary<string, ActionStatistic> actionStatistics = new Dictionary<string, ActionStatistic>();
 
-    public CompositeEpisodeStatistic(IEnumerable<BTTest.LearningActionAgentSwitcher> actions)
+    public CompositeEpisodeStatistic(IEnumerable<BTTest.SwitchedLearningAction> actions)
     {
-        foreach (BTTest.LearningActionAgentSwitcher action in actions)
+        foreach (BTTest.SwitchedLearningAction action in actions)
         {
             actionStatistics.Add(action.Name, new ActionStatistic(action));
         }
@@ -31,7 +31,7 @@ public class ActionStatistic
     public int localResetCount = 0;
     public Dictionary<string, ACCViolatedStatistic> accViolatedStatistics = new Dictionary<string, ACCViolatedStatistic>();
 
-    public ActionStatistic(BTTest.LearningActionAgentSwitcher action)
+    public ActionStatistic(BTTest.SwitchedLearningAction action)
     {
         actionName = action.Name;
         if (action.accs != null)
