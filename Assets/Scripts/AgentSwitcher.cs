@@ -176,7 +176,7 @@ public class AgentSwitchingAsserter
                 break;
             default:
                 throw new Exception("Unknown AgentEvent");
-                break;
+                // break;
         }
     }
 }

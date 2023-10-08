@@ -9,13 +9,14 @@ namespace Env5
 {
     public class PlayerPosVelDynamics : IDynamicsProvider
     {
-        EnvBaseAgent agent;
-        public PlayerPosVelDynamics(EnvBaseAgent agent)
+        IAgentProvider agentProvider;
+        public PlayerPosVelDynamics(IAgentProvider agentProvider)
         {
-            this.agent = agent;
+            this.agentProvider = agentProvider;
         }
         public float[] dxdt(ActionBuffers action)
         {
+            var agent = agentProvider.Agent as EnvBaseAgent;
             var velocity = agent.controller.rb.velocity;
             var acceleration = agent.GetAcceleration(action);
             var dxdt = new PosVelState { position = velocity, velocity = acceleration };
@@ -23,6 +24,7 @@ namespace Env5
         }
         public float[] delta_x(ActionBuffers action, float delta_t)
         {
+            var agent = agentProvider.Agent as EnvBaseAgent;
             var dpdt = agent.controller.rb.velocity;
             var dvdt = agent.GetAcceleration(action);
             var delta_v = dvdt * delta_t;
@@ -32,6 +34,7 @@ namespace Env5
         }
         public float[] x()
         {
+            var agent = agentProvider.Agent as EnvBaseAgent;
             var position = agent.controller.player.localPosition;
             var velocity = agent.controller.rb.velocity;
             var x = new PosVelState { position = position, velocity = velocity };
@@ -41,13 +44,14 @@ namespace Env5
     public class PlayerTrigger1PosVelDynamics : IDynamicsProvider
     {
         // relative position and velocity of player to trigger1
-        EnvBaseAgent agent;
-        public PlayerTrigger1PosVelDynamics(EnvBaseAgent agent)
+        IAgentProvider agentProvider;
+        public PlayerTrigger1PosVelDynamics(IAgentProvider agentProvider)
         {
-            this.agent = agent;
+            this.agentProvider = agentProvider;
         }
         public float[] dxdt(ActionBuffers action)
         {
+            var agent = agentProvider.Agent as EnvBaseAgent;
             var trigger1Velocity = agent.controller.env.trigger1.GetComponentInParent<Rigidbody>().velocity;
             var velocity = agent.controller.rb.velocity - trigger1Velocity;
             var acceleration = agent.GetAcceleration(action);
@@ -56,6 +60,7 @@ namespace Env5
         }
         public float[] delta_x(ActionBuffers action, float delta_t)
         {
+            var agent = agentProvider.Agent as EnvBaseAgent;
             var trigger1Velocity = agent.controller.env.trigger1.GetComponentInParent<Rigidbody>().velocity;
             var dpdt = agent.controller.rb.velocity - trigger1Velocity;
             var dvdt = agent.GetAcceleration(action);
@@ -67,6 +72,7 @@ namespace Env5
 
         public float[] x()
         {
+            var agent = agentProvider.Agent as EnvBaseAgent;
             var position = agent.controller.player.localPosition - agent.controller.env.trigger1.localPosition;
             var velocity = agent.controller.rb.velocity - agent.controller.env.trigger1.GetComponentInParent<Rigidbody>().velocity;
             var x = new PosVelState { position = position, velocity = velocity };
