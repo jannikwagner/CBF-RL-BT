@@ -280,10 +280,10 @@ namespace BTTest
     {
         public ConditionNode(String name) : base(name) { }
     }
-    public class PredicateCondition : ConditionNode
+    public class PredicateConditionNode : ConditionNode
     {
-        private Condition predicate;
-        public PredicateCondition(String name, Condition predicate) : base(name)
+        private readonly Condition predicate;
+        public PredicateConditionNode(String name, Condition predicate) : base(name)
         {
             this.predicate = predicate;
         }
@@ -292,10 +292,10 @@ namespace BTTest
             return predicate.Func() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
-    public class CBFCondition : ConditionNode
+    public class CBFConditionNode : ConditionNode
     {
-        private CBFApplicator cbfApplicator;
-        public CBFCondition(String name, CBFApplicator cbfApplicator) : base(name)
+        private readonly CBFApplicator cbfApplicator;
+        public CBFConditionNode(String name, CBFApplicator cbfApplicator) : base(name)
         {
             this.cbfApplicator = cbfApplicator;
         }

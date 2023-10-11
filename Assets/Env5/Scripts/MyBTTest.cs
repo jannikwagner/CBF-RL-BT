@@ -26,6 +26,7 @@ namespace Env5
         private IEvaluationManager evaluationManager;
         List<Condition> conditions;
         public bool evaluationActive;
+        public bool cbfConditions;
 
         public int MaxSteps { get => maxSteps; set => maxSteps = value; }
 
@@ -71,7 +72,6 @@ namespace Env5
             var b2Pressed = new Condition("B2", controller.env.Button2Pressed);
             var onBridge = new Condition("OnBridge", controller.env.PlayerOnBridge);
             var playerPastX3 = new Condition("PastBridge", controller.env.PlayerRightOfX3);
-            conditions = new List<Condition> { isControllingT1, playerUp, b1Pressed, isControllingT2, b2Pressed, onBridge, playerPastX3 };
 
 
             int steps = moveToTrigger1.ActionsPerDecision;
@@ -115,20 +115,35 @@ namespace Env5
 
             // moveUp.CBFApplicators = new List<CBFApplicator> { button1PressedCBFApplicator };
 
+
+            if (cbfConditions)
+            {
+                var b1Old = b1Pressed;
+                var upOld = playerUp;
+                var onBridgeOld = onBridge;
+                var playerPastX3Old = playerPastX3;
+                playerUp = new Condition(upOld.Name, () => false ? upOld.Func() : upOld.Func() && (b1Old.Func() ? upBridgeCBFApplicator.isSafe() : leftOfX1CBFApplicator.isSafe()));
+                b1Pressed = new Condition(b1Old.Name, () => this.Agent == null ? b1Old.Func() : (b1Old.Func() && button1PressedCBFApplicator.isSafe()));
+                onBridge = new Condition(onBridgeOld.Name, () => this.Agent == null ? onBridgeOld.Func() : onBridgeOld.Func() && (bridgeOpenRightCBFApplicator.isSafe()));
+                playerPastX3 = new Condition(playerPastX3Old.Name, () => this.Agent == null ? playerPastX3Old.Func() : playerPastX3Old.Func() && (pastBridgeCBFApplicator.isSafe()));
+            }
+
+            conditions = new List<Condition> { isControllingT1, playerUp, b1Pressed, isControllingT2, b2Pressed, onBridge, playerPastX3 };
+
             // multi goal
             _tree = new BT(
                 new Sequence("Root", new Node[] {
                     new Selector("Selector", new Node[] {
-                        new PredicateCondition("B1", b1Pressed),
+                        new PredicateConditionNode("B1", b1Pressed),
                         new Sequence("Sequence", new Node[]{
 
                             new Selector("Selector", new Node[]{
-                                new PredicateCondition("T1", isControllingT1),
+                                new PredicateConditionNode("T1", isControllingT1),
                                 new SwitchedLearningAction("MoveToT1", moveToTrigger1, agentSwitcher, isControllingT1, null, new List<Condition> {b1Pressed}),
                             } ),
 
                             new Selector("Selector", new Node[]{
-                                new PredicateCondition("Up", playerUp),
+                                new PredicateConditionNode("Up", playerUp),
                                 new SwitchedLearningAction("MoveUp", moveUp, agentSwitcher, playerUp, new List<Condition> {isControllingT1}, new List<Condition> {b1Pressed}),
                             } ),
 
@@ -137,24 +152,24 @@ namespace Env5
                     }),
 
                     new Selector("Selector", new Node[] {
-                        new PredicateCondition("B2", b2Pressed),
+                        new PredicateConditionNode("B2", b2Pressed),
                         new Sequence("Sequence", new Node[]{
 
                             new Selector("Selector", new Node[]{
-                                new PredicateCondition("T2", isControllingT2),
+                                new PredicateConditionNode("T2", isControllingT2),
                                 new SwitchedLearningAction("MoveToT2", moveToTrigger2, agentSwitcher, isControllingT2, new List<Condition> {b1Pressed}, new List<Condition> {b2Pressed}, new List<CBFApplicator>{button1PressedCBFApplicator}),
                             }),
 
                             new Selector("Selector", new Node[]{
-                                new PredicateCondition("PastBridge", playerPastX3),
+                                new PredicateConditionNode("PastBridge", playerPastX3),
                                 new Sequence("Sequence", new Node[]{
 
                                     new Selector("Selector", new Node[]{
-                                        new PredicateCondition("OnBridge", onBridge),
+                                        new PredicateConditionNode("OnBridge", onBridge),
 
                                         new Sequence("Sequence",new Node[]{
                                             new Selector("Selector", new Node[]{
-                                                new PredicateCondition("Up2", playerUp),
+                                                new PredicateConditionNode("Up2", playerUp),
                                                 new SwitchedLearningAction("MoveUp2", moveUp, agentSwitcher, playerUp, new List<Condition> {b1Pressed}, new List<Condition> {b2Pressed, playerPastX3, onBridge}, new List<CBFApplicator> { button1PressedCBFApplicator }),
                                             }),
 

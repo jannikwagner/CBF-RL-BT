@@ -34,7 +34,7 @@ public class AgentSwitcher : IAgentSwitcher
     public List<BaseAgent> agents;
     protected BaseAgent currentAgent;
     protected AgentSwitcherStatus status;
-    private AgentSwitchingAsserter asserter;
+    private readonly AgentSwitchingAsserter asserter;
 
     public BaseAgent Agent => currentAgent;
 
