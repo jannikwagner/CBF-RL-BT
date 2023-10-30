@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class CompositeEpisodeEvaluator
 {
-    private IEnumerable<LearningActionAgentSwitcher> actions;
+    private IEnumerable<SwitchedLearningAction> actions;
 
-    public CompositeEpisodeEvaluator(IEnumerable<LearningActionAgentSwitcher> actions)
+    public CompositeEpisodeEvaluator(IEnumerable<SwitchedLearningAction> actions)
     {
         this.actions = actions;
     }

@@ -19,7 +19,7 @@ VIOLINPLOT_AXIS_PERCENTILES = (0, 95)
 VIOLINPLOT_AXLIM_MARGIN = 0.04
 VIOLINPLOT_QUANTILE_LINES = [0.25, 0.75]
 
-skill_termination_causes = [
+behavior_termination_causes = [
     "PostConditionReached",
     "ACCViolated",
     "LocalReset",
@@ -27,9 +27,11 @@ skill_termination_causes = [
     "HigherPostConditionReached",
 ]
 action_termination_causes_dict = dict(
-    zip(skill_termination_causes, range(len(skill_termination_causes)))
+    zip(behavior_termination_causes, range(len(behavior_termination_causes)))
 )
-SkillTerminationCause = Enum("ActionTerminationCause", action_termination_causes_dict)
+BehaviorTerminationCause = Enum(
+    "ActionTerminationCause", action_termination_causes_dict
+)
 
 
 @dataclasses.dataclass
@@ -148,7 +150,7 @@ def get_comp_eps_df(eps_df):
     return comp_eps_df
 
 
-def print_skill_summary(eps_df, action):
+def print_behavior_summary(eps_df, action):
     print(action)
     action_df = eps_df.query("action == @action")
     print(action_df.terminationCause.value_counts())
@@ -582,7 +584,7 @@ def get_acc_violation_rate(eps_df: pd.DataFrame):
     return (eps_df.terminationCause == 1).mean()
 
 
-def get_acc_violation_rate_per_skill(eps_df: pd.DataFrame, actions: Sequence[str]):
+def get_acc_violation_rate_per_behavior(eps_df: pd.DataFrame, actions: Sequence[str]):
     local_success_rate = []
     for action in actions:
         action_df = eps_df.query("action == @action")
@@ -640,7 +642,7 @@ def get_local_steps_of_eps_violating_acc_per_acc(
     return res
 
 
-def get_acc_steps_to_recover_per_skill(
+def get_acc_steps_to_recover_per_behavior(
     eps_df: pd.DataFrame, actions, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD
 ):
     steps_list = []
@@ -660,7 +662,7 @@ def get_acc_steps_to_recover(eps_df, threshold=ACC_STEPS_TO_RECOVER_THRESHOLD):
     return acc_steps_to_recover
 
 
-def get_num_eps_per_skill(eps_df: pd.DataFrame, actions):
+def get_num_eps_per_behavior(eps_df: pd.DataFrame, actions):
     # eps_per_action = eps_df.groupby(["action", "compositeEpisodeNumber"]).count().terminationCause.reset_index("compositeEpisodeNumber").groupby("action").terminationCause
     eps_per_action_list = []
     for action in actions:
@@ -670,11 +672,11 @@ def get_num_eps_per_skill(eps_df: pd.DataFrame, actions):
     return eps_per_action_list
 
 
-def get_avg_num_eps_per_skill(eps_df: pd.DataFrame, actions):
-    return [eps.mean() for eps in get_num_eps_per_skill(eps_df, actions)]
+def get_avg_num_eps_per_behavior(eps_df: pd.DataFrame, actions):
+    return [eps.mean() for eps in get_num_eps_per_behavior(eps_df, actions)]
 
 
-def get_total_steps_per_skill(eps_df: pd.DataFrame, actions):
+def get_total_steps_per_behavior(eps_df: pd.DataFrame, actions):
     # summed up local steps (episode lengths) within a composite episode per action
     steps_per_action_list = []
     for action in actions:
@@ -684,11 +686,11 @@ def get_total_steps_per_skill(eps_df: pd.DataFrame, actions):
     return steps_per_action_list
 
 
-def get_avg_total_steps_per_skill(eps_df: pd.DataFrame, actions):
-    return [steps.mean() for steps in get_total_steps_per_skill(eps_df, actions)]
+def get_avg_total_steps_per_behavior(eps_df: pd.DataFrame, actions):
+    return [steps.mean() for steps in get_total_steps_per_behavior(eps_df, actions)]
 
 
-def get_local_steps_per_skill(eps_df: pd.DataFrame, actions):
+def get_local_steps_per_behavior(eps_df: pd.DataFrame, actions):
     steps_per_action_list = []
     for action in actions:
         action_df = eps_df.query("action == @action")

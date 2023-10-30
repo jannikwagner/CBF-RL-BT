@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IEvaluationManager
 {
     void AddEvent(Event _event);
-    public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions, string runId);
+    public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<SwitchedLearningAction> actions, string runId);
 }
 
 public class EvaluationManager : IEvaluationManager
@@ -14,7 +14,7 @@ public class EvaluationManager : IEvaluationManager
     private List<Event> currentCompositeEpisodeEvents;
     private IEnumerable<Condition> conditions;
     private IEnumerable<BaseAgent> agents;
-    private IEnumerable<LearningActionAgentSwitcher> actions;
+    private IEnumerable<SwitchedLearningAction> actions;
     private string runId;
     private string folderPath;
     private IStorageManager storageManager;
@@ -25,7 +25,7 @@ public class EvaluationManager : IEvaluationManager
         currentCompositeEpisodeEvents = new List<Event>();
     }
 
-    public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<LearningActionAgentSwitcher> actions, string runId)
+    public void Init(ILogDataProvider logDataProvider, IEnumerable<Condition> conditions, IEnumerable<BaseAgent> agents, IEnumerable<SwitchedLearningAction> actions, string runId)
     {
         this.logDataProvider = logDataProvider;
         this.conditions = conditions;

@@ -34,7 +34,7 @@ public class AgentSwitcher : IAgentSwitcher
     public List<BaseAgent> agents;
     protected BaseAgent currentAgent;
     protected AgentSwitcherStatus status;
-    private AgentSwitchingAsserter asserter;
+    private readonly AgentSwitchingAsserter asserter;
 
     public BaseAgent Agent => currentAgent;
 
@@ -48,7 +48,7 @@ public class AgentSwitcher : IAgentSwitcher
     {
         if (!agents.Contains(agent))
         {
-            agent.swtichingAsserter = asserter;
+            agent.switchingAsserter = asserter;
             agents.Add(agent);
             agent.gameObject.SetActive(false);
         }
@@ -176,7 +176,7 @@ public class AgentSwitchingAsserter
                 break;
             default:
                 throw new Exception("Unknown AgentEvent");
-                break;
+                // break;
         }
     }
 }

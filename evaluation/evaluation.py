@@ -1,19 +1,19 @@
 from helpers import (
     load_repr1_to_eps,
     gather_statistics,
-    print_skill_summary,
+    print_behavior_summary,
     get_comp_eps_df,
     get_acc_violation_rate,
-    get_acc_violation_rate_per_skill,
+    get_acc_violation_rate_per_behavior,
     get_acc_violation_rate_per_acc,
-    get_num_eps_per_skill,
-    get_avg_num_eps_per_skill,
-    get_total_steps_per_skill,
-    get_avg_total_steps_per_skill,
+    get_num_eps_per_behavior,
+    get_avg_num_eps_per_behavior,
+    get_total_steps_per_behavior,
+    get_avg_total_steps_per_behavior,
     get_acc_steps_to_recover,
-    get_acc_steps_to_recover_per_skill,
+    get_acc_steps_to_recover_per_behavior,
     get_acc_steps_to_recover_per_acc,
-    get_local_steps_per_skill,
+    get_local_steps_per_behavior,
     get_termination_cause_rates,
     plot_per_acc,
     plot_per_group,
@@ -21,8 +21,8 @@ from helpers import (
     bars_per_group,
     bars_per_acc,
     get_local_steps_of_eps_violating_acc_per_acc,
-    SkillTerminationCause,
-    skill_termination_causes,
+    BehaviorTerminationCause,
+    behavior_termination_causes,
     acc_sanity_check,
     acc_steps_recovered_sanity_check,
 )
@@ -31,7 +31,73 @@ import seaborn as sns
 import pandas as pd
 
 NUM_EPISODES = 5000
-store_folder = "notfixedbridge.safeplace"
+
+behaviors = [
+    "MTrigger1",
+    "MUp",
+    "MUp2",
+    "MButton1",
+    "MTrigger2",
+    "MTBridge",
+    "MOBridge",
+    "MButton2",
+]
+old_behaviors = [
+    "MoveToT1",
+    "MoveUp",
+    "MoveUp2",
+    "MoveToB1",
+    "MoveToT2",
+    "MoveToBridge",
+    "MoveOverBridge",
+    "MoveToB2",
+]
+acc_dict = {
+    "MTrigger1": [],
+    "MUp": [],
+    "MUp2": [],
+    "MButton1": ["Up"],
+    "MTrigger2": ["Button1"],
+    "MTBridge": ["Button1", "Up2"],
+    "MOBridge": ["OnBridge"],
+    "MButton2": ["PastBridge"],
+}
+old_acc_dict = {
+    "MoveToT1": [],
+    "MoveUp": [],
+    "MoveUp2": [],
+    "MoveToB1": ["Up"],
+    "MoveToT2": ["B1"],
+    "MoveToBridge": ["B1", "Up"],
+    "MoveOverBridge": ["OnBridge"],
+    "MoveToB2": ["PastBridge"],
+}
+
+
+def get_behavior_acc_tuples(acc_dict):
+    behavior_acc_tuples = [
+        (behavior, acc) for behavior in acc_dict for acc in acc_dict[behavior]
+    ]
+    return behavior_acc_tuples
+
+
+behavior_acc_tuples = get_behavior_acc_tuples(acc_dict)
+old_behavior_acc_tuples = get_behavior_acc_tuples(old_acc_dict)
+
+
+def rename_behaviors_and_accs(
+    df, behavior_acc_tuples, old_behavior_acc_tuples, behaviors, old_behaviors
+):
+    for (s1, a1), (s2, a2) in zip(old_behavior_acc_tuples, behavior_acc_tuples):
+        # print((s1, a1), (s2, a2))
+        index = df.query("action == @s1").index
+        df.loc[index, ["action"]] = s2
+        index = df.query("action == @s2 & terminationCause == 1 & accName == @a1").index
+        df.loc[index, "accName"] = a2
+    for s1, s2 in zip(old_behaviors, behaviors):
+        index = df.query("action == @s1").index
+        df.loc[index, ["action"]] = s2
+
 
 run_id = "testRunId"
 
@@ -45,6 +111,8 @@ wo_nf_s = "env5.wocbf.notfixedbridge.safeplace"
 f_s = w_f_s, wo_f_s
 f_ns = w_f_ns, wo_f_ns
 nf_s = w_nf_s, wo_nf_s
+
+store_folder = "notfixedbridge.safeplace"
 
 file_names = nf_s
 
@@ -62,32 +130,13 @@ eps_df_wocbf = eps_dfs[1]
 
 labels = ["wcbf", "wocbf"]
 
-skills = [
-    "MoveToT1",
-    "MoveUp",
-    "MoveUp2",
-    "MoveToB1",
-    "MoveToT2",
-    "MoveToBridge",
-    "MoveOverBridge",
-    "MoveToB2",
-]
-acc_dict = {
-    "MoveToT1": [],
-    "MoveUp": [],
-    "MoveUp2": [],
-    "MoveToB1": ["Up"],
-    "MoveToT2": ["B1"],
-    "MoveToBridge": ["B1", "Up"],
-    "MoveOverBridge": ["OnBridge"],
-    "MoveToB2": ["PastBridge"],
-}
-skill_acc_tuples = [(skill, acc) for skill in acc_dict for acc in acc_dict[skill]]
-
 
 for df in eps_dfs:
+    rename_behaviors_and_accs(
+        df, behavior_acc_tuples, old_behavior_acc_tuples, behaviors, old_behaviors
+    )
     acc_steps_recovered_sanity_check(df)
-    acc_sanity_check(df, skill_acc_tuples)
+    acc_sanity_check(df, behavior_acc_tuples)
 
 comp_eps_dfs = [get_comp_eps_df(eps_df) for eps_df in eps_dfs]
 
@@ -109,7 +158,7 @@ global_plot(
 
 termination_cause_rates = [get_termination_cause_rates(df) for df in eps_dfs]
 bars_per_group(
-    skill_termination_causes,
+    behavior_termination_causes,
     labels,
     termination_cause_rates,
     "termination cause rate",
@@ -117,15 +166,15 @@ bars_per_group(
     store_folder=store_folder,
 )
 
-for skill in skills:
-    skill_dfs = [df.query("action == @skill") for df in eps_dfs]
-    termination_cause_rates = [get_termination_cause_rates(df) for df in skill_dfs]
+for behavior in behaviors:
+    behavior_dfs = [df.query("action == @behavior") for df in eps_dfs]
+    termination_cause_rates = [get_termination_cause_rates(df) for df in behavior_dfs]
     bars_per_group(
-        skill_termination_causes,
+        behavior_termination_causes,
         labels,
         termination_cause_rates,
         "termination cause rate",
-        f"Termination Cause Rates for Skill {skill}",
+        f"Termination Cause Rates for Behavior {behavior}",
         store_folder=store_folder,
     )
 
@@ -136,23 +185,23 @@ global_plot(
     labels, steps_to_recover, "steps", "Steps to Recover", store_folder=store_folder
 )
 
-steps_to_recover_per_skill = [
-    get_acc_steps_to_recover_per_skill(eps_df, skills) for eps_df in eps_dfs
+steps_to_recover_per_behavior = [
+    get_acc_steps_to_recover_per_behavior(eps_df, behaviors) for eps_df in eps_dfs
 ]
 plot_per_group(
-    skills,
+    behaviors,
     labels,
-    steps_to_recover_per_skill,
+    steps_to_recover_per_behavior,
     "steps",
-    "Steps to Recover grouped by Skill",
+    "Steps to Recover grouped by Behavior",
     store_folder=store_folder,
 )
 
 steps_to_recover_per_acc = [
-    get_acc_steps_to_recover_per_acc(eps_df, skill_acc_tuples) for eps_df in eps_dfs
+    get_acc_steps_to_recover_per_acc(eps_df, behavior_acc_tuples) for eps_df in eps_dfs
 ]
 plot_per_acc(
-    skill_acc_tuples,
+    behavior_acc_tuples,
     labels,
     steps_to_recover_per_acc,
     "steps",
@@ -163,23 +212,23 @@ plot_per_acc(
 acc_violation_rates = [get_acc_violation_rate(eps_df) for eps_df in eps_dfs]
 # print("acc_violation_rates:", acc_violation_rates)
 
-acc_violation_rates_per_skill = [
-    get_acc_violation_rate_per_skill(eps_df, skills) for eps_df in eps_dfs
+acc_violation_rates_per_behavior = [
+    get_acc_violation_rate_per_behavior(eps_df, behaviors) for eps_df in eps_dfs
 ]
 bars_per_group(
-    skills,
+    behaviors,
     labels,
-    acc_violation_rates_per_skill,
+    acc_violation_rates_per_behavior,
     "ACC violation rate",
-    "ACC Violation Rates grouped by Skill",
+    "ACC Violation Rates grouped by Behavior",
     store_folder=store_folder,
 )
 
 acc_violation_rates_per_acc = [
-    get_acc_violation_rate_per_acc(eps_df, skill_acc_tuples) for eps_df in eps_dfs
+    get_acc_violation_rate_per_acc(eps_df, behavior_acc_tuples) for eps_df in eps_dfs
 ]
 bars_per_acc(
-    skill_acc_tuples,
+    behavior_acc_tuples,
     labels,
     acc_violation_rates_per_acc,
     "ACC violation rate",
@@ -188,49 +237,51 @@ bars_per_acc(
 )
 
 
-avg_num_eps_per_skill = [
-    get_avg_num_eps_per_skill(eps_df, skills) for eps_df in eps_dfs
+avg_num_eps_per_behavior = [
+    get_avg_num_eps_per_behavior(eps_df, behaviors) for eps_df in eps_dfs
 ]
 bars_per_group(
-    skills,
+    behaviors,
     labels,
-    avg_num_eps_per_skill,
+    avg_num_eps_per_behavior,
     "episodes",
-    "Average Local Episodes per Composite Episode grouped by Skill",
+    "Average Local Episodes per Composite Episode grouped by Behavior",
     store_folder=store_folder,
 )
 
-num_eps_per_skill = [get_num_eps_per_skill(eps_df, skills) for eps_df in eps_dfs]
+num_eps_per_behavior = [
+    get_num_eps_per_behavior(eps_df, behaviors) for eps_df in eps_dfs
+]
 plot_per_group(
-    skills,
+    behaviors,
     labels,
-    num_eps_per_skill,
+    num_eps_per_behavior,
     "episodes",
-    "Local Episodes per Composite Episode grouped by Skill",
+    "Local Episodes per Composite Episode grouped by Behavior",
     store_folder=store_folder,
 )
 
-avg_total_steps_per_skill = [
-    get_avg_total_steps_per_skill(eps_df, skills) for eps_df in eps_dfs
+avg_total_steps_per_behavior = [
+    get_avg_total_steps_per_behavior(eps_df, behaviors) for eps_df in eps_dfs
 ]
 bars_per_group(
-    skills,
+    behaviors,
     labels,
-    avg_total_steps_per_skill,
+    avg_total_steps_per_behavior,
     "steps",
-    "Average Total Steps per Composite Episode grouped by Skill",
+    "Average Total Steps per Composite Episode grouped by Behavior",
     store_folder=store_folder,
 )
 
-total_steps_per_skill = [
-    get_total_steps_per_skill(eps_df, skills) for eps_df in eps_dfs
+total_steps_per_behavior = [
+    get_total_steps_per_behavior(eps_df, behaviors) for eps_df in eps_dfs
 ]
 plot_per_group(
-    skills,
+    behaviors,
     labels,
-    total_steps_per_skill,
+    total_steps_per_behavior,
     "steps",
-    "Total Steps per Composite Episode grouped by Skill",
+    "Total Steps per Composite Episode grouped by Behavior",
     store_folder=store_folder,
 )
 
@@ -239,15 +290,15 @@ global_plot(
     labels, local_steps, "steps", "Local Episode Length", store_folder=store_folder
 )
 
-local_steps_per_skill = [
-    get_local_steps_per_skill(eps_df, skills) for eps_df in eps_dfs
+local_steps_per_behavior = [
+    get_local_steps_per_behavior(eps_df, behaviors) for eps_df in eps_dfs
 ]
 plot_per_group(
-    skills,
+    behaviors,
     labels,
-    local_steps_per_skill,
+    local_steps_per_behavior,
     "steps",
-    "Local Episode Length grouped by Skill",
+    "Local Episode Length grouped by Behavior",
     store_folder=store_folder,
 )
 
@@ -265,27 +316,27 @@ global_plot(
     store_folder=store_folder,
 )
 
-local_steps_reaching_pc_per_skill = [
-    get_local_steps_per_skill(eps_df, skills) for eps_df in eps_reaching_pc_dfs
+local_steps_reaching_pc_per_behavior = [
+    get_local_steps_per_behavior(eps_df, behaviors) for eps_df in eps_reaching_pc_dfs
 ]
-local_steps_violating_acc_per_skill = [
-    get_local_steps_per_skill(eps_df, skills) for eps_df in eps_violating_acc_dfs
+local_steps_violating_acc_per_behavior = [
+    get_local_steps_per_behavior(eps_df, behaviors) for eps_df in eps_violating_acc_dfs
 ]
 plot_per_group(
-    skills,
+    behaviors,
     labels,
-    local_steps_violating_acc_per_skill,
+    local_steps_violating_acc_per_behavior,
     "steps",
-    "Length of Local Episodes violating ACC grouped by Skill",
+    "Length of Local Episodes violating ACC grouped by Behavior",
     store_folder=store_folder,
 )
 
 local_steps_violating_acc_per_acc = [
-    get_local_steps_of_eps_violating_acc_per_acc(eps_df, skill_acc_tuples)
+    get_local_steps_of_eps_violating_acc_per_acc(eps_df, behavior_acc_tuples)
     for eps_df in eps_dfs
 ]
 plot_per_acc(
-    skill_acc_tuples,
+    behavior_acc_tuples,
     labels,
     local_steps_violating_acc_per_acc,
     "steps",
@@ -311,15 +362,15 @@ for i in range(len(labels)):
 # compare local steps for episodes reaching PC and episodes not reaching PCfor i in range(labels):
 for i in range(len(labels)):
     label = labels[i]
-    reaching_pc = local_steps_reaching_pc_per_skill[i]
-    violating_acc = local_steps_violating_acc_per_skill[i]
+    reaching_pc = local_steps_reaching_pc_per_behavior[i]
+    violating_acc = local_steps_violating_acc_per_behavior[i]
     pc_labels = ["reaching pc", "violating acc"]
     data = [reaching_pc, violating_acc]
     plot_per_group(
-        skills,
+        behaviors,
         pc_labels,
         data,
         "steps",
-        f"Local Episode Length grouped by Skill - {label}",
+        f"Local Episode Length grouped by Behavior - {label}",
         store_folder=store_folder,
     )

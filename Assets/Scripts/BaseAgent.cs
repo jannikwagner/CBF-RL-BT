@@ -23,7 +23,7 @@ public abstract class BaseAgent : Agent
     private IEnumerable<Condition> higherPostConditions;
     private IEnumerable<CBFApplicator> cbfApplicators;
     protected CBFDiscreteInvalidActionMasker masker = new CBFDiscreteInvalidActionMasker();
-    internal AgentSwitchingAsserter swtichingAsserter;
+    internal AgentSwitchingAsserter switchingAsserter;
 
     public int ActionCount { get => actionCount; }
     public int MaxActions { get => maxActions; }
@@ -40,7 +40,7 @@ public abstract class BaseAgent : Agent
     {
         // base.OnEpisodeBegin();
         Debug.Log(this + ": OnEpisodeBegin");
-        swtichingAsserter.log(this, AgentSwitchingAsserter.AgentEvents.EpisodeBegin);
+        switchingAsserter.log(this, AgentSwitchingAsserter.AgentEvents.EpisodeBegin);
         actionCount = 0;
         evaluationManager.AddEvent(new ActionStartEvent { localStep = actionCount });
     }
@@ -130,7 +130,7 @@ public abstract class BaseAgent : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         // base.OnActionReceived(actions);  // is this needed?
-        swtichingAsserter.log(this, AgentSwitchingAsserter.AgentEvents.OnActionReceived);
+        switchingAsserter.log(this, AgentSwitchingAsserter.AgentEvents.OnActionReceived);
         ApplyAction(actions);
         actionCount++;
         // time penalty

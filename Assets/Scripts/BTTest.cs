@@ -280,10 +280,10 @@ namespace BTTest
     {
         public ConditionNode(String name) : base(name) { }
     }
-    public class PredicateCondition : ConditionNode
+    public class PredicateConditionNode : ConditionNode
     {
-        private Condition predicate;
-        public PredicateCondition(String name, Condition predicate) : base(name)
+        private readonly Condition predicate;
+        public PredicateConditionNode(String name, Condition predicate) : base(name)
         {
             this.predicate = predicate;
         }
@@ -292,10 +292,10 @@ namespace BTTest
             return predicate.Func() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
-    public class CBFCondition : ConditionNode
+    public class CBFConditionNode : ConditionNode
     {
-        private CBFApplicator cbfApplicator;
-        public CBFCondition(String name, CBFApplicator cbfApplicator) : base(name)
+        private readonly CBFApplicator cbfApplicator;
+        public CBFConditionNode(String name, CBFApplicator cbfApplicator) : base(name)
         {
             this.cbfApplicator = cbfApplicator;
         }
@@ -304,17 +304,15 @@ namespace BTTest
             return cbfApplicator.isSafe() ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
-    public class LearningActionAgentSwitcher : Action
+    public class SwitchedLearningAction : Action
     {
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher) : base(name) { this.agent = agent; this.switcher = switcher; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition) : this(name, agent, switcher) { this.postCondition = postCondition; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, IEnumerable<Condition> accs) : this(name, agent, switcher, postCondition) { this.accs = accs; }
-        public LearningActionAgentSwitcher(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition, IEnumerable<Condition> accs, IEnumerable<Condition> higherPostConditions) : this(name, agent, switcher, postCondition, accs) { this.higherPostConditions = higherPostConditions; }
+        public SwitchedLearningAction(String name, BaseAgent agent, IAgentSwitcher switcher, Condition postCondition = null, IEnumerable<Condition> accs = null, IEnumerable<Condition> higherPostConditions = null, IEnumerable<CBFApplicator> cbfApplicators = null) : base(name) { this.agent = agent; this.switcher = switcher; this.postCondition = postCondition; this.accs = accs; this.higherPostConditions = higherPostConditions; this.cbfApplicators = cbfApplicators; }
         protected BaseAgent agent;
         protected IAgentSwitcher switcher;
         public Condition postCondition;
         public IEnumerable<Condition> accs;
         public IEnumerable<Condition> higherPostConditions;
+        public IEnumerable<CBFApplicator> cbfApplicators;
 
         public override TaskStatus OnUpdate()
         {
@@ -322,6 +320,7 @@ namespace BTTest
             agent.PostCondition = postCondition;
             agent.ACCs = accs;
             agent.HigherPostConditions = higherPostConditions;
+            agent.CBFApplicators = cbfApplicators;
             switcher.Act(agent);
             return TaskStatus.Running;
         }
